@@ -46,13 +46,21 @@ export interface UserFile {
 }
 
 export interface Phase0 {
+  personalDetailsCompleted: boolean;
   cvSubmitted: boolean;
   interviewCompleted: boolean;
+  jobStatus: 'pending' | 'accepted' | 'rejected';
+  passportUploaded: boolean;
+  pccUploaded: boolean;
+  otherDocumentsUploaded: boolean;
   offerLetterSent: boolean;
   cosSent: boolean;
-  rightToWorkSent: boolean;
-  documentsUploaded: boolean;
   visaStatus: 'pending' | 'approved' | 'rejected';
+  travelDetailsUpdated: boolean;
+  travelDocumentsUploaded: boolean;
+  visaCopyUploaded: boolean;
+  ukContactUpdated: boolean;
+  phase0Complete: boolean;
 }
 
 export interface Phase1 {

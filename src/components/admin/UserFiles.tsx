@@ -30,7 +30,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
 
     setUploading(true);
     try {
-      // Create new file object
+      // Create new file object with category-specific name
       const newFile: UserFile = {
         id: Date.now(),
         name: `${category}_${file.name}`,
@@ -40,28 +40,76 @@ const UserFiles = ({ user }: UserFilesProps) => {
         category
       };
 
-      // Update user's files array
+      // Update user's files array and onboarding status
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       const updatedUsers = users.map((u: User) => {
         if (u.id === user.id) {
-          // Update onboarding status based on file category
           const updatedUser = { ...u };
           if (!updatedUser.files) updatedUser.files = [];
           updatedUser.files.push(newFile);
 
+          // Initialize onboarding if not exists
+          if (!updatedUser.onboarding) {
+            updatedUser.onboarding = {
+              currentPhase: 0,
+              phase0: {
+                personalDetailsCompleted: false,
+                cvSubmitted: false,
+                interviewCompleted: false,
+                jobStatus: 'pending',
+                passportUploaded: false,
+                pccUploaded: false,
+                otherDocumentsUploaded: false,
+                offerLetterSent: false,
+                cosSent: false,
+                visaStatus: 'pending',
+                travelDetailsUpdated: false,
+                travelDocumentsUploaded: false,
+                visaCopyUploaded: false,
+                ukContactUpdated: false,
+                phase0Complete: false
+              },
+              phase1: {
+                hmrcChecklist: false,
+                companyAgreements: false,
+                pensionScheme: false,
+                bankStatements: false,
+                vaccinationProof: false
+              },
+              phase2: {
+                rightToWork: false,
+                shareCode: false,
+                dbs: false,
+                onboardingComplete: false
+              },
+              approvals: {
+                phase0: false,
+                phase1: false,
+                phase2: false
+              }
+            };
+          }
+
+          // Update onboarding status based on file category
           if (updatedUser.onboarding) {
             switch (category) {
               case 'cv':
                 updatedUser.onboarding.phase0.cvSubmitted = true;
                 break;
               case 'passport':
-                updatedUser.onboarding.phase0.documentsUploaded = true;
+                updatedUser.onboarding.phase0.passportUploaded = true;
                 break;
               case 'pcc':
-                updatedUser.onboarding.phase0.documentsUploaded = true;
+                updatedUser.onboarding.phase0.pccUploaded = true;
                 break;
               case 'offerLetter':
                 updatedUser.onboarding.phase0.offerLetterSent = true;
+                break;
+              case 'visa':
+                updatedUser.onboarding.phase0.visaCopyUploaded = true;
+                break;
+              case 'travelDocuments':
+                updatedUser.onboarding.phase0.travelDocumentsUploaded = true;
                 break;
             }
           }
@@ -72,7 +120,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
       });
 
       localStorage.setItem('users', JSON.stringify(updatedUsers));
-      queryClient.invalidateQueries({ queryKey: ['user', user.id.toString()] });
+      queryClient.invalidateQueries({ queryKey: ['users'] });
 
       toast.success(`${category} uploaded successfully`);
     } catch (error) {
@@ -92,7 +140,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Uploaded Files</CardTitle>
         <div className="flex gap-2">
-          {user.onboarding?.currentPhase === 0 && (
+          {(!user.onboarding || user.onboarding.currentPhase === 0) && (
             <>
               <Button variant="outline" size="sm" className="flex items-center gap-2">
                 <input
@@ -123,6 +171,26 @@ const UserFiles = ({ user }: UserFilesProps) => {
                 />
                 <Upload className="h-4 w-4" />
                 Upload PCC
+              </Button>
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => handleFileUpload(e, 'travelDocuments')}
+                  accept=".pdf,.jpg,.jpeg,.png"
+                />
+                <Upload className="h-4 w-4" />
+                Upload Travel Documents
+              </Button>
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => handleFileUpload(e, 'visa')}
+                  accept=".pdf,.jpg,.jpeg,.png"
+                />
+                <Upload className="h-4 w-4" />
+                Upload Visa Copy
               </Button>
             </>
           )}
