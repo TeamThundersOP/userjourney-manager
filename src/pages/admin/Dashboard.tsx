@@ -5,21 +5,23 @@ import { useQuery } from "@tanstack/react-query";
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // Fetch users count from localStorage
+  // Fetch users count from localStorage with automatic refresh
   const { data: usersCount } = useQuery({
     queryKey: ['usersCount'],
     queryFn: () => {
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       return users.length;
     },
+    refetchInterval: 5000, // Refresh every 5 seconds
   });
 
-  // For demo purposes, we'll use a mock reports count
+  // For demo purposes, we'll use a mock reports count with automatic refresh
   const { data: reportsCount } = useQuery({
     queryKey: ['reportsCount'],
     queryFn: () => {
       return 5; // Mock value for demonstration
     },
+    refetchInterval: 5000, // Refresh every 5 seconds
   });
 
   return (
