@@ -73,10 +73,19 @@ const fetchUser = async (userId: string): Promise<User> => {
     return mockUser;
   }
   
+  // Initialize onboarding with all false values if it doesn't exist
+  if (!user.onboarding) {
+    user.onboarding = mockUser.onboarding;
+  }
+  
   // Merge the found user with mock data for missing fields
   return {
     ...mockUser,
-    ...user
+    ...user,
+    onboarding: {
+      ...mockUser.onboarding,
+      ...user.onboarding
+    }
   };
 };
 
