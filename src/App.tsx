@@ -16,6 +16,9 @@ import UserLogin from "./pages/user/Login";
 import ResetPassword from "./pages/user/ResetPassword";
 import PersonalInfo from "./pages/user/PersonalInfo";
 import UserDashboard from "./pages/user/Dashboard";
+import UserDashboardLayout from "./components/user/DashboardLayout";
+import UserReports from "./pages/user/Reports";
+import UserProfile from "./pages/user/Profile";
 
 const queryClient = new QueryClient();
 
@@ -74,18 +77,21 @@ const App = () => (
 
               {/* User routes */}
               <Route path="/user/login" element={<UserLogin />} />
+              <Route path="/user/reset-password" element={<ResetPassword />} />
               <Route
                 path="/user/*"
                 element={
                   <ProtectedUserRoute>
-                    <Routes>
-                      <Route path="reset-password" element={<ResetPassword />} />
-                      <Route path="personal-info" element={<PersonalInfo />} />
-                      <Route path="dashboard" element={<UserDashboard />} />
-                    </Routes>
+                    <UserDashboardLayout />
                   </ProtectedUserRoute>
                 }
-              />
+              >
+                <Route path="dashboard" element={<UserDashboard />} />
+                <Route path="reports" element={<UserReports />} />
+                <Route path="profile" element={<UserProfile />} />
+                <Route path="personal-info" element={<PersonalInfo />} />
+                <Route index element={<Navigate to="dashboard" replace />} />
+              </Route>
             </Routes>
           </UserAuthProvider>
         </AdminAuthProvider>
