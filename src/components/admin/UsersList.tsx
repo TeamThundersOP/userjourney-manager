@@ -7,35 +7,60 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit2, Trash2, Eye } from "lucide-react";
+import { Edit2, Trash2, Eye, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 interface User {
   id: number;
   email: string;
   status: string;
+  personalInfo?: {
+    fullName?: string;
+  };
 }
 
 const fetchUsers = async (): Promise<User[]> => {
   // For demo purposes, we'll return mock data
   // In a real app, this would be an API call
   return [
-    { id: 1, email: "user1@example.com", status: "Active" },
-    { id: 2, email: "user2@example.com", status: "Pending" },
+    { 
+      id: 1, 
+      email: "user1@example.com", 
+      status: "Active",
+      personalInfo: { fullName: "John Doe" }
+    },
+    { 
+      id: 2, 
+      email: "user2@example.com", 
+      status: "Pending",
+      personalInfo: { fullName: "Jane Smith" }
+    },
     // Add any newly created users from localStorage
     ...(JSON.parse(localStorage.getItem('users') || '[]'))
   ];
 };
 
 const UsersList = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const { data: users = [], isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: fetchUsers,
   });
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const filteredUsers = users.filter((user) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      user.id.toString().includes(searchTerm) ||
+      user.personalInfo?.fullName?.toLowerCase().includes(searchLower) ||
+      ""
+    );
+  });
 
   if (isLoading) {
     return (
@@ -83,20 +108,31 @@ const UsersList = () => {
 
   return (
     <div className="space-y-4">
+      <div className="relative">
+        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+        <Input
+          placeholder="Search by ID or name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
+      </div>
       <div className="rounded-lg border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">User ID</TableHead>
+              <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">#{user.id}</TableCell>
+                <TableCell>{user.personalInfo?.fullName || "N/A"}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
                   <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
