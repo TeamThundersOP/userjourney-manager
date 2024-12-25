@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import UserPersonalInfo from '@/components/admin/UserPersonalInfo';
 import UserOnboarding from '@/components/admin/UserOnboarding';
 import UserFiles from '@/components/admin/UserFiles';
@@ -63,8 +63,7 @@ const mockUser: User = {
 };
 
 const fetchUser = async (userId: string): Promise<User> => {
-  // For demo purposes, we'll return mock data
-  // In a real app, this would be an API call
+  // Get the latest data from localStorage
   const users = JSON.parse(localStorage.getItem('users') || '[]');
   const user = users.find((u: User) => u.id === parseInt(userId));
   
@@ -84,16 +83,34 @@ const fetchUser = async (userId: string): Promise<User> => {
     ...user,
     onboarding: {
       ...mockUser.onboarding,
-      ...user.onboarding
+      ...user.onboarding,
+      phase0: {
+        ...mockUser.onboarding.phase0,
+        ...user.onboarding?.phase0
+      },
+      phase1: {
+        ...mockUser.onboarding.phase1,
+        ...user.onboarding?.phase1
+      },
+      phase2: {
+        ...mockUser.onboarding.phase2,
+        ...user.onboarding?.phase2
+      }
     }
   };
 };
 
 const ViewUser = () => {
   const { userId } = useParams();
+  const queryClient = useQueryClient();
+
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['user', userId],
     queryFn: () => fetchUser(userId || ''),
+    // Refresh data every 2 seconds to catch updates
+    refetchInterval: 2000,
+    // Enable real-time updates
+    refetchOnWindowFocus: true,
   });
 
   if (isLoading) {
