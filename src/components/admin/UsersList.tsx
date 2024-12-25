@@ -12,46 +12,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
-
-interface User {
-  id: number;
-  email: string;
-  status: string;
-  personalInfo?: {
-    fullName?: string;
-  };
-}
-
-// Mock data
-const mockUsers = [
-  { 
-    id: 1, 
-    email: "john.doe@example.com", 
-    status: "Active",
-    personalInfo: { fullName: "John Doe" }
-  },
-  { 
-    id: 2, 
-    email: "jane.smith@example.com", 
-    status: "Active",
-    personalInfo: { fullName: "Jane Smith" }
-  },
-  { 
-    id: 3, 
-    email: "mike.wilson@example.com", 
-    status: "Pending",
-    personalInfo: { fullName: "Mike Wilson" }
-  },
-];
-
-// Initialize localStorage with mock users if it hasn't been done
-const initializeUsers = () => {
-  const existingUsers = localStorage.getItem('users');
-  if (!existingUsers) {
-    localStorage.setItem('users', JSON.stringify(mockUsers));
-  }
-};
+import { useState } from "react";
+import { User } from "@/types/user";
 
 const fetchUsers = async (): Promise<User[]> => {
   const users = JSON.parse(localStorage.getItem('users') || '[]');
@@ -61,10 +23,6 @@ const fetchUsers = async (): Promise<User[]> => {
 const UsersList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const queryClient = useQueryClient();
-  
-  useEffect(() => {
-    initializeUsers();
-  }, []);
 
   const { data: users = [], isLoading, error } = useQuery({
     queryKey: ['users'],
