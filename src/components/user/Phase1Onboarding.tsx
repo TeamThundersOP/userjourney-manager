@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Phase1, User } from "@/types/user";
-import { Upload } from "lucide-react"; // Changed from FileUpload to Upload
+import { Upload } from "lucide-react";
 
 interface Phase1OnboardingProps {
   user: User;
@@ -23,7 +23,7 @@ interface Phase1OnboardingProps {
 const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
   const [phase1Data, setPhase1Data] = useState<Phase1>({
     cvSubmitted: false,
-    personalDetailsCompleted: false,
+    personalDetailsCompleted: true, // Set to true by default
     interviewStatus: 'pending',
     jobStatus: 'pending',
     documents: {
@@ -80,6 +80,29 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
     setProgress(calculateProgress());
   }, [phase1Data]);
 
+  const handleFileUpload = (type: 'cv' | 'offerLetter') => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.doc,.docx';
+    
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // Here you would typically upload the file to your server
+        // For now, we'll just show a success message
+        if (type === 'cv') {
+          setPhase1Data(prev => ({ ...prev, cvSubmitted: true }));
+          toast.success('CV uploaded successfully');
+        } else {
+          setPhase1Data(prev => ({ ...prev, offerLetterSent: true }));
+          toast.success('Offer letter uploaded successfully');
+        }
+      }
+    };
+    
+    input.click();
+  };
+
   const handleSave = () => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const updatedUsers = users.map((u: User) =>
@@ -120,16 +143,27 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
           <div className="flex items-center space-x-2">
             <Checkbox
               checked={phase1Data.cvSubmitted}
+              disabled={phase1Data.cvSubmitted}
               onCheckedChange={(checked) =>
                 setPhase1Data(prev => ({ ...prev, cvSubmitted: checked as boolean }))
               }
             />
             <Label>CV Submitted</Label>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => handleFileUpload('cv')}
+              disabled={phase1Data.cvSubmitted}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Upload CV
+            </Button>
           </div>
 
           <div className="flex items-center space-x-2">
             <Checkbox
               checked={phase1Data.personalDetailsCompleted}
+              disabled={true} // Always disabled since it's completed by default
               onCheckedChange={(checked) =>
                 setPhase1Data(prev => ({ ...prev, personalDetailsCompleted: checked as boolean }))
               }
@@ -205,21 +239,21 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
           <div className="flex items-center space-x-2">
             <Checkbox
               checked={phase1Data.offerLetterSent}
+              disabled={phase1Data.offerLetterSent}
               onCheckedChange={(checked) =>
                 setPhase1Data(prev => ({ ...prev, offerLetterSent: checked as boolean }))
               }
             />
             <Label>Offer Letter Sent</Label>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              checked={phase1Data.cosSent}
-              onCheckedChange={(checked) =>
-                setPhase1Data(prev => ({ ...prev, cosSent: checked as boolean }))
-              }
-            />
-            <Label>CoS Sent</Label>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => handleFileUpload('offerLetter')}
+              disabled={phase1Data.offerLetterSent}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Offer Letter
+            </Button>
           </div>
 
           <div className="space-y-2">
