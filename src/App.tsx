@@ -7,6 +7,8 @@ import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import Index from "./pages/Index";
 import AdminLogin from "./pages/admin/Login";
 import DashboardLayout from "./components/admin/DashboardLayout";
+import Dashboard from "./pages/admin/Dashboard";
+import Users from "./pages/admin/Users";
 
 const queryClient = new QueryClient();
 
@@ -32,7 +34,11 @@ const App = () => (
                   <DashboardLayout />
                 </ProtectedRoute>
               }
-            />
+            >
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="users" element={<Users />} />
+              <Route index element={<Navigate to="dashboard" replace />} />
+            </Route>
           </Routes>
         </AdminAuthProvider>
       </TooltipProvider>
