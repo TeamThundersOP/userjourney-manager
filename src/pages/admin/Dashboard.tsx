@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // Fetch users count from localStorage
+  // Fetch users count from localStorage only
   const { data: usersCount } = useQuery({
     queryKey: ['usersCount'],
     queryFn: () => {
@@ -15,12 +15,11 @@ const Dashboard = () => {
     refetchInterval: 5000, // Refresh every 5 seconds
   });
 
-  // Fetch reports count from localStorage
+  // For demo purposes, we'll use a mock reports count with automatic refresh
   const { data: reportsCount } = useQuery({
     queryKey: ['reportsCount'],
     queryFn: () => {
-      const localStorageReports = JSON.parse(localStorage.getItem('reports') || '[]');
-      return localStorageReports.length;
+      return 5; // Mock value for demonstration
     },
     refetchInterval: 5000, // Refresh every 5 seconds
   });

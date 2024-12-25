@@ -12,14 +12,30 @@ interface UserFile {
   size: string;
 }
 
+// Mock data - in a real app, this would come from your backend
+const mockFiles: UserFile[] = [
+  {
+    id: 1,
+    name: "passport.pdf",
+    type: "PDF",
+    uploadedAt: "2024-02-20",
+    size: "2.3 MB"
+  },
+  {
+    id: 2,
+    name: "visa.jpg",
+    type: "Image",
+    uploadedAt: "2024-02-19",
+    size: "1.1 MB"
+  }
+];
+
 const UserFiles = () => {
   const handleDownload = (file: UserFile) => {
     // In a real application, this would trigger a download from your backend
+    // For now, we'll just show a toast notification
     toast.success(`Downloading ${file.name}`);
   };
-
-  // Empty array since we removed mock data
-  const files: UserFile[] = [];
 
   return (
     <Card>
@@ -27,7 +43,7 @@ const UserFiles = () => {
         <CardTitle>Uploaded Files</CardTitle>
       </CardHeader>
       <CardContent>
-        {files.length === 0 ? (
+        {mockFiles.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-gray-500">
             <FileText className="h-12 w-12 mb-2" />
             <p>No files uploaded yet</p>
@@ -44,7 +60,7 @@ const UserFiles = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {files.map((file) => (
+              {mockFiles.map((file) => (
                 <TableRow key={file.id}>
                   <TableCell className="font-medium">{file.name}</TableCell>
                   <TableCell>{file.type}</TableCell>

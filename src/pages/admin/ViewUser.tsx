@@ -5,15 +5,71 @@ import UserOnboarding from '@/components/admin/UserOnboarding';
 import UserFiles from '@/components/admin/UserFiles';
 import { User } from '@/types/user';
 
+// Mock data for demonstration
+const mockUser: User = {
+  id: 1,
+  email: "user1@example.com",
+  status: "Active",
+  personalInfo: {
+    fullName: "John Doe",
+    nationality: "British",
+    dateOfBirth: "1990-01-01",
+    gender: "Male",
+    passportNumber: "123456789",
+    address: "123 Main St",
+    city: "London",
+    postalCode: "SW1A 1AA",
+    country: "United Kingdom",
+    phone: "+44 123 456 7890"
+  },
+  onboarding: {
+    currentPhase: 1,
+    phase0: {
+      cvSubmitted: true,
+      interviewCompleted: true,
+      offerLetterSent: true,
+      cosSent: false,
+      rightToWorkSent: true,
+      documentsUploaded: true,
+      visaStatus: 'pending'
+    },
+    phase1: {
+      hmrcChecklist: true,
+      companyAgreements: false,
+      pensionScheme: false,
+      bankStatements: true,
+      vaccinationProof: true
+    },
+    phase2: {
+      rightToWork: false,
+      shareCode: false,
+      dbs: false,
+      onboardingComplete: false
+    },
+    approvals: {
+      phase0: false,
+      phase1: false,
+      phase2: false
+    }
+  }
+};
+
 const fetchUser = async (userId: string): Promise<User> => {
+  // For demo purposes, we'll return mock data
+  // In a real app, this would be an API call
   const users = JSON.parse(localStorage.getItem('users') || '[]');
   const user = users.find((u: User) => u.id === parseInt(userId));
   
   if (!user) {
-    throw new Error('User not found');
+    // Return mock data if no user is found
+    return mockUser;
   }
   
-  return user;
+  // Merge the found user with mock data for missing fields
+  return {
+    ...mockUser,
+    ...user
+  };
 };
 
 const ViewUser = () => {

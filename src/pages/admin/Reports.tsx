@@ -16,8 +16,13 @@ const Reports = () => {
   const { data: reports, refetch } = useQuery({
     queryKey: ['reports'],
     queryFn: () => {
-      // Get reports from localStorage or return empty array if none exist
-      return JSON.parse(localStorage.getItem('reports') || '[]');
+      return [
+        { id: 1, type: 'Bug Report', status: 'Open', date: '2024-03-15', sender: 'john@example.com', description: 'Users are experiencing login issues on mobile devices.' },
+        { id: 2, type: 'Feature Request', status: 'In Progress', date: '2024-03-14', sender: 'jane@example.com', description: 'Add dark mode support to the application.' },
+        { id: 3, type: 'Support Ticket', status: 'Closed', date: '2024-03-13', sender: 'mike@example.com', description: 'Password reset functionality not working.' },
+        { id: 4, type: 'Bug Report', status: 'Open', date: '2024-03-12', sender: 'sarah@example.com', description: 'Performance issues in the dashboard.' },
+        { id: 5, type: 'Feature Request', status: 'Open', date: '2024-03-11', sender: 'alex@example.com', description: 'Request for multi-language support.' },
+      ];
     },
     refetchInterval: 5000,
   });
@@ -29,20 +34,13 @@ const Reports = () => {
 
   const handleStatusChange = (newStatus: string) => {
     if (selectedReport) {
-      // Update report status in localStorage
-      const updatedReports = reports.map((report: any) => 
-        report.id === selectedReport.id 
-          ? { ...report, status: newStatus }
-          : report
-      );
-      localStorage.setItem('reports', JSON.stringify(updatedReports));
       setSelectedReport({ ...selectedReport, status: newStatus });
       toast.success("Report status updated successfully");
       refetch();
     }
   };
 
-  const filteredReports = reports?.filter((report: any) => {
+  const filteredReports = reports?.filter((report) => {
     const matchesType = filterType === "all" ? true : 
       report.type === (
         filterType === "bug" ? "Bug Report" :
