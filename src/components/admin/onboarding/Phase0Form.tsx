@@ -43,6 +43,24 @@ const Phase0Form = ({ phase0, onUpdate }: Phase0FormProps) => {
           />
           <Label htmlFor="interviewCompleted">Interview Completed</Label>
         </div>
+        <div className="col-span-2">
+          <Label htmlFor="jobStatus">Job Status</Label>
+          <Select
+            value={phase0.jobStatus}
+            onValueChange={(value: 'pending' | 'accepted' | 'rejected') =>
+              onUpdate('jobStatus', value)
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select job status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="accepted">Accepted</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="flex items-center space-x-2">
           <Checkbox
             id="passportUploaded"
@@ -107,7 +125,7 @@ const Phase0Form = ({ phase0, onUpdate }: Phase0FormProps) => {
               onUpdate('visaStatus', value)
             }
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select visa status" />
             </SelectTrigger>
             <SelectContent>
