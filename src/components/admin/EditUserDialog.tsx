@@ -24,7 +24,7 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave }: EditUserDialogProp
   const [formData, setFormData] = useState({
     email: user.email,
     fullName: user.personalInfo?.fullName || "",
-    phone: user.personalInfo?.phone || "",
+    mobileNumber: user.personalInfo?.mobileNumber || "",
     address: user.personalInfo?.address || "",
     city: user.personalInfo?.city || "",
     postalCode: user.personalInfo?.postalCode || "",
@@ -39,7 +39,7 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave }: EditUserDialogProp
       personalInfo: {
         ...user.personalInfo,
         fullName: formData.fullName,
-        phone: formData.phone,
+        mobileNumber: formData.mobileNumber,
         address: formData.address,
         city: formData.city,
         postalCode: formData.postalCode,
@@ -79,11 +79,11 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave }: EditUserDialogProp
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="mobileNumber">Mobile Number</Label>
               <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                id="mobileNumber"
+                value={formData.mobileNumber}
+                onChange={(e) => setFormData({ ...formData, mobileNumber: e.target.value })}
               />
             </div>
             <div className="grid gap-2">
