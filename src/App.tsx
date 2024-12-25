@@ -10,11 +10,11 @@ import UserLogin from "./pages/user/Login";
 import ResetPassword from "./pages/user/ResetPassword";
 import PersonalInfo from "./pages/user/PersonalInfo";
 import DashboardLayout from "./components/admin/DashboardLayout";
-import Dashboard from "./pages/admin/Dashboard";
+import AdminDashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
 import ViewUser from "./pages/admin/ViewUser";
 import Reports from "./pages/admin/Reports";
-import Dashboard from "./pages/user/Dashboard";
+import UserDashboard from "./pages/user/Dashboard";
 import Report from "./pages/user/Report";
 import Profile from "./pages/user/Profile";
 
@@ -110,7 +110,7 @@ const App = () => (
                 </ProtectedUserRoute>
               }
             >
-              <Route index element={<Dashboard />} />
+              <Route index element={<UserDashboard />} />
               <Route path="report" element={<Report />} />
               <Route path="profile" element={<Profile />} />
             </Route>
@@ -125,7 +125,7 @@ const App = () => (
                 </ProtectedAdminRoute>
               }
             >
-              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<Users />} />
               <Route path="users/:userId" element={<ViewUser />} />
               <Route path="reports" element={<Reports />} />
