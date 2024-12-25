@@ -54,7 +54,13 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Nunito", "sans-serif"],
+        sans: ["ArabotoNormal", "sans-serif"],
+        araboto: {
+          thin: ["ArabotoThin", "sans-serif"],
+          light: ["ArabotoLight", "sans-serif"],
+          normal: ["ArabotoNormal", "sans-serif"],
+          bold: ["ArabotoBold", "sans-serif"],
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

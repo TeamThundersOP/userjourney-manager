@@ -2,9 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css?family=Nunito:300,400,600,700&subset=latin-ext");
-
 @layer base {
+  @font-face {
+    font-family: 'ArabotoBold';
+    src: url('/fonts/Araboto-Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'ArabotoLight';
+    src: url('/fonts/Araboto-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'ArabotoNormal';
+    src: url('/fonts/Araboto-Normal.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'ArabotoThin';
+    src: url('/fonts/Araboto-Thin.otf') format('opentype');
+    font-weight: 100;
+    font-style: normal;
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -12,7 +38,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 0 68.2% 38.6%; /* #af1626 converted to HSL */
+    --primary: 0 68.2% 38.6%;
     --primary-foreground: 0 0% 100%;
     --secondary: 220 13% 91%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -24,7 +50,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 0 68.2% 38.6%; /* #af1626 */
+    --ring: 0 68.2% 38.6%;
     --radius: 0.5rem;
   }
 
@@ -35,7 +61,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 0 68.2% 38.6%; /* #af1626 */
+    --primary: 0 68.2% 38.6%;
     --primary-foreground: 0 0% 100%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -47,17 +73,20 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 0 68.2% 38.6%; /* #af1626 */
+    --ring: 0 68.2% 38.6%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
+
   body {
-    font-family: "Nunito", sans-serif;
+    font-family: "ArabotoNormal", sans-serif;
     @apply bg-background text-foreground antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "ArabotoBold", sans-serif;
   }
 }
 
