@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit2, Trash2, Eye, Search } from "lucide-react";
+import { Trash2, Eye, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -82,13 +82,6 @@ const UsersList = () => {
     navigate(`/admin/users/${userId}`);
   };
 
-  const handleEdit = (userId: number) => {
-    toast({
-      title: "Edit User",
-      description: `Editing user with ID: ${userId}`,
-    });
-  };
-
   const handleDelete = (userId: number) => {
     // Get existing users from localStorage
     const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
@@ -149,13 +142,6 @@ const UsersList = () => {
                       onClick={() => handleView(user.id)}
                     >
                       <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleEdit(user.id)}
-                    >
-                      <Edit2 className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="outline"
