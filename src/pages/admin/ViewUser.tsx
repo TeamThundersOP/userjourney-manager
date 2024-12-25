@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import UserPersonalInfo from '@/components/admin/UserPersonalInfo';
 import UserOnboarding from '@/components/admin/UserOnboarding';
+import UserFiles from '@/components/admin/UserFiles';
 import { User } from '@/types/user';
 
 // Mock data for demonstration
@@ -104,6 +105,7 @@ const ViewUser = () => {
       <h1 className="text-3xl font-bold">User Profile</h1>
       <UserPersonalInfo user={user} />
       <UserOnboarding user={user} />
+      <UserFiles />
     </div>
   );
 };
