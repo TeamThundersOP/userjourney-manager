@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, Eye, Search } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
@@ -23,35 +23,37 @@ interface User {
   };
 }
 
+// Mock data
+const mockUsers = [
+  { 
+    id: 1, 
+    email: "john.doe@example.com", 
+    status: "Active",
+    personalInfo: { fullName: "John Doe" }
+  },
+  { 
+    id: 2, 
+    email: "jane.smith@example.com", 
+    status: "Active",
+    personalInfo: { fullName: "Jane Smith" }
+  },
+  { 
+    id: 3, 
+    email: "mike.wilson@example.com", 
+    status: "Pending",
+    personalInfo: { fullName: "Mike Wilson" }
+  },
+];
+
 const fetchUsers = async (): Promise<User[]> => {
-  // For demo purposes, we'll return mock data
-  // In a real app, this would be an API call
-  return [
-    { 
-      id: 1, 
-      email: "john.doe@example.com", 
-      status: "Active",
-      personalInfo: { fullName: "John Doe" }
-    },
-    { 
-      id: 2, 
-      email: "jane.smith@example.com", 
-      status: "Active",
-      personalInfo: { fullName: "Jane Smith" }
-    },
-    { 
-      id: 3, 
-      email: "mike.wilson@example.com", 
-      status: "Pending",
-      personalInfo: { fullName: "Mike Wilson" }
-    },
-    // Add any newly created users from localStorage
-    ...(JSON.parse(localStorage.getItem('users') || '[]'))
-  ];
+  const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
+  const allUsers = [...mockUsers, ...localUsers];
+  return allUsers;
 };
 
 const UsersList = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const queryClient = useQueryClient();
   const { data: users = [], isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: fetchUsers,
@@ -96,13 +98,16 @@ const UsersList = () => {
     // Update localStorage
     localStorage.setItem('users', JSON.stringify(updatedUsers));
     
+    // Update the query cache to remove the user
+    queryClient.setQueryData(['users'], (oldData: User[] | undefined) => {
+      if (!oldData) return [];
+      return oldData.filter(user => user.id !== userId);
+    });
+    
     toast({
       title: "Success",
       description: "User deleted successfully",
     });
-    
-    // Refetch users
-    window.location.reload();
   };
 
   return (
