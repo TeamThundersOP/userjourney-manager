@@ -1,10 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { toast } from "sonner";
-import { format } from "date-fns";
 import { ReportFilters } from "@/components/admin/reports/ReportFilters";
 import { ReportsTable } from "@/components/admin/reports/ReportsTable";
 import { ReportDetailsDialog } from "@/components/admin/reports/ReportDetailsDialog";
+import { useQuery } from "@tanstack/react-query";
 
 const Reports = () => {
   const [selectedReport, setSelectedReport] = useState<any>(null);
@@ -13,17 +11,18 @@ const Reports = () => {
   const [filterDate, setFilterDate] = useState<Date>();
   const [filterSender, setFilterSender] = useState<string>("");
 
-  // Initialize empty reports array in localStorage if it doesn't exist
-  useState(() => {
-    localStorage.setItem('reports', '[]');
-  });
+  // Initialize reports in localStorage if it doesn't exist
+  if (!localStorage.getItem('reports')) {
+    localStorage.setItem('reports', JSON.stringify([]));
+  }
 
   const { data: reports, refetch } = useQuery({
     queryKey: ['reports'],
     queryFn: () => {
-      return JSON.parse(localStorage.getItem('reports') || '[]');
+      const storedReports = localStorage.getItem('reports');
+      return storedReports ? JSON.parse(storedReports) : [];
     },
-    refetchInterval: 5000,
+    refetchInterval: 5000, // Refresh every 5 seconds to catch new reports
   });
 
   const handleViewReport = (report: any) => {
@@ -40,24 +39,26 @@ const Reports = () => {
       );
       localStorage.setItem('reports', JSON.stringify(updatedReports));
       setSelectedReport({ ...selectedReport, status: newStatus });
-      toast.success("Report status updated successfully");
       refetch();
     }
   };
 
   const filteredReports = reports?.filter((report: any) => {
     const matchesType = filterType === "all" ? true : 
-      report.type === (
-        filterType === "bug" ? "Bug Report" :
-        filterType === "feature" ? "Feature Request" :
-        filterType === "support" ? "Support Ticket" : ""
-      );
+      report.type.toLowerCase() === (
+        filterType === "bug" ? "bug report" :
+        filterType === "feature" ? "feature request" :
+        filterType === "support" ? "support ticket" : ""
+      ).toLowerCase();
+    
     const matchesDate = filterDate
-      ? report.date === format(filterDate, 'yyyy-MM-dd')
+      ? report.date === filterDate.toISOString().split('T')[0]
       : true;
+    
     const matchesSender = filterSender
       ? report.sender.toLowerCase().includes(filterSender.toLowerCase())
       : true;
+    
     return matchesType && matchesDate && matchesSender;
   });
 

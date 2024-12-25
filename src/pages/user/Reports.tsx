@@ -29,7 +29,9 @@ const Reports = () => {
       return;
     }
 
-    const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+    // Get existing reports or initialize empty array
+    const existingReports = JSON.parse(localStorage.getItem('reports') || '[]');
+    
     const newReport = {
       id: Date.now(),
       type,
@@ -39,7 +41,11 @@ const Reports = () => {
       sender: localStorage.getItem('userEmail') || 'anonymous',
     };
 
-    localStorage.setItem('reports', JSON.stringify([...reports, newReport]));
+    // Add new report to existing reports
+    const updatedReports = [...existingReports, newReport];
+    
+    // Save back to localStorage
+    localStorage.setItem('reports', JSON.stringify(updatedReports));
     
     setType("");
     setDescription("");
