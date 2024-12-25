@@ -19,11 +19,15 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Create new user object
+    // Create new user object with password
     const newUser = {
-      id: Date.now(), // Generate a unique ID
+      id: Date.now(),
       email,
+      password, // Now including password in the stored data
       status: "Pending",
+      personalInfo: {
+        email: email,
+      }
     };
 
     // Get existing users from localStorage
