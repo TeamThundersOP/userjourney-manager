@@ -64,6 +64,7 @@ const Reports = () => {
                 <SelectItem value="Bug Report">Bug Report</SelectItem>
                 <SelectItem value="Feature Request">Feature Request</SelectItem>
                 <SelectItem value="Support Ticket">Support Ticket</SelectItem>
+                <SelectItem value="Others">Others</SelectItem>
               </SelectContent>
             </Select>
           </div>
