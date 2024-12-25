@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Phase0Onboarding from '@/components/user/onboarding/Phase0Onboarding';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const UserDashboard = () => {
   const { userId } = useUserAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: userData } = useQuery({
     queryKey: ['user', userId],
@@ -44,8 +45,13 @@ const UserDashboard = () => {
       // Save back to localStorage
       localStorage.setItem('users', JSON.stringify(updatedUsers));
       
+      // Invalidate and refetch queries to update both user and admin views
+      await queryClient.invalidateQueries({ queryKey: ['user'] });
+      await queryClient.invalidateQueries({ queryKey: ['users'] });
+      
       toast.success('Progress saved successfully');
     } catch (error) {
+      console.error('Error saving progress:', error);
       toast.error('Failed to save progress');
     } finally {
       setIsLoading(false);
