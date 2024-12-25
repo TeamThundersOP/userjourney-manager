@@ -42,28 +42,82 @@ const UserPersonalInfo = ({ user: initialUser }: UserPersonalInfoProps) => {
           <p className="font-medium">#{user.id}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Email</p>
-          <p className="font-medium">{user.email}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Full Name</p>
-          <p className="font-medium">{user.personalInfo?.fullName}</p>
-        </div>
-        <div>
           <p className="text-sm text-gray-500">Status</p>
           <Badge variant={user.status === 'Active' ? 'default' : 'secondary'}>
             {user.status}
           </Badge>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Phone</p>
-          <p className="font-medium">{user.personalInfo?.phone}</p>
+          <p className="text-sm text-gray-500">Family Name</p>
+          <p className="font-medium">{user.personalInfo?.familyName}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Address</p>
-          <p className="font-medium">
-            {user.personalInfo?.address}, {user.personalInfo?.city}, {user.personalInfo?.postalCode}
-          </p>
+          <p className="text-sm text-gray-500">Given Name</p>
+          <p className="font-medium">{user.personalInfo?.givenName}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Other Names</p>
+          <p className="font-medium">{user.personalInfo?.otherNames}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Nationality</p>
+          <p className="font-medium">{user.personalInfo?.nationality}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Place of Birth</p>
+          <p className="font-medium">{user.personalInfo?.placeOfBirth}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Date of Birth</p>
+          <p className="font-medium">{user.personalInfo?.dateOfBirth}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Gender</p>
+          <p className="font-medium">{user.personalInfo?.gender}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Country of Residence</p>
+          <p className="font-medium">{user.personalInfo?.countryOfResidence}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Passport Number</p>
+          <p className="font-medium">{user.personalInfo?.passportNumber}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Passport Issue Date</p>
+          <p className="font-medium">{user.personalInfo?.passportIssueDate}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Passport Expiry Date</p>
+          <p className="font-medium">{user.personalInfo?.passportExpiryDate}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Place of Issue (Passport)</p>
+          <p className="font-medium">{user.personalInfo?.passportPlaceOfIssue}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Current Address</p>
+          <p className="font-medium">{user.personalInfo?.address}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">City</p>
+          <p className="font-medium">{user.personalInfo?.city}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Postal Code</p>
+          <p className="font-medium">{user.personalInfo?.postalCode}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Country</p>
+          <p className="font-medium">{user.personalInfo?.country}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Email</p>
+          <p className="font-medium">{user.personalInfo?.email || user.email}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Mobile Number</p>
+          <p className="font-medium">{user.personalInfo?.phone}</p>
         </div>
       </CardContent>
 
