@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import { UserAuthProvider } from "@/contexts/UserAuthContext";
 import Index from "./pages/Index";
 import AdminLogin from "./pages/admin/Login";
 import DashboardLayout from "./components/admin/DashboardLayout";
@@ -11,6 +12,10 @@ import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
 import ViewUser from "./pages/admin/ViewUser";
 import Reports from "./pages/admin/Reports";
+import UserLogin from "./pages/user/Login";
+import ResetPassword from "./pages/user/ResetPassword";
+import PersonalInfo from "./pages/user/PersonalInfo";
+import UserDashboard from "./pages/user/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -29,31 +34,60 @@ const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const ProtectedUserRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = localStorage.getItem('userAuth') === 'true';
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/user/login" />;
+  }
+  
+  return <>{children}</>;
+};
+
 const App = () => (
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AdminAuthProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route
-              path="/admin/*"
-              element={
-                <ProtectedAdminRoute>
-                  <DashboardLayout />
-                </ProtectedAdminRoute>
-              }
-            >
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="users" element={<Users />} />
-              <Route path="users/:userId" element={<ViewUser />} />
-              <Route path="reports" element={<Reports />} />
-              <Route index element={<Navigate to="dashboard" replace />} />
-            </Route>
-          </Routes>
+          <UserAuthProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              
+              {/* Admin routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route
+                path="/admin/*"
+                element={
+                  <ProtectedAdminRoute>
+                    <DashboardLayout />
+                  </ProtectedAdminRoute>
+                }
+              >
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="users" element={<Users />} />
+                <Route path="users/:userId" element={<ViewUser />} />
+                <Route path="reports" element={<Reports />} />
+                <Route index element={<Navigate to="dashboard" replace />} />
+              </Route>
+
+              {/* User routes */}
+              <Route path="/user/login" element={<UserLogin />} />
+              <Route
+                path="/user/*"
+                element={
+                  <ProtectedUserRoute>
+                    <Routes>
+                      <Route path="reset-password" element={<ResetPassword />} />
+                      <Route path="personal-info" element={<PersonalInfo />} />
+                      <Route path="dashboard" element={<UserDashboard />} />
+                    </Routes>
+                  </ProtectedUserRoute>
+                }
+              />
+            </Routes>
+          </UserAuthProvider>
         </AdminAuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
