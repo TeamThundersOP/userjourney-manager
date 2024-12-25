@@ -20,6 +20,7 @@ export interface User {
     postalCode?: string;
     country?: string;
     phone?: string;
+    email?: string;
     fullName?: string;
   };
   onboarding?: {

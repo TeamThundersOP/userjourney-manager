@@ -113,7 +113,7 @@ const UserPersonalInfo = ({ user: initialUser }: UserPersonalInfoProps) => {
         </div>
         <div>
           <p className="text-sm text-gray-500">Email</p>
-          <p className="font-medium">{user.personalInfo?.email || user.email}</p>
+          <p className="font-medium">{user.email}</p>
         </div>
         <div>
           <p className="text-sm text-gray-500">Mobile Number</p>
