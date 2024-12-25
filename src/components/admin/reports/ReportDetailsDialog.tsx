@@ -1,9 +1,6 @@
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -14,18 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface Report {
-  id: number;
-  type: string;
-  status: string;
-  date: string;
-  sender: string;
-  description: string;
-}
+import { Label } from "@/components/ui/label";
 
 interface ReportDetailsDialogProps {
-  report: Report | null;
+  report: any;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onStatusChange: (status: string) => void;
@@ -44,44 +33,38 @@ export const ReportDetailsDialog = ({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Report Details</DialogTitle>
-          <DialogDescription>View and update the report status</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <p className="font-medium">Type</p>
-            <p className="text-sm text-muted-foreground">{report.type}</p>
+        <div className="grid gap-4 py-4">
+          <div className="space-y-2">
+            <Label>Type</Label>
+            <div>{report.type}</div>
           </div>
-          <div>
-            <p className="font-medium">Description</p>
-            <p className="text-sm text-muted-foreground">{report.description}</p>
+          <div className="space-y-2">
+            <Label>Date</Label>
+            <div>{report.date}</div>
           </div>
-          <div>
-            <p className="font-medium">Date</p>
-            <p className="text-sm text-muted-foreground">{report.date}</p>
+          <div className="space-y-2">
+            <Label>Sender</Label>
+            <div>{report.sender}</div>
           </div>
-          <div>
-            <p className="font-medium">Sender</p>
-            <p className="text-sm text-muted-foreground">{report.sender}</p>
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <div className="text-sm text-gray-600">{report.description}</div>
           </div>
-          <div>
-            <p className="font-medium">Status</p>
+          <div className="space-y-2">
+            <Label>Status</Label>
             <Select value={report.status} onValueChange={onStatusChange}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Open">Open</SelectItem>
+                <SelectItem value="Pending">Pending</SelectItem>
                 <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Closed">Closed</SelectItem>
+                <SelectItem value="Resolved">Resolved</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
