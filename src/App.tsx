@@ -14,6 +14,9 @@ import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
 import ViewUser from "./pages/admin/ViewUser";
 import Reports from "./pages/admin/Reports";
+import UserDashboardLayout from "./components/user/DashboardLayout";
+import UserDashboard from "./pages/user/Dashboard";
+import UserReports from "./pages/user/Reports";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +35,16 @@ const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const ProtectedUserRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = localStorage.getItem('userAuth') === 'true';
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  return <>{children}</>;
+};
+
 const App = () => (
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
@@ -43,7 +56,23 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<UserLogin />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/personal-details" element={<PersonalDetails />} />
+            
+            {/* User routes */}
+            <Route
+              path="/user/*"
+              element={
+                <ProtectedUserRoute>
+                  <UserDashboardLayout />
+                </ProtectedUserRoute>
+              }
+            >
+              <Route path="dashboard" element={<UserDashboard />} />
+              <Route path="reports" element={<UserReports />} />
+              <Route path="profile" element={<PersonalDetails />} />
+              <Route index element={<Navigate to="dashboard" replace />} />
+            </Route>
+
+            {/* Admin routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
               path="/admin/*"
