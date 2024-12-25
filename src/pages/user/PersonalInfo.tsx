@@ -89,7 +89,7 @@ const PersonalInfo = () => {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 bg-gradient-to-br from-[#F2FCE2] via-white to-[#FEF7CD]">
+    <div className="min-h-screen py-8 px-4 bg-gradient-to-br from-[#E5DEFF] to-white">
       <div className="max-w-4xl mx-auto space-y-6">
         <PersonalInfoHeader />
         
@@ -149,12 +149,14 @@ const PersonalInfo = () => {
               onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
             />
             <div className="space-y-2">
-              <label htmlFor="gender" className="text-sm font-medium text-white">Gender</label>
+              <label htmlFor="gender" className="text-sm font-medium text-gray-700">
+                Gender
+              </label>
               <Select
                 value={formData.gender}
                 onValueChange={(value) => setFormData({ ...formData, gender: value })}
               >
-                <SelectTrigger className="w-full bg-white/20 border-white/30 text-white">
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -236,7 +238,7 @@ const PersonalInfo = () => {
 
           <Button
             type="submit"
-            className="w-full glass-morphism bg-gradient-to-r from-[#D3E4FD] to-[#E5DEFF] text-gray-700 py-6 hover:opacity-90 transition-all duration-300"
+            className="w-full bg-gradient-to-r from-[#9b87f5] to-[#8B5CF6] text-white hover:opacity-90 transition-opacity duration-200 py-6"
           >
             Save Information
           </Button>

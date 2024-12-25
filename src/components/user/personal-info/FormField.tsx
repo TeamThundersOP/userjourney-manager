@@ -25,8 +25,8 @@ const FormField = ({ label, id, value, onChange, disabled, required = true, type
         disabled={disabled}
         required={required}
         className={`w-full ${
-          disabled ? 'bg-gray-50' : 'bg-white'
-        } border-gray-200 focus:border-[#D3E4FD] focus:ring-[#E5DEFF] text-gray-700 placeholder-gray-400 transition-colors duration-200`}
+          disabled ? 'bg-gray-100' : 'bg-white'
+        } border-gray-200 focus:border-[#9b87f5] focus:ring-[#9b87f5] transition-colors duration-200`}
       />
     </div>
   );
