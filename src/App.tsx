@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import AdminLogin from "./pages/admin/Login";
 import UserLogin from "./pages/user/Login";
 import ResetPassword from "./pages/user/ResetPassword";
+import PersonalInfo from "./pages/user/PersonalInfo";
 import DashboardLayout from "./components/admin/DashboardLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
@@ -40,6 +41,26 @@ const ProtectedResetPasswordRoute = ({ children }: { children: React.ReactNode }
   }
   
   if (isPasswordReset) {
+    return <Navigate to="/personal-info" />;
+  }
+  
+  return <>{children}</>;
+};
+
+const ProtectedPersonalInfoRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = localStorage.getItem('userAuth') === 'true';
+  const isPasswordReset = localStorage.getItem('passwordReset') === 'true';
+  const isPersonalInfoCompleted = localStorage.getItem('personalInfoCompleted') === 'true';
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  if (!isPasswordReset) {
+    return <Navigate to="/reset-password" />;
+  }
+  
+  if (isPersonalInfoCompleted) {
     return <Navigate to="/dashboard" />;
   }
   
@@ -60,6 +81,11 @@ const App = () => (
               <ProtectedResetPasswordRoute>
                 <ResetPassword />
               </ProtectedResetPasswordRoute>
+            } />
+            <Route path="/personal-info" element={
+              <ProtectedPersonalInfoRoute>
+                <PersonalInfo />
+              </ProtectedPersonalInfoRoute>
             } />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
