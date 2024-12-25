@@ -23,13 +23,19 @@ const initializeDummyData = () => {
     const dummyUser = {
       id: 1,
       email: "user@example.com",
+      password: "password123", // Added password for login
       status: "Active",
       personalInfo: {
         fullName: "John Doe",
         phone: "+1234567890",
         address: "123 Main St",
         city: "New York",
-        postalCode: "10001"
+        postalCode: "10001",
+        nationality: "American",
+        dateOfBirth: "1990-01-01",
+        gender: "Male",
+        passportNumber: "AB123456",
+        country: "United States"
       }
     };
     localStorage.setItem('users', JSON.stringify([dummyUser]));
