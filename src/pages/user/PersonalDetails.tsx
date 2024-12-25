@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import PersonalDetailsForm from "@/components/user/PersonalDetailsForm";
+import { User } from "@/types/user";
 
 const PersonalDetails = () => {
   const [formData, setFormData] = useState({
@@ -31,19 +32,41 @@ const PersonalDetails = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
+    const userEmail = localStorage.getItem("userEmail");
+    if (!userEmail) {
       navigate("/login");
       return;
     }
 
-    // Get user's email from localStorage
+    // Get user's data from localStorage
     const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const user = users.find((u: any) => u.id === Number(userId));
-    if (user) {
+    const user = users.find((u: User) => u.email === userEmail);
+    
+    if (user && user.personalInfo) {
+      setFormData({
+        familyName: user.personalInfo.familyName || "",
+        givenName: user.personalInfo.givenName || "",
+        otherNames: user.personalInfo.otherNames || "",
+        nationality: user.personalInfo.nationality || "",
+        placeOfBirth: user.personalInfo.placeOfBirth || "",
+        dateOfBirth: user.personalInfo.dateOfBirth || "",
+        gender: user.personalInfo.gender || "",
+        countryOfResidence: user.personalInfo.countryOfResidence || "",
+        passportNumber: user.personalInfo.passportNumber || "",
+        passportIssueDate: user.personalInfo.passportIssueDate || "",
+        passportExpiryDate: user.personalInfo.passportExpiryDate || "",
+        passportPlaceOfIssue: user.personalInfo.passportPlaceOfIssue || "",
+        address: user.personalInfo.address || "",
+        city: user.personalInfo.city || "",
+        postalCode: user.personalInfo.postalCode || "",
+        country: user.personalInfo.country || "",
+        email: user.email || "",
+        phone: user.personalInfo.phone || "",
+      });
+    } else {
       setFormData(prev => ({
         ...prev,
-        email: user.email
+        email: userEmail
       }));
     }
   }, [navigate]);
@@ -51,16 +74,16 @@ const PersonalDetails = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
+    const userEmail = localStorage.getItem("userEmail");
+    if (!userEmail) {
       navigate("/login");
       return;
     }
 
     // Get users from localStorage
     const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const updatedUsers = users.map((user: any) =>
-      user.id === Number(userId)
+    const updatedUsers = users.map((user: User) =>
+      user.email === userEmail
         ? {
             ...user,
             personalInfo: {
@@ -78,14 +101,14 @@ const PersonalDetails = () => {
       description: "Personal details saved successfully",
     });
 
-    navigate("/dashboard");
+    navigate("/user/dashboard");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
       <Card className="w-full max-w-4xl">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Complete Your Profile</CardTitle>
+          <CardTitle className="text-2xl text-center">My Profile</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
