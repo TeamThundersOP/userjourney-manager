@@ -6,18 +6,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import { User } from "@/types/user";
 import { useState } from "react";
+import { defaultOnboarding } from "@/utils/defaultOnboarding";
+import Phase0Form from "./onboarding/Phase0Form";
+import Phase1Form from "./onboarding/Phase1Form";
+import Phase2Form from "./onboarding/Phase2Form";
 
 interface EditOnboardingDialogProps {
   user: User;
@@ -33,8 +28,12 @@ const EditOnboardingDialog = ({
   onSave,
 }: EditOnboardingDialogProps) => {
   const [onboarding, setOnboarding] = useState({
+    ...defaultOnboarding,
     ...user.onboarding,
-    approvals: user.onboarding?.approvals || { phase0: false, phase1: false, phase2: false }
+    phase0: { ...defaultOnboarding.phase0, ...user.onboarding?.phase0 },
+    phase1: { ...defaultOnboarding.phase1, ...user.onboarding?.phase1 },
+    phase2: { ...defaultOnboarding.phase2, ...user.onboarding?.phase2 },
+    approvals: { ...defaultOnboarding.approvals, ...user.onboarding?.approvals },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,239 +57,33 @@ const EditOnboardingDialog = ({
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-6 py-4">
-            <div className="space-y-4">
-              <h3 className="font-semibold">Phase 0: Initial Setup</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="cvSubmitted"
-                    checked={onboarding?.phase0.cvSubmitted}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase0: { ...prev!.phase0, cvSubmitted: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="cvSubmitted">CV Submitted</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="interviewCompleted"
-                    checked={onboarding?.phase0.interviewCompleted}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase0: { ...prev!.phase0, interviewCompleted: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="interviewCompleted">Interview Completed</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="offerLetterSent"
-                    checked={onboarding?.phase0.offerLetterSent}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase0: { ...prev!.phase0, offerLetterSent: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="offerLetterSent">Offer Letter Sent</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="cosSent"
-                    checked={onboarding?.phase0.cosSent}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase0: { ...prev!.phase0, cosSent: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="cosSent">COS Sent</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="rightToWorkSent"
-                    checked={onboarding?.phase0.rightToWorkSent}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase0: { ...prev!.phase0, rightToWorkSent: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="rightToWorkSent">Right to Work Sent</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="documentsUploaded"
-                    checked={onboarding?.phase0.documentsUploaded}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase0: { ...prev!.phase0, documentsUploaded: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="documentsUploaded">Documents Uploaded</Label>
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor="visaStatus">Visa Status</Label>
-                  <Select
-                    value={onboarding?.phase0.visaStatus}
-                    onValueChange={(value: 'pending' | 'approved' | 'rejected') =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase0: { ...prev!.phase0, visaStatus: value },
-                      }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select visa status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="approved">Approved</SelectItem>
-                      <SelectItem value="rejected">Rejected</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="font-semibold">Phase 1: Documentation</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="hmrcChecklist"
-                    checked={onboarding?.phase1.hmrcChecklist}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase1: { ...prev!.phase1, hmrcChecklist: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="hmrcChecklist">HMRC Checklist</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="companyAgreements"
-                    checked={onboarding?.phase1.companyAgreements}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase1: { ...prev!.phase1, companyAgreements: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="companyAgreements">Company Agreements</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="pensionScheme"
-                    checked={onboarding?.phase1.pensionScheme}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase1: { ...prev!.phase1, pensionScheme: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="pensionScheme">Pension Scheme</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="bankStatements"
-                    checked={onboarding?.phase1.bankStatements}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase1: { ...prev!.phase1, bankStatements: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="bankStatements">Bank Statements</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="vaccinationProof"
-                    checked={onboarding?.phase1.vaccinationProof}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase1: { ...prev!.phase1, vaccinationProof: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="vaccinationProof">Vaccination Proof</Label>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="font-semibold">Phase 2: Final Steps</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="rightToWork"
-                    checked={onboarding?.phase2.rightToWork}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase2: { ...prev!.phase2, rightToWork: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="rightToWork">Right to Work</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="shareCode"
-                    checked={onboarding?.phase2.shareCode}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase2: { ...prev!.phase2, shareCode: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="shareCode">Share Code</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="dbs"
-                    checked={onboarding?.phase2.dbs}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase2: { ...prev!.phase2, dbs: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="dbs">DBS</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="onboardingComplete"
-                    checked={onboarding?.phase2.onboardingComplete}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase2: { ...prev!.phase2, onboardingComplete: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="onboardingComplete">Onboarding Complete</Label>
-                </div>
-              </div>
-            </div>
+            <Phase0Form
+              phase0={onboarding.phase0}
+              onUpdate={(updates) =>
+                setOnboarding((prev) => ({
+                  ...prev,
+                  phase0: { ...prev.phase0, ...updates },
+                }))
+              }
+            />
+            <Phase1Form
+              phase1={onboarding.phase1}
+              onUpdate={(updates) =>
+                setOnboarding((prev) => ({
+                  ...prev,
+                  phase1: { ...prev.phase1, ...updates },
+                }))
+              }
+            />
+            <Phase2Form
+              phase2={onboarding.phase2}
+              onUpdate={(updates) =>
+                setOnboarding((prev) => ({
+                  ...prev,
+                  phase2: { ...prev.phase2, ...updates },
+                }))
+              }
+            />
           </div>
           <DialogFooter>
             <Button type="submit">Save changes</Button>
