@@ -54,11 +54,7 @@ const UsersList = () => {
   }
 
   const handleView = (userId: number) => {
-    // For now, just show a toast since we haven't implemented the view page yet
-    toast({
-      title: "View User",
-      description: `Viewing user with ID: ${userId}`,
-    });
+    navigate(`/admin/users/${userId}`);
   };
 
   const handleEdit = (userId: number) => {

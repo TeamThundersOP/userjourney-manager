@@ -9,6 +9,7 @@ import AdminLogin from "./pages/admin/Login";
 import DashboardLayout from "./components/admin/DashboardLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
+import ViewUser from "./pages/admin/ViewUser";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             >
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="users" element={<Users />} />
+              <Route path="users/:userId" element={<ViewUser />} />
               <Route index element={<Navigate to="dashboard" replace />} />
             </Route>
           </Routes>
