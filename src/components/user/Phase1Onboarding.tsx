@@ -50,9 +50,7 @@ const defaultPhase1Data: Phase1 = {
 };
 
 const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
-  const [phase1Data, setPhase1Data] = useState<Phase1>(
-    user?.onboarding?.phase1 || defaultPhase1Data
-  );
+  const [phase1Data, setPhase1Data] = useState<Phase1>(defaultPhase1Data);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -137,7 +135,18 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
     }
   };
 
-  // ... keep existing code (JSX for the form UI)
+  if (!user) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Phase 1: Initial Setup</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-4">Loading...</div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
