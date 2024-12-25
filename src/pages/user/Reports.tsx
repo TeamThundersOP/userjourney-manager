@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const Reports = () => {
@@ -35,8 +35,8 @@ const Reports = () => {
       type,
       description,
       status: 'Open',
-      date: new Date().toISOString(),
-      sender: localStorage.getItem('userEmail'),
+      date: new Date().toISOString().split('T')[0],
+      sender: localStorage.getItem('userEmail') || 'anonymous',
     };
 
     localStorage.setItem('reports', JSON.stringify([...reports, newReport]));
@@ -64,10 +64,9 @@ const Reports = () => {
                   <SelectValue placeholder="Select report type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Technical Issue">Technical Issue</SelectItem>
-                  <SelectItem value="Documentation">Documentation</SelectItem>
-                  <SelectItem value="Process Related">Process Related</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
+                  <SelectItem value="Bug Report">Technical Issue</SelectItem>
+                  <SelectItem value="Feature Request">Feature Request</SelectItem>
+                  <SelectItem value="Support Ticket">Support Ticket</SelectItem>
                 </SelectContent>
               </Select>
             </div>
