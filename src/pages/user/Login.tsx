@@ -18,36 +18,47 @@ const UserLogin = () => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find((u: any) => u.email === email);
     
-    if (user) {
-      // In a real app, we would hash passwords and compare them securely
-      localStorage.setItem('userAuth', 'true');
-      localStorage.setItem('userId', user.id.toString());
-      localStorage.setItem('userEmail', email);
-      
-      toast({
-        title: "Success",
-        description: "Successfully logged in",
-      });
-
-      // Check if password has been reset
-      const isPasswordReset = localStorage.getItem('passwordReset');
-      if (!isPasswordReset) {
-        navigate('/reset-password');
-      } else {
-        // Check if personal info has been completed
-        const isPersonalInfoCompleted = localStorage.getItem('personalInfoCompleted');
-        if (!isPersonalInfoCompleted) {
-          navigate('/personal-info');
-        } else {
-          navigate('/dashboard');
-        }
-      }
-    } else {
+    if (!user) {
       toast({
         title: "Error",
-        description: "Invalid credentials or user not found",
+        description: "User not found",
         variant: "destructive",
       });
+      return;
+    }
+
+    // Check if password matches (in a real app, we would hash passwords)
+    if (user.password !== password) {
+      toast({
+        title: "Error",
+        description: "Invalid password",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // If validation passes, set auth state
+    localStorage.setItem('userAuth', 'true');
+    localStorage.setItem('userId', user.id.toString());
+    localStorage.setItem('userEmail', email);
+    
+    toast({
+      title: "Success",
+      description: "Successfully logged in",
+    });
+
+    // Check if password has been reset
+    const isPasswordReset = localStorage.getItem(`passwordReset_${user.id}`);
+    if (!isPasswordReset) {
+      navigate('/reset-password');
+    } else {
+      // Check if personal info has been completed
+      const isPersonalInfoCompleted = localStorage.getItem(`personalInfoCompleted_${user.id}`);
+      if (!isPersonalInfoCompleted) {
+        navigate('/personal-info');
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 
@@ -81,6 +92,7 @@ const UserLogin = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
               />
             </div>
             <Button type="submit" className="w-full">
