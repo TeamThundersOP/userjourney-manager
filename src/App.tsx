@@ -46,12 +46,10 @@ const ProtectedUserRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => (
-  <BrowserRouter>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <BrowserRouter>
         <AdminAuthProvider>
-          <Toaster />
-          <Sonner />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<UserLogin />} />
@@ -89,10 +87,12 @@ const App = () => (
               <Route index element={<Navigate to="dashboard" replace />} />
             </Route>
           </Routes>
+          <Toaster />
+          <Sonner />
         </AdminAuthProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </BrowserRouter>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
 );
 
 export default App;
