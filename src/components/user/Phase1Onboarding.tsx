@@ -20,40 +20,41 @@ interface Phase1OnboardingProps {
   user: User;
 }
 
-const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
-  const [phase1Data, setPhase1Data] = useState<Phase1>({
-    cvSubmitted: false,
-    personalDetailsCompleted: true, // Set to true by default
-    interviewStatus: 'pending',
-    jobStatus: 'pending',
-    documents: {
-      passport: false,
-      pcc: false,
-      other: false
-    },
-    offerLetterSent: false,
-    cosSent: false,
-    visaStatus: 'pending',
-    ukTravel: {
-      ticket: false,
-      visaCopy: false
-    },
-    ukContact: {
-      phone: '',
-      address: ''
-    },
-    completed: false,
-    hmrcChecklist: false,
-    companyAgreements: false,
-    pensionScheme: false,
-    bankStatements: false,
-    vaccinationProof: false,
-  });
+const defaultPhase1Data: Phase1 = {
+  cvSubmitted: false,
+  personalDetailsCompleted: true,
+  interviewStatus: 'pending',
+  jobStatus: 'pending',
+  documents: {
+    passport: false,
+    pcc: false,
+    other: false
+  },
+  offerLetterSent: false,
+  cosSent: false,
+  visaStatus: 'pending',
+  ukTravel: {
+    ticket: false,
+    visaCopy: false
+  },
+  ukContact: {
+    phone: '',
+    address: ''
+  },
+  completed: false,
+  hmrcChecklist: false,
+  companyAgreements: false,
+  pensionScheme: false,
+  bankStatements: false,
+  vaccinationProof: false,
+};
 
+const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
+  const [phase1Data, setPhase1Data] = useState<Phase1>(defaultPhase1Data);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (user.onboarding?.phase1) {
+    if (user?.onboarding?.phase1) {
       setPhase1Data(user.onboarding.phase1);
     }
   }, [user]);

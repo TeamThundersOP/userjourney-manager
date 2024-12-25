@@ -40,6 +40,7 @@ const PersonalDetailsForm = () => {
         ...users[userIndex],
         personalInfo: formData,
         onboarding: {
+          ...users[userIndex].onboarding,
           currentPhase: 0,
           phase0: {
             cvSubmitted: false,
