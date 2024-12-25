@@ -8,7 +8,7 @@ interface FormSectionProps {
 
 const FormSection = ({ title, children }: FormSectionProps) => {
   return (
-    <Card className="glass-morphism mb-6 relative overflow-hidden bg-gradient-to-r from-[#af1626] to-[#fb0918] text-white">
+    <Card className="glass-morphism mb-6 relative overflow-hidden bg-gradient-to-br from-[#D3E4FD] to-[#E5DEFF] text-gray-700">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
       </CardHeader>

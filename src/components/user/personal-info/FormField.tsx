@@ -14,7 +14,7 @@ interface FormFieldProps {
 const FormField = ({ label, id, value, onChange, disabled, required = true, type = "text" }: FormFieldProps) => {
   return (
     <div className="space-y-2">
-      <Label htmlFor={id} className="text-sm font-medium text-white">
+      <Label htmlFor={id} className="text-sm font-medium text-gray-700">
         {label}
       </Label>
       <Input
@@ -25,8 +25,8 @@ const FormField = ({ label, id, value, onChange, disabled, required = true, type
         disabled={disabled}
         required={required}
         className={`w-full ${
-          disabled ? 'bg-white/10' : 'bg-white/20'
-        } border-white/30 focus:border-white focus:ring-white text-white placeholder-white/70 transition-colors duration-200`}
+          disabled ? 'bg-gray-50' : 'bg-white'
+        } border-gray-200 focus:border-[#D3E4FD] focus:ring-[#E5DEFF] text-gray-700 placeholder-gray-400 transition-colors duration-200`}
       />
     </div>
   );

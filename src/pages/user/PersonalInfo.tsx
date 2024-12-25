@@ -89,7 +89,7 @@ const PersonalInfo = () => {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 bg-gradient-to-br from-[#fff7f5] via-white to-[#fff7f5]">
+    <div className="min-h-screen py-8 px-4 bg-gradient-to-br from-[#F2FCE2] via-white to-[#FEF7CD]">
       <div className="max-w-4xl mx-auto space-y-6">
         <PersonalInfoHeader />
         
@@ -236,7 +236,7 @@ const PersonalInfo = () => {
 
           <Button
             type="submit"
-            className="w-full glass-morphism bg-gradient-to-r from-[#fb0918] to-[#af1626] text-white py-6"
+            className="w-full glass-morphism bg-gradient-to-r from-[#D3E4FD] to-[#E5DEFF] text-gray-700 py-6 hover:opacity-90 transition-all duration-300"
           >
             Save Information
           </Button>
