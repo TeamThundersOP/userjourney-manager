@@ -3,7 +3,7 @@ import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 
-const Dashboard = () => {
+const UserDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -98,4 +98,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default UserDashboard;

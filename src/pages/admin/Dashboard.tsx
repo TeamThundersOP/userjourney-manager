@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-const Dashboard = () => {
+const AdminDashboard = () => {
   const navigate = useNavigate();
 
   // Fetch users count from localStorage
@@ -57,4 +57,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;
