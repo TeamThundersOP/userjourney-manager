@@ -1,11 +1,22 @@
 export const defaultPhase0 = {
   cvSubmitted: false,
+  personalDetailsCompleted: false,
   interviewCompleted: false,
+  jobStatus: 'pending' as const,
+  documents: {
+    passportCopy: false,
+    pcc: false,
+    other: false,
+  },
   offerLetterSent: false,
   cosSent: false,
-  rightToWorkSent: false,
-  documentsUploaded: false,
   visaStatus: 'pending' as const,
+  ukTravel: {
+    ticketUploaded: false,
+    visaCopyUploaded: false,
+  },
+  ukContactUpdated: false,
+  phase0Complete: false,
 };
 
 export const defaultPhase1 = {

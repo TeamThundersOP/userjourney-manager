@@ -38,12 +38,23 @@ export interface User {
 
 export interface Phase0 {
   cvSubmitted: boolean;
+  personalDetailsCompleted: boolean;
   interviewCompleted: boolean;
+  jobStatus: 'pending' | 'accepted' | 'rejected';
+  documents: {
+    passportCopy: boolean;
+    pcc: boolean;
+    other: boolean;
+  };
   offerLetterSent: boolean;
   cosSent: boolean;
-  rightToWorkSent: boolean;
-  documentsUploaded: boolean;
   visaStatus: 'pending' | 'approved' | 'rejected';
+  ukTravel: {
+    ticketUploaded: boolean;
+    visaCopyUploaded: boolean;
+  };
+  ukContactUpdated: boolean;
+  phase0Complete: boolean;
 }
 
 export interface Phase1 {
