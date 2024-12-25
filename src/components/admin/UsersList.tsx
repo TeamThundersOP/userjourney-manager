@@ -12,7 +12,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface User {
   id: number;
@@ -45,15 +45,27 @@ const mockUsers = [
   },
 ];
 
+// Initialize localStorage with mock users if it hasn't been done
+const initializeUsers = () => {
+  const existingUsers = localStorage.getItem('users');
+  if (!existingUsers) {
+    localStorage.setItem('users', JSON.stringify(mockUsers));
+  }
+};
+
 const fetchUsers = async (): Promise<User[]> => {
-  const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
-  const allUsers = [...mockUsers, ...localUsers];
-  return allUsers;
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  return users;
 };
 
 const UsersList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const queryClient = useQueryClient();
+  
+  useEffect(() => {
+    initializeUsers();
+  }, []);
+
   const { data: users = [], isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: fetchUsers,
@@ -91,18 +103,11 @@ const UsersList = () => {
   };
 
   const handleDelete = (userId: number) => {
-    // Get existing users from localStorage
     const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    // Filter out the deleted user
     const updatedUsers = existingUsers.filter((user: User) => user.id !== userId);
-    // Update localStorage
     localStorage.setItem('users', JSON.stringify(updatedUsers));
     
-    // Update the query cache to remove the user
-    queryClient.setQueryData(['users'], (oldData: User[] | undefined) => {
-      if (!oldData) return [];
-      return oldData.filter(user => user.id !== userId);
-    });
+    queryClient.setQueryData(['users'], updatedUsers);
     
     toast({
       title: "Success",
