@@ -13,10 +13,16 @@ const Reports = () => {
   const [filterDate, setFilterDate] = useState<Date>();
   const [filterSender, setFilterSender] = useState<string>("");
 
+  // Clear any existing reports data when component mounts
+  useState(() => {
+    if (!localStorage.getItem('reports')) {
+      localStorage.setItem('reports', JSON.stringify([]));
+    }
+  });
+
   const { data: reports, refetch } = useQuery({
     queryKey: ['reports'],
     queryFn: () => {
-      // Get reports from localStorage or return empty array if none exist
       return JSON.parse(localStorage.getItem('reports') || '[]');
     },
     refetchInterval: 5000,
@@ -29,7 +35,6 @@ const Reports = () => {
 
   const handleStatusChange = (newStatus: string) => {
     if (selectedReport) {
-      // Update report status in localStorage
       const updatedReports = reports.map((report: any) => 
         report.id === selectedReport.id 
           ? { ...report, status: newStatus }
