@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { PenSquare, Check, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { PenSquare, Check } from "lucide-react";
 import { User } from "@/types/user";
 import { calculatePhaseProgress } from "@/utils/onboarding";
 import { useState } from "react";
@@ -16,7 +17,17 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [user, setUser] = useState(initialUser);
 
-  if (!user.onboarding) return null;
+  if (!user.onboarding) {
+    return (
+      <Card>
+        <CardContent className="py-6">
+          <div className="text-center text-gray-500">
+            No onboarding information available
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const phase0Progress = calculatePhaseProgress(user.onboarding.phase0);
   const phase1Progress = calculatePhaseProgress(user.onboarding.phase1);
@@ -84,7 +95,7 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold">Phase 0: Initial Setup</h3>
             {user.onboarding?.approvals.phase0 ? (
-              <Badge variant="success" className="flex items-center gap-1">
+              <Badge variant="default" className="flex items-center gap-1">
                 <Check className="h-3 w-3" />
                 Approved
               </Badge>
@@ -129,7 +140,7 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
             <div className="flex justify-between items-center mb-2">
               <h3 className="font-semibold">Phase 1: Documentation</h3>
               {user.onboarding?.approvals.phase1 ? (
-                <Badge variant="success" className="flex items-center gap-1">
+                <Badge variant="default" className="flex items-center gap-1">
                   <Check className="h-3 w-3" />
                   Approved
                 </Badge>
@@ -161,7 +172,7 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
             <div className="flex justify-between items-center mb-2">
               <h3 className="font-semibold">Phase 2: Final Steps</h3>
               {user.onboarding?.approvals.phase2 ? (
-                <Badge variant="success" className="flex items-center gap-1">
+                <Badge variant="default" className="flex items-center gap-1">
                   <Check className="h-3 w-3" />
                   Approved
                 </Badge>

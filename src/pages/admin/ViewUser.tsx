@@ -45,6 +45,11 @@ const mockUser: User = {
       shareCode: false,
       dbs: false,
       onboardingComplete: false
+    },
+    approvals: {
+      phase0: false,
+      phase1: false,
+      phase2: false
     }
   }
 };
