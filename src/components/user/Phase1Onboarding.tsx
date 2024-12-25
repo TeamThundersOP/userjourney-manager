@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Phase1, User } from "@/types/user";
-import { FileUpload } from "lucide-react";
+import { Upload } from "lucide-react"; // Changed from FileUpload to Upload
 
 interface Phase1OnboardingProps {
   user: User;
@@ -42,7 +42,12 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
       phone: '',
       address: ''
     },
-    completed: false
+    completed: false,
+    hmrcChecklist: false,
+    companyAgreements: false,
+    pensionScheme: false,
+    bankStatements: false,
+    vaccinationProof: false,
   });
 
   const [progress, setProgress] = useState(0);
@@ -189,7 +194,7 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
                   />
                   <Label className="capitalize">{key}</Label>
                   <Button variant="outline" size="sm">
-                    <FileUpload className="h-4 w-4 mr-2" />
+                    <Upload className="h-4 w-4 mr-2" />
                     Upload
                   </Button>
                 </div>
@@ -255,7 +260,7 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
                   />
                   <Label className="capitalize">{key.replace(/([A-Z])/g, ' $1')}</Label>
                   <Button variant="outline" size="sm">
-                    <FileUpload className="h-4 w-4 mr-2" />
+                    <Upload className="h-4 w-4 mr-2" />
                     Upload
                   </Button>
                 </div>
