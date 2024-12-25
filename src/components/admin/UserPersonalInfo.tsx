@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PenSquare } from "lucide-react";
+import { PenSquare, Key } from "lucide-react";
 import { User } from "@/types/user";
 import { useState } from "react";
 import EditUserDialog from "./EditUserDialog";
+import ResetUserPasswordDialog from "./ResetUserPasswordDialog";
 
 interface UserPersonalInfoProps {
   user: User;
@@ -12,6 +13,7 @@ interface UserPersonalInfoProps {
 
 const UserPersonalInfo = ({ user: initialUser }: UserPersonalInfoProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
   const [user, setUser] = useState(initialUser);
 
   const handleSaveUser = (updatedUser: User) => {
@@ -28,13 +30,22 @@ const UserPersonalInfo = ({ user: initialUser }: UserPersonalInfoProps) => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Personal Information</CardTitle>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setIsEditDialogOpen(true)}
-        >
-          <PenSquare className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setIsResetPasswordDialogOpen(true)}
+          >
+            <Key className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setIsEditDialogOpen(true)}
+          >
+            <PenSquare className="h-4 w-4" />
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -126,6 +137,15 @@ const UserPersonalInfo = ({ user: initialUser }: UserPersonalInfoProps) => {
         open={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
         onSave={handleSaveUser}
+      />
+
+      <ResetUserPasswordDialog
+        userId={user.id}
+        open={isResetPasswordDialogOpen}
+        onOpenChange={setIsResetPasswordDialogOpen}
+        onSuccess={() => {
+          // Handle success if needed
+        }}
       />
     </Card>
   );
