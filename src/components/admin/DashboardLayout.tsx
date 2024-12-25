@@ -1,6 +1,6 @@
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from "@/components/ui/button";
-import { useNavigate, Outlet } from 'react-router-dom';
+import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { Home, Users, FileText, LogOut, Sun, Moon, Menu, X } from 'lucide-react';
 import { Toggle } from "@/components/ui/toggle";
 import { useState, useEffect } from 'react';
@@ -9,6 +9,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 const DashboardLayout = () => {
   const { logout } = useAdminAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isDark, setIsDark] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const isMobile = useIsMobile();
@@ -36,6 +37,10 @@ const DashboardLayout = () => {
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
+  };
+
+  const isActive = (path: string) => {
+    return location.pathname === `/admin/${path}`;
   };
 
   return (
@@ -83,8 +88,12 @@ const DashboardLayout = () => {
         </div>
         <nav className="mt-6 space-y-2 px-3">
           <Button
-            variant="ghost"
-            className="w-full justify-start px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary transition-all duration-200"
+            variant={isActive('dashboard') ? 'default' : 'ghost'}
+            className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
+              isActive('dashboard') 
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
+            }`}
             onClick={() => {
               navigate('/admin/dashboard');
               isMobile && setSidebarOpen(false);
@@ -94,8 +103,12 @@ const DashboardLayout = () => {
             Home
           </Button>
           <Button
-            variant="ghost"
-            className="w-full justify-start px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary transition-all duration-200"
+            variant={isActive('users') ? 'default' : 'ghost'}
+            className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
+              isActive('users')
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
+            }`}
             onClick={() => {
               navigate('/admin/users');
               isMobile && setSidebarOpen(false);
@@ -105,8 +118,12 @@ const DashboardLayout = () => {
             Users
           </Button>
           <Button
-            variant="ghost"
-            className="w-full justify-start px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary transition-all duration-200"
+            variant={isActive('reports') ? 'default' : 'ghost'}
+            className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
+              isActive('reports')
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
+            }`}
             onClick={() => {
               navigate('/admin/reports');
               isMobile && setSidebarOpen(false);
