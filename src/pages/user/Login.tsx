@@ -18,47 +18,21 @@ const UserLogin = () => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find((u: any) => u.email === email);
     
-    if (!user) {
+    if (user) {
+      // In a real app, we would hash passwords and compare them securely
+      localStorage.setItem('userAuth', 'true');
+      localStorage.setItem('userId', user.id.toString());
       toast({
-        title: "Error",
-        description: "User not found",
-        variant: "destructive",
+        title: "Success",
+        description: "Successfully logged in",
       });
-      return;
-    }
-
-    // Check if password matches (in a real app, we would hash passwords)
-    if (user.password !== password) {
-      toast({
-        title: "Error",
-        description: "Invalid password",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // If validation passes, set auth state
-    localStorage.setItem('userAuth', 'true');
-    localStorage.setItem('userId', user.id.toString());
-    localStorage.setItem('userEmail', email);
-    
-    toast({
-      title: "Success",
-      description: "Successfully logged in",
-    });
-
-    // Check if password has been reset
-    const isPasswordReset = localStorage.getItem(`passwordReset_${user.id}`);
-    if (!isPasswordReset) {
-      navigate('/reset-password');
+      navigate('/dashboard'); // We'll create the user dashboard next
     } else {
-      // Check if personal info has been completed
-      const isPersonalInfoCompleted = localStorage.getItem(`personalInfoCompleted_${user.id}`);
-      if (!isPersonalInfoCompleted) {
-        navigate('/personal-info');
-      } else {
-        navigate('/dashboard');
-      }
+      toast({
+        title: "Error",
+        description: "Invalid credentials or user not found",
+        variant: "destructive",
+      });
     }
   };
 
@@ -92,7 +66,6 @@ const UserLogin = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
               />
             </div>
             <Button type="submit" className="w-full">

@@ -7,16 +7,11 @@ import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import Index from "./pages/Index";
 import AdminLogin from "./pages/admin/Login";
 import UserLogin from "./pages/user/Login";
-import ResetPassword from "./pages/user/ResetPassword";
-import PersonalInfo from "./pages/user/PersonalInfo";
 import DashboardLayout from "./components/admin/DashboardLayout";
-import AdminDashboard from "./pages/admin/Dashboard";
+import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
 import ViewUser from "./pages/admin/ViewUser";
 import Reports from "./pages/admin/Reports";
-import UserDashboard from "./pages/user/Dashboard";
-import Report from "./pages/user/Report";
-import Profile from "./pages/user/Profile";
 
 const queryClient = new QueryClient();
 
@@ -35,51 +30,6 @@ const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const ProtectedResetPasswordRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = localStorage.getItem('userAuth') === 'true';
-  const isPasswordReset = localStorage.getItem('passwordReset') === 'true';
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
-  
-  if (isPasswordReset) {
-    return <Navigate to="/personal-info" />;
-  }
-  
-  return <>{children}</>;
-};
-
-const ProtectedPersonalInfoRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = localStorage.getItem('userAuth') === 'true';
-  const isPasswordReset = localStorage.getItem('passwordReset') === 'true';
-  const isPersonalInfoCompleted = localStorage.getItem('personalInfoCompleted') === 'true';
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
-  
-  if (!isPasswordReset) {
-    return <Navigate to="/reset-password" />;
-  }
-  
-  if (isPersonalInfoCompleted) {
-    return <Navigate to="/dashboard" />;
-  }
-  
-  return <>{children}</>;
-};
-
-const ProtectedUserRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = localStorage.getItem('userAuth') === 'true';
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
-  
-  return <>{children}</>;
-};
-
 const App = () => (
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
@@ -90,32 +40,6 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<UserLogin />} />
-            <Route path="/reset-password" element={
-              <ProtectedResetPasswordRoute>
-                <ResetPassword />
-              </ProtectedResetPasswordRoute>
-            } />
-            <Route path="/personal-info" element={
-              <ProtectedPersonalInfoRoute>
-                <PersonalInfo />
-              </ProtectedPersonalInfoRoute>
-            } />
-            
-            {/* User Dashboard Routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedUserRoute>
-                  <DashboardLayout />
-                </ProtectedUserRoute>
-              }
-            >
-              <Route index element={<UserDashboard />} />
-              <Route path="report" element={<Report />} />
-              <Route path="profile" element={<Profile />} />
-            </Route>
-
-            {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
               path="/admin/*"
@@ -125,7 +49,7 @@ const App = () => (
                 </ProtectedAdminRoute>
               }
             >
-              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="dashboard" element={<Dashboard />} />
               <Route path="users" element={<Users />} />
               <Route path="users/:userId" element={<ViewUser />} />
               <Route path="reports" element={<Reports />} />

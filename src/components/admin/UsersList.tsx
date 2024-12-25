@@ -23,13 +23,13 @@ const fetchUsers = async (): Promise<User[]> => {
 const UsersList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const navigate = useNavigate();
 
   const { data: users = [], isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: fetchUsers,
   });
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const filteredUsers = users.filter((user) => {
     const searchLower = searchTerm.toLowerCase();
@@ -61,27 +61,15 @@ const UsersList = () => {
   };
 
   const handleDelete = (userId: number) => {
-    // Get all users
     const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
     const updatedUsers = existingUsers.filter((user: User) => user.id !== userId);
     localStorage.setItem('users', JSON.stringify(updatedUsers));
-
-    // Clean up reset password users
-    const resetPasswordUsers = JSON.parse(localStorage.getItem('resetPasswordUsers') || '[]');
-    const updatedResetPasswordUsers = resetPasswordUsers.filter((id: number) => id !== userId);
-    localStorage.setItem('resetPasswordUsers', JSON.stringify(updatedResetPasswordUsers));
-
-    // Clean up personal info completion status
-    const personalInfoUsers = JSON.parse(localStorage.getItem('personalInfoUsers') || '[]');
-    const updatedPersonalInfoUsers = personalInfoUsers.filter((id: number) => id !== userId);
-    localStorage.setItem('personalInfoUsers', JSON.stringify(updatedPersonalInfoUsers));
-
-    // Update the query cache
+    
     queryClient.setQueryData(['users'], updatedUsers);
     
     toast({
       title: "Success",
-      description: "User and all related records deleted successfully",
+      description: "User deleted successfully",
     });
   };
 
