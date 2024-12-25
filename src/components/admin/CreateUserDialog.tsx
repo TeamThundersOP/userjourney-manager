@@ -21,9 +21,11 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
     
     // Create new user object
     const newUser = {
-      id: Date.now(), // Generate a unique ID
+      id: Date.now(),
       email,
+      password, // Now including password in the user object
       status: "Pending",
+      hasResetPassword: false // Add this flag to force password reset on first login
     };
 
     // Get existing users from localStorage
