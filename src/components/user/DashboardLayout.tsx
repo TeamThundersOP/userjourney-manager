@@ -13,6 +13,10 @@ const DashboardLayout = () => {
     navigate('/login');
   };
 
+  const handleProfileClick = () => {
+    navigate('/user/profile');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
@@ -40,7 +44,7 @@ const DashboardLayout = () => {
           <Button
             variant="ghost"
             className="w-full justify-start px-6 py-3 text-left"
-            onClick={() => navigate('/user/profile')}
+            onClick={handleProfileClick}
           >
             <User className="mr-2 h-4 w-4" />
             My Profile
