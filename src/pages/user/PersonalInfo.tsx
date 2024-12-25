@@ -54,13 +54,61 @@ const PersonalInfo = () => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const updatedUsers = users.map((u: any) => {
       if (u.id.toString() === userId) {
+        // Create or update onboarding object with personalDetailsCompleted set to true
+        const currentOnboarding = u.onboarding || {
+          currentPhase: 0,
+          phase0: {
+            personalDetailsCompleted: false,
+            cvSubmitted: false,
+            interviewCompleted: false,
+            jobStatus: 'pending',
+            passportUploaded: false,
+            pccUploaded: false,
+            otherDocumentsUploaded: false,
+            offerLetterSent: false,
+            cosSent: false,
+            rightToWorkSent: false,
+            documentsUploaded: false,
+            visaStatus: 'pending',
+            travelDetailsUpdated: false,
+            travelDocumentsUploaded: false,
+            visaCopyUploaded: false,
+            ukContactUpdated: false
+          },
+          phase1: {
+            hmrcChecklist: false,
+            companyAgreements: false,
+            pensionScheme: false,
+            bankStatements: false,
+            vaccinationProof: false
+          },
+          phase2: {
+            rightToWork: false,
+            shareCode: false,
+            dbs: false,
+            onboardingComplete: false
+          },
+          approvals: {
+            phase0: false,
+            phase1: false,
+            phase2: false
+          }
+        };
+
         return {
           ...u,
           personalInfo: {
             ...formData,
             fullName: `${formData.givenName} ${formData.familyName}`,
           },
-          hasFilledPersonalInfo: true
+          hasFilledPersonalInfo: true,
+          onboarding: {
+            ...currentOnboarding,
+            phase0: {
+              ...currentOnboarding.phase0,
+              personalDetailsCompleted: true
+            }
+          }
         };
       }
       return u;
