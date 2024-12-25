@@ -24,6 +24,8 @@ const UserLogin = () => {
       
       if (!user.hasResetPassword) {
         navigate('/reset-password');
+      } else if (!user.hasCompletedPersonalInfo) {
+        navigate('/personal-details');
       } else {
         toast({
           title: "Success",

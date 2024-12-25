@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import AdminLogin from "./pages/admin/Login";
 import UserLogin from "./pages/user/Login";
 import ResetPassword from "./pages/user/ResetPassword";
+import PersonalDetails from "./pages/user/PersonalDetails";
 import DashboardLayout from "./components/admin/DashboardLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<UserLogin />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/personal-details" element={<PersonalDetails />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
               path="/admin/*"
