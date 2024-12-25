@@ -7,64 +7,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { User } from "@/types/user";
 
-interface FileUploadButtonProps {
+interface UserFile {
+  id: number;
+  name: string;
+  type: string;
+  uploadedAt: string;
+  size: string;
   category: string;
-  onUpload: (e: React.ChangeEvent<HTMLInputElement>, category: string) => void;
-  disabled?: boolean;
 }
-
-const FileUploadButton = ({ category, onUpload, disabled }: FileUploadButtonProps) => (
-  <Button variant="outline" size="sm" className="flex items-center gap-2" disabled={disabled}>
-    <input
-      type="file"
-      className="hidden"
-      onChange={(e) => onUpload(e, category)}
-      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-    />
-    <Upload className="h-4 w-4" />
-    Upload {category}
-  </Button>
-);
-
-interface FileTableProps {
-  files: any[];
-  onDownload: (file: any) => void;
-}
-
-const FileTable = ({ files, onDownload }: FileTableProps) => (
-  <Table>
-    <TableHeader>
-      <TableRow>
-        <TableHead>Name</TableHead>
-        <TableHead>Type</TableHead>
-        <TableHead>Upload Date</TableHead>
-        <TableHead>Size</TableHead>
-        <TableHead>Action</TableHead>
-      </TableRow>
-    </TableHeader>
-    <TableBody>
-      {files.map((file) => (
-        <TableRow key={file.id}>
-          <TableCell className="font-medium">{file.name}</TableCell>
-          <TableCell>{file.type}</TableCell>
-          <TableCell>{new Date(file.uploadedAt).toLocaleDateString()}</TableCell>
-          <TableCell>{file.size}</TableCell>
-          <TableCell>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onDownload(file)}
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Download
-            </Button>
-          </TableCell>
-        </TableRow>
-      ))}
-    </TableBody>
-  </Table>
-);
 
 interface UserFilesProps {
   user: User;
@@ -81,7 +31,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
     setUploading(true);
     try {
       // Create new file object with category-specific name
-      const newFile = {
+      const newFile: UserFile = {
         id: Date.now(),
         name: `${category}_${file.name}`,
         type: file.type,
@@ -183,25 +133,70 @@ const UserFiles = ({ user }: UserFilesProps) => {
     }
   };
 
-  const handleDownload = (file: any) => {
+  const handleDownload = (file: UserFile) => {
     toast.success(`Downloading ${file.name}`);
   };
-
-  const showUploadButtons = !user.onboarding || user.onboarding.currentPhase === 0;
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Uploaded Files</CardTitle>
-        {showUploadButtons && (
-          <div className="flex flex-wrap gap-2">
-            <FileUploadButton category="cv" onUpload={handleFileUpload} disabled={uploading} />
-            <FileUploadButton category="passport" onUpload={handleFileUpload} disabled={uploading} />
-            <FileUploadButton category="pcc" onUpload={handleFileUpload} disabled={uploading} />
-            <FileUploadButton category="travelDocuments" onUpload={handleFileUpload} disabled={uploading} />
-            <FileUploadButton category="visa" onUpload={handleFileUpload} disabled={uploading} />
-          </div>
-        )}
+        <div className="flex gap-2">
+          {(!user.onboarding || user.onboarding.currentPhase === 0) && (
+            <>
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => handleFileUpload(e, 'cv')}
+                  accept=".pdf,.doc,.docx"
+                />
+                <Upload className="h-4 w-4" />
+                Upload CV
+              </Button>
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => handleFileUpload(e, 'passport')}
+                  accept=".pdf,.jpg,.jpeg,.png"
+                />
+                <Upload className="h-4 w-4" />
+                Upload Passport
+              </Button>
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => handleFileUpload(e, 'pcc')}
+                  accept=".pdf"
+                />
+                <Upload className="h-4 w-4" />
+                Upload PCC
+              </Button>
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => handleFileUpload(e, 'travelDocuments')}
+                  accept=".pdf,.jpg,.jpeg,.png"
+                />
+                <Upload className="h-4 w-4" />
+                Upload Travel Documents
+              </Button>
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => handleFileUpload(e, 'visa')}
+                  accept=".pdf,.jpg,.jpeg,.png"
+                />
+                <Upload className="h-4 w-4" />
+                Upload Visa Copy
+              </Button>
+            </>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {(!user.files || user.files.length === 0) ? (
@@ -210,7 +205,38 @@ const UserFiles = ({ user }: UserFilesProps) => {
             <p>No files uploaded yet</p>
           </div>
         ) : (
-          <FileTable files={user.files} onDownload={handleDownload} />
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Upload Date</TableHead>
+                <TableHead>Size</TableHead>
+                <TableHead>Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {user.files.map((file) => (
+                <TableRow key={file.id}>
+                  <TableCell className="font-medium">{file.name}</TableCell>
+                  <TableCell>{file.type}</TableCell>
+                  <TableCell>{new Date(file.uploadedAt).toLocaleDateString()}</TableCell>
+                  <TableCell>{file.size}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDownload(file)}
+                      className="flex items-center gap-2"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
       </CardContent>
     </Card>
