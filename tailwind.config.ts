@@ -25,7 +25,7 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#1E40AF",
+          DEFAULT: "#af1626",
           foreground: "#FFFFFF",
         },
         secondary: {
@@ -33,7 +33,7 @@ export default {
           foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#60A5FA",
+          DEFAULT: "#fb0918",
           foreground: "#FFFFFF",
         },
         destructive: {
@@ -54,12 +54,16 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: ["Nunito", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      gradientColorStops: {
+        'primary-start': '#af1626',
+        'primary-end': '#fb0918',
       },
     },
   },
