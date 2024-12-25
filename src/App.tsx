@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import React from 'react';
 import Index from "./pages/Index";
 import AdminLogin from "./pages/admin/Login";
 import UserLogin from "./pages/user/Login";
@@ -46,53 +47,55 @@ const ProtectedUserRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AdminAuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<UserLogin />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            
-            {/* User routes */}
-            <Route
-              path="/user/*"
-              element={
-                <ProtectedUserRoute>
-                  <UserDashboardLayout />
-                </ProtectedUserRoute>
-              }
-            >
-              <Route path="dashboard" element={<UserDashboard />} />
-              <Route path="reports" element={<UserReports />} />
-              <Route path="profile" element={<PersonalDetails />} />
-              <Route index element={<Navigate to="dashboard" replace />} />
-            </Route>
+        <TooltipProvider>
+          <AdminAuthProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<UserLogin />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              
+              {/* User routes */}
+              <Route
+                path="/user/*"
+                element={
+                  <ProtectedUserRoute>
+                    <UserDashboardLayout />
+                  </ProtectedUserRoute>
+                }
+              >
+                <Route path="dashboard" element={<UserDashboard />} />
+                <Route path="reports" element={<UserReports />} />
+                <Route path="profile" element={<PersonalDetails />} />
+                <Route index element={<Navigate to="dashboard" replace />} />
+              </Route>
 
-            {/* Admin routes */}
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route
-              path="/admin/*"
-              element={
-                <ProtectedAdminRoute>
-                  <DashboardLayout />
-                </ProtectedAdminRoute>
-              }
-            >
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="users" element={<Users />} />
-              <Route path="users/:userId" element={<ViewUser />} />
-              <Route path="reports" element={<Reports />} />
-              <Route index element={<Navigate to="dashboard" replace />} />
-            </Route>
-          </Routes>
-          <Toaster />
-          <Sonner />
-        </AdminAuthProvider>
+              {/* Admin routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route
+                path="/admin/*"
+                element={
+                  <ProtectedAdminRoute>
+                    <DashboardLayout />
+                  </ProtectedAdminRoute>
+                }
+              >
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="users" element={<Users />} />
+                <Route path="users/:userId" element={<ViewUser />} />
+                <Route path="reports" element={<Reports />} />
+                <Route index element={<Navigate to="dashboard" replace />} />
+              </Route>
+            </Routes>
+            <Toaster />
+            <Sonner />
+          </AdminAuthProvider>
+        </TooltipProvider>
       </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
