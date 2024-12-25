@@ -45,18 +45,23 @@ const ResetPassword = () => {
         ? {
             ...user,
             password: newPassword,
-            hasResetPassword: true,
+            hasResetPassword: true, // Set this flag to true after password reset
           }
         : user
     );
     localStorage.setItem("users", JSON.stringify(updatedUsers));
 
+    // Clear userId from localStorage since we're logging out
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userAuth");
+
     toast({
       title: "Success",
-      description: "Password has been reset successfully",
+      description: "Password has been reset successfully. Please login with your new password.",
     });
     
-    navigate("/dashboard");
+    // Redirect to login page after successful password reset
+    navigate("/login");
   };
 
   return (
