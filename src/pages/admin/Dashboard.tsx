@@ -26,27 +26,6 @@ const Dashboard = () => {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Admin Dashboard</h1>
       
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className="bg-blue-50">
-          <CardHeader>
-            <CardTitle className="text-blue-700">Total Users</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-blue-900">{usersCount || 0}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-green-50">
-          <CardHeader>
-            <CardTitle className="text-green-700">Total Reports</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-green-900">{reportsCount || 0}</p>
-          </CardContent>
-        </Card>
-      </div>
-      
       {/* Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="cursor-pointer hover:shadow-lg transition-shadow" 
@@ -56,6 +35,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600">Create, edit, and manage user accounts</p>
+            <p className="mt-4 text-2xl font-bold text-blue-600">{usersCount || 0} Users</p>
           </CardContent>
         </Card>
 
@@ -66,6 +46,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600">View and respond to user reports</p>
+            <p className="mt-4 text-2xl font-bold text-green-600">{reportsCount || 0} Reports</p>
           </CardContent>
         </Card>
       </div>
