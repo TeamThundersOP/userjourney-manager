@@ -4,13 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import ResetPasswordDialog from '@/components/user/ResetPasswordDialog';
 
 const UserLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showResetDialog, setShowResetDialog] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -22,11 +19,17 @@ const UserLogin = () => {
     const user = users.find((u: any) => u.email === email);
     
     if (user && user.password === password) {
+      localStorage.setItem('userAuth', 'true');
+      localStorage.setItem('userId', user.id.toString());
+      
       if (!user.hasResetPassword) {
-        setCurrentUserId(user.id);
-        setShowResetDialog(true);
+        navigate('/reset-password');
       } else {
-        completeLogin(user.id);
+        toast({
+          title: "Success",
+          description: "Successfully logged in",
+        });
+        navigate('/dashboard');
       }
     } else {
       toast({
@@ -35,16 +38,6 @@ const UserLogin = () => {
         variant: "destructive",
       });
     }
-  };
-
-  const completeLogin = (userId: number) => {
-    localStorage.setItem('userAuth', 'true');
-    localStorage.setItem('userId', userId.toString());
-    toast({
-      title: "Success",
-      description: "Successfully logged in",
-    });
-    navigate('/dashboard');
   };
 
   return (
@@ -85,18 +78,6 @@ const UserLogin = () => {
           </form>
         </CardContent>
       </Card>
-
-      {showResetDialog && currentUserId && (
-        <ResetPasswordDialog
-          open={showResetDialog}
-          onOpenChange={setShowResetDialog}
-          userId={currentUserId}
-          onSuccess={() => {
-            setShowResetDialog(false);
-            completeLogin(currentUserId);
-          }}
-        />
-      )}
     </div>
   );
 };
