@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useQueryClient } from "@tanstack/react-query";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 
 interface CreateUserDialogProps {
@@ -14,18 +14,34 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // TODO: Implement user creation logic here
-    console.log("Creating user:", { email, password });
+    // Create new user object
+    const newUser = {
+      id: Date.now(), // Generate a unique ID
+      email,
+      status: "Pending",
+    };
+
+    // Get existing users from localStorage
+    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
     
+    // Add new user to the list
+    localStorage.setItem('users', JSON.stringify([...existingUsers, newUser]));
+
+    // Show success toast
     toast({
       title: "Success",
       description: "User created successfully",
     });
-    
+
+    // Invalidate and refetch users query
+    queryClient.invalidateQueries({ queryKey: ['users'] });
+
+    // Reset form and close dialog
     setEmail("");
     setPassword("");
     onOpenChange(false);
@@ -37,36 +53,28 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         <DialogHeader>
           <DialogTitle>Create New User</DialogTitle>
         </DialogHeader>
-        
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+          <div>
             <Input
-              id="email"
+              placeholder="Email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+          <div>
             <Input
-              id="password"
+              placeholder="Password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
-          
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">Create User</Button>
-          </DialogFooter>
+          <Button type="submit" className="w-full">
+            Create User
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

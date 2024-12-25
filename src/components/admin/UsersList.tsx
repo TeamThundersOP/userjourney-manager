@@ -8,13 +8,38 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
-const UsersList = () => {
-  // TODO: Implement actual user data fetching
-  const mockUsers = [
+interface User {
+  id: number;
+  email: string;
+  status: string;
+}
+
+const fetchUsers = async (): Promise<User[]> => {
+  // For demo purposes, we'll return mock data
+  // In a real app, this would be an API call
+  return [
     { id: 1, email: "user1@example.com", status: "Active" },
     { id: 2, email: "user2@example.com", status: "Pending" },
+    // Add any newly created users from localStorage
+    ...(JSON.parse(localStorage.getItem('users') || '[]'))
   ];
+};
+
+const UsersList = () => {
+  const { data: users = [], isLoading, error } = useQuery({
+    queryKey: ['users'],
+    queryFn: fetchUsers,
+  });
+
+  if (isLoading) {
+    return <div>Loading users...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading users</div>;
+  }
 
   return (
     <div className="border rounded-lg">
@@ -28,7 +53,7 @@ const UsersList = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {mockUsers.map((user) => (
+          {users.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.id}</TableCell>
               <TableCell>{user.email}</TableCell>
