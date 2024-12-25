@@ -85,13 +85,23 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave }: EditUserDialogProp
       updatedUser.onboarding = {
         currentPhase: 0,
         phase0: {
+          personalDetailsCompleted: false,
           cvSubmitted: false,
           interviewCompleted: false,
+          jobStatus: 'pending',
+          passportUploaded: false,
+          pccUploaded: false,
+          otherDocumentsUploaded: false,
           offerLetterSent: false,
           cosSent: false,
           rightToWorkSent: false,
           documentsUploaded: false,
-          visaStatus: 'pending'
+          visaStatus: 'pending',
+          travelDetailsUpdated: false,
+          travelDocumentsUploaded: false,
+          visaCopyUploaded: false,
+          ukContactUpdated: false,
+          phase0Complete: false
         },
         phase1: {
           hmrcChecklist: false,

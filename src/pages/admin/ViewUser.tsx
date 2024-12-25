@@ -5,7 +5,6 @@ import UserOnboarding from '@/components/admin/UserOnboarding';
 import UserFiles from '@/components/admin/UserFiles';
 import { User } from '@/types/user';
 
-// Mock data for demonstration
 const mockUser: User = {
   id: 1,
   email: "user1@example.com",
@@ -25,13 +24,23 @@ const mockUser: User = {
   onboarding: {
     currentPhase: 1,
     phase0: {
+      personalDetailsCompleted: true,
       cvSubmitted: true,
       interviewCompleted: true,
+      jobStatus: 'pending',
+      passportUploaded: true,
+      pccUploaded: true,
+      otherDocumentsUploaded: true,
       offerLetterSent: true,
       cosSent: false,
       rightToWorkSent: true,
       documentsUploaded: true,
-      visaStatus: 'pending'
+      visaStatus: 'pending',
+      travelDetailsUpdated: false,
+      travelDocumentsUploaded: false,
+      visaCopyUploaded: false,
+      ukContactUpdated: false,
+      phase0Complete: false
     },
     phase1: {
       hmrcChecklist: true,

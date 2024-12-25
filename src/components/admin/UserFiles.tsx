@@ -62,6 +62,8 @@ const UserFiles = ({ user }: UserFilesProps) => {
                 otherDocumentsUploaded: false,
                 offerLetterSent: false,
                 cosSent: false,
+                rightToWorkSent: false,
+                documentsUploaded: false,
                 visaStatus: 'pending',
                 travelDetailsUpdated: false,
                 travelDocumentsUploaded: false,
