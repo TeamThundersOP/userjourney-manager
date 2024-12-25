@@ -1,9 +1,8 @@
 import { useUserAuth } from '@/contexts/UserAuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Phase0Onboarding from '@/components/user/onboarding/Phase0Onboarding';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User } from '@/types/user';
 
@@ -16,8 +15,8 @@ const UserDashboard = () => {
     queryKey: ['user', userId],
     queryFn: async () => {
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      // Convert the parsed userId to number for comparison
-      const user = users.find((u: any) => Number(u.id) === userId);
+      // Ensure both IDs are strings for comparison
+      const user = users.find((u: any) => String(u.id) === String(userId));
       
       // If user exists but doesn't have onboarding data, initialize it
       if (user && !user.onboarding) {
@@ -63,7 +62,7 @@ const UserDashboard = () => {
         
         // Save the initialized user back to localStorage
         const updatedUsers = users.map((u: User) => 
-          Number(u.id) === userId ? user : u
+          String(u.id) === String(userId) ? user : u
         );
         localStorage.setItem('users', JSON.stringify(updatedUsers));
       }
@@ -81,7 +80,7 @@ const UserDashboard = () => {
     try {
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       const updatedUsers = users.map((u: User) => {
-        if (Number(u.id) === userId) {
+        if (String(u.id) === String(userId)) {
           return {
             ...u,
             onboarding: {
