@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PenSquare, User, Mail, Phone, MapPin, Globe, Calendar, Passport } from "lucide-react";
+import { PenSquare, User, Mail, Phone, MapPin, Globe, Calendar, IdCard } from "lucide-react";
 import { User as UserType } from "@/types/user";
 import { useState } from "react";
 import EditUserDialog from "./EditUserDialog";
@@ -109,7 +109,7 @@ const UserPersonalInfo = ({ user: initialUser }: UserPersonalInfoProps) => {
         </div>
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground flex items-center gap-2">
-            <Passport className="h-4 w-4" />
+            <IdCard className="h-4 w-4" />
             Passport Information
           </p>
           <div className="space-y-1">
