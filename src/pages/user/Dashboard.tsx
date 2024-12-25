@@ -16,7 +16,8 @@ const UserDashboard = () => {
     queryKey: ['user', userId],
     queryFn: async () => {
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const user = users.find((u: any) => u.id === userId);
+      // Convert the parsed userId to number for comparison
+      const user = users.find((u: any) => Number(u.id) === userId);
       
       // If user exists but doesn't have onboarding data, initialize it
       if (user && !user.onboarding) {
@@ -62,7 +63,7 @@ const UserDashboard = () => {
         
         // Save the initialized user back to localStorage
         const updatedUsers = users.map((u: User) => 
-          u.id === userId ? user : u
+          Number(u.id) === userId ? user : u
         );
         localStorage.setItem('users', JSON.stringify(updatedUsers));
       }
@@ -80,7 +81,7 @@ const UserDashboard = () => {
     try {
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       const updatedUsers = users.map((u: User) => {
-        if (u.id === userId) {
+        if (Number(u.id) === userId) {
           return {
             ...u,
             onboarding: {
