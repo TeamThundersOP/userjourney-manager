@@ -1,37 +1,77 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useState } from "react";
+import { User } from "@/types/user";
 
-interface PersonalDetailsFormProps {
-  formData: {
-    familyName: string;
-    givenName: string;
-    otherNames: string;
-    nationality: string;
-    placeOfBirth: string;
-    dateOfBirth: string;
-    gender: string;
-    countryOfResidence: string;
-    passportNumber: string;
-    passportIssueDate: string;
-    passportExpiryDate: string;
-    passportPlaceOfIssue: string;
-    address: string;
-    city: string;
-    postalCode: string;
-    country: string;
-    email: string;
-    phone: string;
+const PersonalDetailsForm = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    familyName: "",
+    givenName: "",
+    otherNames: "",
+    nationality: "",
+    placeOfBirth: "",
+    dateOfBirth: "",
+    gender: "",
+    countryOfResidence: "",
+    passportNumber: "",
+    passportIssueDate: "",
+    passportExpiryDate: "",
+    passportPlaceOfIssue: "",
+    address: "",
+    city: "",
+    postalCode: "",
+    country: "",
+    phone: "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const userId = localStorage.getItem('userId');
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userIndex = users.findIndex((u: User) => u.id === Number(userId));
+    
+    if (userIndex !== -1) {
+      const updatedUser = {
+        ...users[userIndex],
+        personalInfo: formData,
+        onboarding: {
+          currentPhase: 0,
+          phase0: {
+            cvSubmitted: false,
+            interviewCompleted: false,
+            offerLetterSent: false,
+            cosSent: false,
+            rightToWorkSent: false,
+            documentsUploaded: false,
+            visaStatus: 'pending'
+          },
+          phase1: users[userIndex].onboarding?.phase1 || {},
+          phase2: users[userIndex].onboarding?.phase2 || {},
+          approvals: {
+            phase0: false,
+            phase1: false,
+            phase2: false
+          }
+        }
+      };
+      
+      users[userIndex] = updatedUser;
+      localStorage.setItem('users', JSON.stringify(users));
+      
+      toast.success("Personal details saved successfully");
+      navigate("/user/dashboard");
+    }
   };
-  setFormData: (data: any) => void;
-}
 
-const PersonalDetailsForm = ({ formData, setFormData }: PersonalDetailsFormProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="space-y-2">
-        <label htmlFor="familyName" className="text-sm font-medium">
-          Family Name
-        </label>
+    <form onSubmit={handleSubmit}>
+      <div>
+        <Label htmlFor="familyName">Family Name</Label>
         <Input
           id="familyName"
           value={formData.familyName}
@@ -39,10 +79,8 @@ const PersonalDetailsForm = ({ formData, setFormData }: PersonalDetailsFormProps
           required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="givenName" className="text-sm font-medium">
-          Given Name
-        </label>
+      <div>
+        <Label htmlFor="givenName">Given Name</Label>
         <Input
           id="givenName"
           value={formData.givenName}
@@ -50,195 +88,131 @@ const PersonalDetailsForm = ({ formData, setFormData }: PersonalDetailsFormProps
           required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="otherNames" className="text-sm font-medium">
-          Other Names
-        </label>
+      <div>
+        <Label htmlFor="otherNames">Other Names</Label>
         <Input
           id="otherNames"
           value={formData.otherNames}
           onChange={(e) => setFormData({ ...formData, otherNames: e.target.value })}
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="nationality" className="text-sm font-medium">
-          Nationality
-        </label>
+      <div>
+        <Label htmlFor="nationality">Nationality</Label>
         <Input
           id="nationality"
           value={formData.nationality}
           onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="placeOfBirth" className="text-sm font-medium">
-          Place of Birth
-        </label>
+      <div>
+        <Label htmlFor="placeOfBirth">Place of Birth</Label>
         <Input
           id="placeOfBirth"
           value={formData.placeOfBirth}
           onChange={(e) => setFormData({ ...formData, placeOfBirth: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="dateOfBirth" className="text-sm font-medium">
-          Date of Birth
-        </label>
+      <div>
+        <Label htmlFor="dateOfBirth">Date of Birth</Label>
         <Input
           id="dateOfBirth"
           type="date"
           value={formData.dateOfBirth}
           onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="gender" className="text-sm font-medium">
-          Gender
-        </label>
-        <Select
+      <div>
+        <Label htmlFor="gender">Gender</Label>
+        <Input
+          id="gender"
           value={formData.gender}
-          onValueChange={(value) => setFormData({ ...formData, gender: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select gender" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="male">Male</SelectItem>
-            <SelectItem value="female">Female</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
+          onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+        />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="countryOfResidence" className="text-sm font-medium">
-          Country of Residence
-        </label>
+      <div>
+        <Label htmlFor="countryOfResidence">Country of Residence</Label>
         <Input
           id="countryOfResidence"
           value={formData.countryOfResidence}
           onChange={(e) => setFormData({ ...formData, countryOfResidence: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="passportNumber" className="text-sm font-medium">
-          Passport Number
-        </label>
+      <div>
+        <Label htmlFor="passportNumber">Passport Number</Label>
         <Input
           id="passportNumber"
           value={formData.passportNumber}
           onChange={(e) => setFormData({ ...formData, passportNumber: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="passportIssueDate" className="text-sm font-medium">
-          Passport Issue Date
-        </label>
+      <div>
+        <Label htmlFor="passportIssueDate">Passport Issue Date</Label>
         <Input
           id="passportIssueDate"
           type="date"
           value={formData.passportIssueDate}
           onChange={(e) => setFormData({ ...formData, passportIssueDate: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="passportExpiryDate" className="text-sm font-medium">
-          Passport Expiry Date
-        </label>
+      <div>
+        <Label htmlFor="passportExpiryDate">Passport Expiry Date</Label>
         <Input
           id="passportExpiryDate"
           type="date"
           value={formData.passportExpiryDate}
           onChange={(e) => setFormData({ ...formData, passportExpiryDate: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="passportPlaceOfIssue" className="text-sm font-medium">
-          Place of Issue (Passport)
-        </label>
+      <div>
+        <Label htmlFor="passportPlaceOfIssue">Place of Issue (Passport)</Label>
         <Input
           id="passportPlaceOfIssue"
           value={formData.passportPlaceOfIssue}
           onChange={(e) => setFormData({ ...formData, passportPlaceOfIssue: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="address" className="text-sm font-medium">
-          Current Address
-        </label>
+      <div>
+        <Label htmlFor="address">Current Address</Label>
         <Input
           id="address"
           value={formData.address}
           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="city" className="text-sm font-medium">
-          City
-        </label>
+      <div>
+        <Label htmlFor="city">City</Label>
         <Input
           id="city"
           value={formData.city}
           onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="postalCode" className="text-sm font-medium">
-          Postal Code
-        </label>
+      <div>
+        <Label htmlFor="postalCode">Postal Code</Label>
         <Input
           id="postalCode"
           value={formData.postalCode}
           onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="country" className="text-sm font-medium">
-          Country
-        </label>
+      <div>
+        <Label htmlFor="country">Country</Label>
         <Input
           id="country"
           value={formData.country}
           onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-          required
         />
       </div>
-      <div className="space-y-2">
-        <label htmlFor="email" className="text-sm font-medium">
-          Email
-        </label>
-        <Input
-          id="email"
-          type="email"
-          value={formData.email}
-          readOnly
-          className="bg-gray-100"
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <label htmlFor="phone" className="text-sm font-medium">
-          Mobile Number
-        </label>
+      <div>
+        <Label htmlFor="phone">Mobile Number</Label>
         <Input
           id="phone"
-          type="tel"
           value={formData.phone}
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          required
         />
       </div>
-    </div>
+      <Button type="submit">Save</Button>
+    </form>
   );
 };
 
