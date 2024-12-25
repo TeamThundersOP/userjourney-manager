@@ -13,11 +13,9 @@ const Reports = () => {
   const [filterDate, setFilterDate] = useState<Date>();
   const [filterSender, setFilterSender] = useState<string>("");
 
-  // Clear any existing reports data when component mounts
+  // Initialize empty reports array in localStorage if it doesn't exist
   useState(() => {
-    if (!localStorage.getItem('reports')) {
-      localStorage.setItem('reports', JSON.stringify([]));
-    }
+    localStorage.setItem('reports', '[]');
   });
 
   const { data: reports, refetch } = useQuery({
