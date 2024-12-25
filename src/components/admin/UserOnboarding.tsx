@@ -1,13 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { PenSquare, Check } from "lucide-react";
+import { PenSquare } from "lucide-react";
 import { User } from "@/types/user";
 import { calculatePhaseProgress } from "@/utils/onboarding";
 import { useState } from "react";
 import EditOnboardingDialog from "./EditOnboardingDialog";
 import { toast } from "sonner";
+import PhaseHeader from "./onboarding/PhaseHeader";
+import PhaseProgress from "./onboarding/PhaseProgress";
 
 interface UserOnboardingProps {
   user: User;
@@ -92,110 +92,45 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-semibold">Phase 0: Initial Setup</h3>
-            {user.onboarding?.approvals.phase0 ? (
-              <Badge variant="default" className="flex items-center gap-1">
-                <Check className="h-3 w-3" />
-                Approved
-              </Badge>
-            ) : canApprovePhase(0) ? (
-              <Button 
-                size="sm" 
-                onClick={() => handleApprovePhase(0)}
-                className="flex items-center gap-1"
-              >
-                <Check className="h-4 w-4" />
-                Approve Phase
-              </Button>
-            ) : null}
-          </div>
-          <Progress value={phase0Progress} className="mb-2" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {Object.entries(user.onboarding.phase0).map(([key, value]) => (
-              <div key={key} className="flex items-center">
-                <div className={`w-2 h-2 rounded-full mr-2 ${
-                  key === 'visaStatus' 
-                    ? value === 'approved' 
-                      ? 'bg-green-500' 
-                      : value === 'rejected'
-                      ? 'bg-red-500'
-                      : 'bg-yellow-500'
-                    : value 
-                    ? 'bg-green-500' 
-                    : 'bg-gray-300'
-                }`} />
-                <span className="text-sm capitalize">
-                  {key === 'visaStatus' 
-                    ? `Visa Status: ${value}` 
-                    : key.replace(/([A-Z])/g, ' $1')}
-                </span>
-              </div>
-            ))}
-          </div>
+          <PhaseHeader
+            title="Phase 0: Initial Setup"
+            isApproved={user.onboarding.approvals.phase0}
+            canApprove={canApprovePhase(0)}
+            onApprove={() => handleApprovePhase(0)}
+          />
+          <PhaseProgress
+            progress={phase0Progress}
+            items={Object.entries(user.onboarding.phase0).map(([key, value]) => ({ key, value }))}
+          />
         </div>
 
         {user.onboarding?.approvals.phase0 && (
           <div>
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="font-semibold">Phase 1: Documentation</h3>
-              {user.onboarding?.approvals.phase1 ? (
-                <Badge variant="default" className="flex items-center gap-1">
-                  <Check className="h-3 w-3" />
-                  Approved
-                </Badge>
-              ) : canApprovePhase(1) ? (
-                <Button 
-                  size="sm" 
-                  onClick={() => handleApprovePhase(1)}
-                  className="flex items-center gap-1"
-                >
-                  <Check className="h-4 w-4" />
-                  Approve Phase
-                </Button>
-              ) : null}
-            </div>
-            <Progress value={phase1Progress} className="mb-2" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {Object.entries(user.onboarding.phase1).map(([key, value]) => (
-                <div key={key} className="flex items-center">
-                  <div className={`w-2 h-2 rounded-full mr-2 ${value ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  <span className="text-sm capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                </div>
-              ))}
-            </div>
+            <PhaseHeader
+              title="Phase 1: Documentation"
+              isApproved={user.onboarding.approvals.phase1}
+              canApprove={canApprovePhase(1)}
+              onApprove={() => handleApprovePhase(1)}
+            />
+            <PhaseProgress
+              progress={phase1Progress}
+              items={Object.entries(user.onboarding.phase1).map(([key, value]) => ({ key, value }))}
+            />
           </div>
         )}
 
         {user.onboarding?.approvals.phase1 && (
           <div>
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="font-semibold">Phase 2: Final Steps</h3>
-              {user.onboarding?.approvals.phase2 ? (
-                <Badge variant="default" className="flex items-center gap-1">
-                  <Check className="h-3 w-3" />
-                  Approved
-                </Badge>
-              ) : canApprovePhase(2) ? (
-                <Button 
-                  size="sm" 
-                  onClick={() => handleApprovePhase(2)}
-                  className="flex items-center gap-1"
-                >
-                  <Check className="h-4 w-4" />
-                  Approve Phase
-                </Button>
-              ) : null}
-            </div>
-            <Progress value={phase2Progress} className="mb-2" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {Object.entries(user.onboarding.phase2).map(([key, value]) => (
-                <div key={key} className="flex items-center">
-                  <div className={`w-2 h-2 rounded-full mr-2 ${value ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  <span className="text-sm capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                </div>
-              ))}
-            </div>
+            <PhaseHeader
+              title="Phase 2: Final Steps"
+              isApproved={user.onboarding.approvals.phase2}
+              canApprove={canApprovePhase(2)}
+              onApprove={() => handleApprovePhase(2)}
+            />
+            <PhaseProgress
+              progress={phase2Progress}
+              items={Object.entries(user.onboarding.phase2).map(([key, value]) => ({ key, value }))}
+            />
           </div>
         )}
       </CardContent>
