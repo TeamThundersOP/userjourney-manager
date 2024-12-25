@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import PersonalDetailsForm from "@/components/user/PersonalDetailsForm";
 import { User } from "@/types/user";
+import { defaultOnboarding } from "@/utils/defaultOnboarding";
 
 const PersonalDetails = () => {
   const [formData, setFormData] = useState({
@@ -91,6 +92,15 @@ const PersonalDetails = () => {
               fullName: `${formData.givenName} ${formData.familyName}`,
             },
             hasCompletedPersonalInfo: true,
+            onboarding: {
+              ...defaultOnboarding,
+              ...user.onboarding,
+              phase0: {
+                ...defaultOnboarding.phase0,
+                ...user.onboarding?.phase0,
+                personalDetailsCompleted: true,
+              },
+            },
           }
         : user
     );
