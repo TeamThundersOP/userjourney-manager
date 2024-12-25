@@ -110,7 +110,7 @@ const ViewUser = () => {
       <h1 className="text-3xl font-bold">User Profile</h1>
       <UserPersonalInfo user={user} />
       <UserOnboarding user={user} />
-      <UserFiles />
+      <UserFiles user={user} />
     </div>
   );
 };
