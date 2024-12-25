@@ -31,7 +31,7 @@ const UserLogin = () => {
           title: "Success",
           description: "Successfully logged in",
         });
-        navigate('/dashboard');
+        navigate('/user/dashboard');
       }
     } else {
       toast({
