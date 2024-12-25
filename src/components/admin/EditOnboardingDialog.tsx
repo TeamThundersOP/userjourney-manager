@@ -34,7 +34,47 @@ const EditOnboardingDialog = ({
 }: EditOnboardingDialogProps) => {
   const [onboarding, setOnboarding] = useState({
     ...user.onboarding,
-    approvals: user.onboarding?.approvals || { phase0: false, phase1: false, phase2: false }
+    currentPhase: user.onboarding?.currentPhase || 0,
+    phase0: {
+      personalDetailsCompleted: false,
+      cvSubmitted: false,
+      interviewCompleted: false,
+      jobStatus: 'pending',
+      passportUploaded: false,
+      pccUploaded: false,
+      otherDocumentsUploaded: false,
+      offerLetterSent: false,
+      cosSent: false,
+      rightToWorkSent: false,
+      documentsUploaded: false,
+      visaStatus: 'pending',
+      travelDetailsUpdated: false,
+      travelDocumentsUploaded: false,
+      visaCopyUploaded: false,
+      ukContactUpdated: false,
+      ...user.onboarding?.phase0
+    },
+    phase1: {
+      hmrcChecklist: false,
+      companyAgreements: false,
+      pensionScheme: false,
+      bankStatements: false,
+      vaccinationProof: false,
+      ...user.onboarding?.phase1
+    },
+    phase2: {
+      rightToWork: false,
+      shareCode: false,
+      dbs: false,
+      onboardingComplete: false,
+      ...user.onboarding?.phase2
+    },
+    approvals: {
+      phase0: false,
+      phase1: false,
+      phase2: false,
+      ...user.onboarding?.approvals
+    }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
