@@ -20,7 +20,7 @@ const UserLogin = () => {
     
     if (user && user.password === password) {
       localStorage.setItem('userAuth', 'true');
-      localStorage.setItem('userId', user.id.toString());
+      localStorage.setItem('userEmail', email);
       
       if (!user.hasResetPassword) {
         navigate('/reset-password');
@@ -31,7 +31,7 @@ const UserLogin = () => {
           title: "Success",
           description: "Successfully logged in",
         });
-        navigate('/dashboard');
+        navigate('/user/dashboard');
       }
     } else {
       toast({
