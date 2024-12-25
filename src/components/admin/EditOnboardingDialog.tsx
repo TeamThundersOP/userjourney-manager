@@ -42,7 +42,46 @@ const EditOnboardingDialog = ({
     
     const updatedUser: User = {
       ...user,
-      onboarding: onboarding,
+      onboarding: {
+        ...onboarding,
+        phase0: {
+          personalDetailsCompleted: onboarding?.phase0?.personalDetailsCompleted || false,
+          cvSubmitted: onboarding?.phase0?.cvSubmitted || false,
+          interviewCompleted: onboarding?.phase0?.interviewCompleted || false,
+          jobStatus: onboarding?.phase0?.jobStatus || 'pending',
+          passportUploaded: onboarding?.phase0?.passportUploaded || false,
+          pccUploaded: onboarding?.phase0?.pccUploaded || false,
+          otherDocumentsUploaded: onboarding?.phase0?.otherDocumentsUploaded || false,
+          offerLetterSent: onboarding?.phase0?.offerLetterSent || false,
+          cosSent: onboarding?.phase0?.cosSent || false,
+          rightToWorkSent: onboarding?.phase0?.rightToWorkSent || false,
+          documentsUploaded: onboarding?.phase0?.documentsUploaded || false,
+          visaStatus: onboarding?.phase0?.visaStatus || 'pending',
+          travelDetailsUpdated: onboarding?.phase0?.travelDetailsUpdated || false,
+          travelDocumentsUploaded: onboarding?.phase0?.travelDocumentsUploaded || false,
+          visaCopyUploaded: onboarding?.phase0?.visaCopyUploaded || false,
+          ukContactUpdated: onboarding?.phase0?.ukContactUpdated || false,
+          phase0Complete: onboarding?.phase0?.phase0Complete || false
+        },
+        phase1: onboarding?.phase1 || {
+          hmrcChecklist: false,
+          companyAgreements: false,
+          pensionScheme: false,
+          bankStatements: false,
+          vaccinationProof: false
+        },
+        phase2: onboarding?.phase2 || {
+          rightToWork: false,
+          shareCode: false,
+          dbs: false,
+          onboardingComplete: false
+        },
+        approvals: onboarding?.approvals || {
+          phase0: false,
+          phase1: false,
+          phase2: false
+        }
+      }
     };
 
     onSave(updatedUser);
@@ -63,8 +102,21 @@ const EditOnboardingDialog = ({
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
                   <Checkbox
+                    id="personalDetailsCompleted"
+                    checked={onboarding?.phase0?.personalDetailsCompleted}
+                    onCheckedChange={(checked) =>
+                      setOnboarding((prev) => ({
+                        ...prev!,
+                        phase0: { ...prev!.phase0, personalDetailsCompleted: checked as boolean },
+                      }))
+                    }
+                  />
+                  <Label htmlFor="personalDetailsCompleted">Personal Details Completed</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
                     id="cvSubmitted"
-                    checked={onboarding?.phase0.cvSubmitted}
+                    checked={onboarding?.phase0?.cvSubmitted}
                     onCheckedChange={(checked) =>
                       setOnboarding((prev) => ({
                         ...prev!,
@@ -77,7 +129,7 @@ const EditOnboardingDialog = ({
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="interviewCompleted"
-                    checked={onboarding?.phase0.interviewCompleted}
+                    checked={onboarding?.phase0?.interviewCompleted}
                     onCheckedChange={(checked) =>
                       setOnboarding((prev) => ({
                         ...prev!,
@@ -89,8 +141,47 @@ const EditOnboardingDialog = ({
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
+                    id="passportUploaded"
+                    checked={onboarding?.phase0?.passportUploaded}
+                    onCheckedChange={(checked) =>
+                      setOnboarding((prev) => ({
+                        ...prev!,
+                        phase0: { ...prev!.phase0, passportUploaded: checked as boolean },
+                      }))
+                    }
+                  />
+                  <Label htmlFor="passportUploaded">Passport Uploaded</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="pccUploaded"
+                    checked={onboarding?.phase0?.pccUploaded}
+                    onCheckedChange={(checked) =>
+                      setOnboarding((prev) => ({
+                        ...prev!,
+                        phase0: { ...prev!.phase0, pccUploaded: checked as boolean },
+                      }))
+                    }
+                  />
+                  <Label htmlFor="pccUploaded">PCC Uploaded</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="otherDocumentsUploaded"
+                    checked={onboarding?.phase0?.otherDocumentsUploaded}
+                    onCheckedChange={(checked) =>
+                      setOnboarding((prev) => ({
+                        ...prev!,
+                        phase0: { ...prev!.phase0, otherDocumentsUploaded: checked as boolean },
+                      }))
+                    }
+                  />
+                  <Label htmlFor="otherDocumentsUploaded">Other Documents Uploaded</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
                     id="offerLetterSent"
-                    checked={onboarding?.phase0.offerLetterSent}
+                    checked={onboarding?.phase0?.offerLetterSent}
                     onCheckedChange={(checked) =>
                       setOnboarding((prev) => ({
                         ...prev!,
@@ -103,7 +194,7 @@ const EditOnboardingDialog = ({
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="cosSent"
-                    checked={onboarding?.phase0.cosSent}
+                    checked={onboarding?.phase0?.cosSent}
                     onCheckedChange={(checked) =>
                       setOnboarding((prev) => ({
                         ...prev!,
@@ -116,7 +207,7 @@ const EditOnboardingDialog = ({
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="rightToWorkSent"
-                    checked={onboarding?.phase0.rightToWorkSent}
+                    checked={onboarding?.phase0?.rightToWorkSent}
                     onCheckedChange={(checked) =>
                       setOnboarding((prev) => ({
                         ...prev!,
@@ -129,7 +220,7 @@ const EditOnboardingDialog = ({
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="documentsUploaded"
-                    checked={onboarding?.phase0.documentsUploaded}
+                    checked={onboarding?.phase0?.documentsUploaded}
                     onCheckedChange={(checked) =>
                       setOnboarding((prev) => ({
                         ...prev!,
@@ -142,7 +233,7 @@ const EditOnboardingDialog = ({
                 <div className="col-span-2">
                   <Label htmlFor="visaStatus">Visa Status</Label>
                   <Select
-                    value={onboarding?.phase0.visaStatus}
+                    value={onboarding?.phase0?.visaStatus}
                     onValueChange={(value: 'pending' | 'approved' | 'rejected') =>
                       setOnboarding((prev) => ({
                         ...prev!,
@@ -159,6 +250,71 @@ const EditOnboardingDialog = ({
                       <SelectItem value="rejected">Rejected</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="travelDetailsUpdated"
+                    checked={onboarding?.phase0?.travelDetailsUpdated}
+                    onCheckedChange={(checked) =>
+                      setOnboarding((prev) => ({
+                        ...prev!,
+                        phase0: { ...prev!.phase0, travelDetailsUpdated: checked as boolean },
+                      }))
+                    }
+                  />
+                  <Label htmlFor="travelDetailsUpdated">Travel Details Updated</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="travelDocumentsUploaded"
+                    checked={onboarding?.phase0?.travelDocumentsUploaded}
+                    onCheckedChange={(checked) =>
+                      setOnboarding((prev) => ({
+                        ...prev!,
+                        phase0: { ...prev!.phase0, travelDocumentsUploaded: checked as boolean },
+                      }))
+                    }
+                  />
+                  <Label htmlFor="travelDocumentsUploaded">Travel Documents Uploaded</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="visaCopyUploaded"
+                    checked={onboarding?.phase0?.visaCopyUploaded}
+                    onCheckedChange={(checked) =>
+                      setOnboarding((prev) => ({
+                        ...prev!,
+                        phase0: { ...prev!.phase0, visaCopyUploaded: checked as boolean },
+                      }))
+                    }
+                  />
+                  <Label htmlFor="visaCopyUploaded">Visa Copy Uploaded</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="ukContactUpdated"
+                    checked={onboarding?.phase0?.ukContactUpdated}
+                    onCheckedChange={(checked) =>
+                      setOnboarding((prev) => ({
+                        ...prev!,
+                        phase0: { ...prev!.phase0, ukContactUpdated: checked as boolean },
+                      }))
+                    }
+                  />
+                  <Label htmlFor="ukContactUpdated">UK Contact Updated</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="phase0Complete"
+                    checked={onboarding?.phase0?.phase0Complete}
+                    onCheckedChange={(checked) =>
+                      setOnboarding((prev) => ({
+                        ...prev!,
+                        phase0: { ...prev!.phase0, phase0Complete: checked as boolean },
+                      }))
+                    }
+                  />
+                  <Label htmlFor="phase0Complete">Phase 0 Complete</Label>
                 </div>
               </div>
             </div>
