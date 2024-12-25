@@ -29,15 +29,21 @@ const fetchUsers = async (): Promise<User[]> => {
   return [
     { 
       id: 1, 
-      email: "user1@example.com", 
+      email: "john.doe@example.com", 
       status: "Active",
       personalInfo: { fullName: "John Doe" }
     },
     { 
       id: 2, 
-      email: "user2@example.com", 
-      status: "Pending",
+      email: "jane.smith@example.com", 
+      status: "Active",
       personalInfo: { fullName: "Jane Smith" }
+    },
+    { 
+      id: 3, 
+      email: "mike.wilson@example.com", 
+      status: "Pending",
+      personalInfo: { fullName: "Mike Wilson" }
     },
     // Add any newly created users from localStorage
     ...(JSON.parse(localStorage.getItem('users') || '[]'))
