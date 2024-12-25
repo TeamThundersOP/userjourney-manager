@@ -19,6 +19,11 @@ export interface User {
     phase0: Phase0;
     phase1: Phase1;
     phase2: Phase2;
+    approvals: {
+      phase0: boolean;
+      phase1: boolean;
+      phase2: boolean;
+    };
   };
 }
 

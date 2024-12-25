@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { User } from "@/types/user";
 import { useState } from "react";
 
@@ -32,8 +32,10 @@ const EditOnboardingDialog = ({
   onOpenChange,
   onSave,
 }: EditOnboardingDialogProps) => {
-  const { toast } = useToast();
-  const [onboarding, setOnboarding] = useState(user.onboarding);
+  const [onboarding, setOnboarding] = useState({
+    ...user.onboarding,
+    approvals: user.onboarding?.approvals || { phase0: false, phase1: false, phase2: false }
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,10 +46,7 @@ const EditOnboardingDialog = ({
     };
 
     onSave(updatedUser);
-    toast({
-      title: "Success",
-      description: "Onboarding progress updated successfully",
-    });
+    toast.success("Onboarding progress updated successfully");
     onOpenChange(false);
   };
 

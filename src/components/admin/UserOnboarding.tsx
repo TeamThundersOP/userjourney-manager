@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { PenSquare } from "lucide-react";
+import { PenSquare, Check, X } from "lucide-react";
 import { User } from "@/types/user";
 import { calculatePhaseProgress } from "@/utils/onboarding";
 import { useState } from "react";
 import EditOnboardingDialog from "./EditOnboardingDialog";
+import { toast } from "sonner";
 
 interface UserOnboardingProps {
   user: User;
@@ -21,6 +22,30 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
   const phase1Progress = calculatePhaseProgress(user.onboarding.phase1);
   const phase2Progress = calculatePhaseProgress(user.onboarding.phase2);
 
+  const handleApprovePhase = (phase: number) => {
+    const updatedUser = {
+      ...user,
+      onboarding: {
+        ...user.onboarding!,
+        approvals: {
+          ...user.onboarding!.approvals,
+          [`phase${phase}`]: true
+        },
+        currentPhase: phase + 1
+      }
+    };
+    setUser(updatedUser);
+    
+    // Update localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map((u: User) => 
+      u.id === updatedUser.id ? updatedUser : u
+    );
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    
+    toast.success(`Phase ${phase} approved successfully`);
+  };
+
   const handleSaveOnboarding = (updatedUser: User) => {
     setUser(updatedUser);
     // Update localStorage
@@ -31,9 +56,16 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
     localStorage.setItem('users', JSON.stringify(updatedUsers));
   };
 
-  // Check if phase is complete (100% progress)
-  const isPhase0Complete = phase0Progress === 100;
-  const isPhase1Complete = phase1Progress === 100;
+  const canApprovePhase = (phase: number) => {
+    if (phase === 0) {
+      return phase0Progress === 100 && !user.onboarding?.approvals.phase0;
+    } else if (phase === 1) {
+      return phase1Progress === 100 && user.onboarding?.approvals.phase0 && !user.onboarding?.approvals.phase1;
+    } else if (phase === 2) {
+      return phase2Progress === 100 && user.onboarding?.approvals.phase1 && !user.onboarding?.approvals.phase2;
+    }
+    return false;
+  };
 
   return (
     <Card>
@@ -49,7 +81,24 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <h3 className="font-semibold mb-2">Phase 0: Initial Setup</h3>
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="font-semibold">Phase 0: Initial Setup</h3>
+            {user.onboarding?.approvals.phase0 ? (
+              <Badge variant="success" className="flex items-center gap-1">
+                <Check className="h-3 w-3" />
+                Approved
+              </Badge>
+            ) : canApprovePhase(0) ? (
+              <Button 
+                size="sm" 
+                onClick={() => handleApprovePhase(0)}
+                className="flex items-center gap-1"
+              >
+                <Check className="h-4 w-4" />
+                Approve Phase
+              </Button>
+            ) : null}
+          </div>
           <Progress value={phase0Progress} className="mb-2" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {Object.entries(user.onboarding.phase0).map(([key, value]) => (
@@ -75,9 +124,26 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
           </div>
         </div>
 
-        {isPhase0Complete && (
+        {user.onboarding?.approvals.phase0 && (
           <div>
-            <h3 className="font-semibold mb-2">Phase 1: Documentation</h3>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-semibold">Phase 1: Documentation</h3>
+              {user.onboarding?.approvals.phase1 ? (
+                <Badge variant="success" className="flex items-center gap-1">
+                  <Check className="h-3 w-3" />
+                  Approved
+                </Badge>
+              ) : canApprovePhase(1) ? (
+                <Button 
+                  size="sm" 
+                  onClick={() => handleApprovePhase(1)}
+                  className="flex items-center gap-1"
+                >
+                  <Check className="h-4 w-4" />
+                  Approve Phase
+                </Button>
+              ) : null}
+            </div>
             <Progress value={phase1Progress} className="mb-2" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {Object.entries(user.onboarding.phase1).map(([key, value]) => (
@@ -90,9 +156,26 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
           </div>
         )}
 
-        {isPhase0Complete && isPhase1Complete && (
+        {user.onboarding?.approvals.phase1 && (
           <div>
-            <h3 className="font-semibold mb-2">Phase 2: Final Steps</h3>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-semibold">Phase 2: Final Steps</h3>
+              {user.onboarding?.approvals.phase2 ? (
+                <Badge variant="success" className="flex items-center gap-1">
+                  <Check className="h-3 w-3" />
+                  Approved
+                </Badge>
+              ) : canApprovePhase(2) ? (
+                <Button 
+                  size="sm" 
+                  onClick={() => handleApprovePhase(2)}
+                  className="flex items-center gap-1"
+                >
+                  <Check className="h-4 w-4" />
+                  Approve Phase
+                </Button>
+              ) : null}
+            </div>
             <Progress value={phase2Progress} className="mb-2" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {Object.entries(user.onboarding.phase2).map(([key, value]) => (
