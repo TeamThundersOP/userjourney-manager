@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -14,7 +12,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Phase1, User } from "@/types/user";
-import { Upload } from "lucide-react";
+import { DocumentsSection } from "./phase1/DocumentsSection";
+import { UKTravelSection } from "./phase1/UKTravelSection";
 
 interface Phase1OnboardingProps {
   user: User;
@@ -22,7 +21,7 @@ interface Phase1OnboardingProps {
 
 const defaultPhase1Data: Phase1 = {
   cvSubmitted: false,
-  personalDetailsCompleted: true,
+  personalDetailsCompleted: false,
   interviewStatus: 'pending',
   jobStatus: 'pending',
   documents: {
@@ -156,167 +155,31 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid gap-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              checked={phase1Data.cvSubmitted}
-              disabled={phase1Data.cvSubmitted}
-              onCheckedChange={(checked) =>
-                setPhase1Data(prev => ({ ...prev, cvSubmitted: checked as boolean }))
-              }
-            />
-            <Label>CV Submitted</Label>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => handleFileUpload('cv')}
-              disabled={phase1Data.cvSubmitted}
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Upload CV
-            </Button>
-          </div>
+          <DocumentsSection 
+            documents={phase1Data.documents}
+            onDocumentChange={(key, value) =>
+              setPhase1Data(prev => ({
+                ...prev,
+                documents: {
+                  ...prev.documents,
+                  [key]: value
+                }
+              }))
+            }
+          />
 
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              checked={phase1Data.personalDetailsCompleted}
-              disabled={true}
-              onCheckedChange={(checked) =>
-                setPhase1Data(prev => ({ ...prev, personalDetailsCompleted: checked as boolean }))
-              }
-            />
-            <Label>Personal Details Completed</Label>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Interview Status</Label>
-            <Select
-              value={phase1Data.interviewStatus}
-              onValueChange={(value: 'pending' | 'completed' | 'rejected') =>
-                setPhase1Data(prev => ({ ...prev, interviewStatus: value }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Job Status</Label>
-            <Select
-              value={phase1Data.jobStatus}
-              onValueChange={(value: 'pending' | 'accepted' | 'rejected') =>
-                setPhase1Data(prev => ({ ...prev, jobStatus: value }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="accepted">Accepted</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Documents</Label>
-            <div className="grid gap-2">
-              {Object.entries(phase1Data.documents).map(([key, value]) => (
-                <div key={key} className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={value}
-                    onCheckedChange={(checked) =>
-                      setPhase1Data(prev => ({
-                        ...prev,
-                        documents: {
-                          ...prev.documents,
-                          [key]: checked as boolean
-                        }
-                      }))
-                    }
-                  />
-                  <Label className="capitalize">{key}</Label>
-                  <Button variant="outline" size="sm">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              checked={phase1Data.offerLetterSent}
-              disabled={phase1Data.offerLetterSent}
-              onCheckedChange={(checked) =>
-                setPhase1Data(prev => ({ ...prev, offerLetterSent: checked as boolean }))
-              }
-            />
-            <Label>Offer Letter Sent</Label>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => handleFileUpload('offerLetter')}
-              disabled={phase1Data.offerLetterSent}
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Upload Offer Letter
-            </Button>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Visa Status</Label>
-            <Select
-              value={phase1Data.visaStatus}
-              onValueChange={(value: 'pending' | 'approved' | 'rejected') =>
-                setPhase1Data(prev => ({ ...prev, visaStatus: value }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>UK Travel Documents</Label>
-            <div className="grid gap-2">
-              {Object.entries(phase1Data.ukTravel).map(([key, value]) => (
-                <div key={key} className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={value}
-                    onCheckedChange={(checked) =>
-                      setPhase1Data(prev => ({
-                        ...prev,
-                        ukTravel: {
-                          ...prev.ukTravel,
-                          [key]: checked as boolean
-                        }
-                      }))
-                    }
-                  />
-                  <Label className="capitalize">{key.replace(/([A-Z])/g, ' $1')}</Label>
-                  <Button variant="outline" size="sm">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
+          <UKTravelSection
+            ukTravel={phase1Data.ukTravel}
+            onUKTravelChange={(key, value) =>
+              setPhase1Data(prev => ({
+                ...prev,
+                ukTravel: {
+                  ...prev.ukTravel,
+                  [key]: value
+                }
+              }))
+            }
+          />
 
           <div className="space-y-2">
             <Label>UK Contact Information</Label>
@@ -349,7 +212,6 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
               />
             </div>
           </div>
-
         </div>
 
         {!user?.onboarding?.approvals.phase1 && progress === 100 && (
