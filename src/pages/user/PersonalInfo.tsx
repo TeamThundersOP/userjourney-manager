@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '@/contexts/UserAuthContext';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import PersonalInfoHeader from '@/components/user/personal-info/PersonalInfoHeader';
-import FormSection from '@/components/user/personal-info/FormSection';
-import FormField from '@/components/user/personal-info/FormField';
 import {
   Select,
   SelectContent,
@@ -89,161 +88,199 @@ const PersonalInfo = () => {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 bg-gradient-to-br from-[#E5DEFF] to-white">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <PersonalInfoHeader />
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <FormSection title="Basic Information">
-            <FormField
-              label="ID"
-              id="id"
-              value={user.id}
-              disabled
-            />
-            <FormField
-              label="Email"
-              id="email"
-              value={user.email}
-              disabled
-            />
-            <FormField
-              label="Family Name"
-              id="familyName"
-              value={formData.familyName}
-              onChange={(e) => setFormData({ ...formData, familyName: e.target.value })}
-            />
-            <FormField
-              label="Given Name"
-              id="givenName"
-              value={formData.givenName}
-              onChange={(e) => setFormData({ ...formData, givenName: e.target.value })}
-            />
-            <FormField
-              label="Other Names"
-              id="otherNames"
-              value={formData.otherNames}
-              onChange={(e) => setFormData({ ...formData, otherNames: e.target.value })}
-              required={false}
-            />
-          </FormSection>
-
-          <FormSection title="Personal Details">
-            <FormField
-              label="Nationality"
-              id="nationality"
-              value={formData.nationality}
-              onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
-            />
-            <FormField
-              label="Place of Birth"
-              id="placeOfBirth"
-              value={formData.placeOfBirth}
-              onChange={(e) => setFormData({ ...formData, placeOfBirth: e.target.value })}
-            />
-            <FormField
-              label="Date of Birth"
-              id="dateOfBirth"
-              type="date"
-              value={formData.dateOfBirth}
-              onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-            />
-            <div className="space-y-2">
-              <label htmlFor="gender" className="text-sm font-medium text-gray-700">
-                Gender
-              </label>
-              <Select
-                value={formData.gender}
-                onValueChange={(value) => setFormData({ ...formData, gender: value })}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+    <div className="min-h-screen py-8 px-4 bg-gray-50">
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">Personal Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">ID</label>
+                <Input value={user.id} disabled />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Email</label>
+                <Input value={user.email} disabled />
+              </div>
             </div>
-            <FormField
-              label="Country of Residence"
-              id="countryOfResidence"
-              value={formData.countryOfResidence}
-              onChange={(e) => setFormData({ ...formData, countryOfResidence: e.target.value })}
-            />
-          </FormSection>
 
-          <FormSection title="Passport Information">
-            <FormField
-              label="Passport Number"
-              id="passportNumber"
-              value={formData.passportNumber}
-              onChange={(e) => setFormData({ ...formData, passportNumber: e.target.value })}
-            />
-            <FormField
-              label="Place of Issue"
-              id="passportPlaceOfIssue"
-              value={formData.passportPlaceOfIssue}
-              onChange={(e) => setFormData({ ...formData, passportPlaceOfIssue: e.target.value })}
-            />
-            <FormField
-              label="Issue Date"
-              id="passportIssueDate"
-              type="date"
-              value={formData.passportIssueDate}
-              onChange={(e) => setFormData({ ...formData, passportIssueDate: e.target.value })}
-            />
-            <FormField
-              label="Expiry Date"
-              id="passportExpiryDate"
-              type="date"
-              value={formData.passportExpiryDate}
-              onChange={(e) => setFormData({ ...formData, passportExpiryDate: e.target.value })}
-            />
-          </FormSection>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Family Name</label>
+                <Input
+                  value={formData.familyName}
+                  onChange={(e) => setFormData({ ...formData, familyName: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Given Name</label>
+                <Input
+                  value={formData.givenName}
+                  onChange={(e) => setFormData({ ...formData, givenName: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
 
-          <FormSection title="Contact Information">
-            <FormField
-              label="Current Address"
-              id="address"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            />
-            <FormField
-              label="City"
-              id="city"
-              value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-            />
-            <FormField
-              label="Postal Code"
-              id="postalCode"
-              value={formData.postalCode}
-              onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-            />
-            <FormField
-              label="Country"
-              id="country"
-              value={formData.country}
-              onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-            />
-            <FormField
-              label="Mobile Number"
-              id="phone"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            />
-          </FormSection>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Other Names</label>
+              <Input
+                value={formData.otherNames}
+                onChange={(e) => setFormData({ ...formData, otherNames: e.target.value })}
+              />
+            </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-gradient-to-r from-[#9b87f5] to-[#8B5CF6] text-white hover:opacity-90 transition-opacity duration-200 py-6"
-          >
-            Save Information
-          </Button>
-        </form>
-      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Nationality</label>
+                <Input
+                  value={formData.nationality}
+                  onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Place of Birth</label>
+                <Input
+                  value={formData.placeOfBirth}
+                  onChange={(e) => setFormData({ ...formData, placeOfBirth: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Date of Birth</label>
+                <Input
+                  type="date"
+                  value={formData.dateOfBirth}
+                  onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Gender</label>
+                <Select
+                  value={formData.gender}
+                  onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Country of Residence</label>
+              <Input
+                value={formData.countryOfResidence}
+                onChange={(e) => setFormData({ ...formData, countryOfResidence: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold">Passport Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Passport Number</label>
+                  <Input
+                    value={formData.passportNumber}
+                    onChange={(e) => setFormData({ ...formData, passportNumber: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Place of Issue</label>
+                  <Input
+                    value={formData.passportPlaceOfIssue}
+                    onChange={(e) => setFormData({ ...formData, passportPlaceOfIssue: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Issue Date</label>
+                  <Input
+                    type="date"
+                    value={formData.passportIssueDate}
+                    onChange={(e) => setFormData({ ...formData, passportIssueDate: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Expiry Date</label>
+                  <Input
+                    type="date"
+                    value={formData.passportExpiryDate}
+                    onChange={(e) => setFormData({ ...formData, passportExpiryDate: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold">Contact Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Current Address</label>
+                  <Input
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">City</label>
+                  <Input
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Postal Code</label>
+                  <Input
+                    value={formData.postalCode}
+                    onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Country</label>
+                  <Input
+                    value={formData.country}
+                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Mobile Number</label>
+                  <Input
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full">
+              Save Information
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
