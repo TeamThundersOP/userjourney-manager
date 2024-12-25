@@ -60,8 +60,7 @@ const EditOnboardingDialog = ({
           travelDetailsUpdated: onboarding?.phase0?.travelDetailsUpdated || false,
           travelDocumentsUploaded: onboarding?.phase0?.travelDocumentsUploaded || false,
           visaCopyUploaded: onboarding?.phase0?.visaCopyUploaded || false,
-          ukContactUpdated: onboarding?.phase0?.ukContactUpdated || false,
-          phase0Complete: onboarding?.phase0?.phase0Complete || false
+          ukContactUpdated: onboarding?.phase0?.ukContactUpdated || false
         },
         phase1: onboarding?.phase1 || {
           hmrcChecklist: false,
@@ -302,19 +301,6 @@ const EditOnboardingDialog = ({
                     }
                   />
                   <Label htmlFor="ukContactUpdated">UK Contact Updated</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="phase0Complete"
-                    checked={onboarding?.phase0?.phase0Complete}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase0: { ...prev!.phase0, phase0Complete: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="phase0Complete">Phase 0 Complete</Label>
                 </div>
               </div>
             </div>
