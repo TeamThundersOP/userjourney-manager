@@ -81,20 +81,16 @@ const EditOnboardingDialog = ({
               onUpdate={handlePhase0Update}
               isAdmin={isAdmin}
             />
-            {onboarding?.phase0.interviewStatus === 'accepted' && (
-              <Phase1Form
-                phase1={onboarding.phase1}
-                onUpdate={handlePhase1Update}
-                isAdmin={isAdmin}
-              />
-            )}
-            {onboarding?.phase1.shareCodeUploaded && onboarding?.phase1.dbsUploaded && (
-              <Phase2Form
-                phase2={onboarding.phase2}
-                onUpdate={handlePhase2Update}
-                isAdmin={isAdmin}
-              />
-            )}
+            <Phase1Form
+              phase1={onboarding!.phase1}
+              onUpdate={handlePhase1Update}
+              isAdmin={isAdmin}
+            />
+            <Phase2Form
+              phase2={onboarding!.phase2}
+              onUpdate={handlePhase2Update}
+              isAdmin={isAdmin}
+            />
           </div>
           <DialogFooter>
             <Button type="submit">Save changes</Button>
