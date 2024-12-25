@@ -28,16 +28,6 @@ const Dashboard = () => {
             <p className="text-sm text-gray-600">View and respond to user reports</p>
           </CardContent>
         </Card>
-
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => navigate('/admin/documents')}>
-          <CardHeader>
-            <CardTitle>Documents</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600">Manage user documents and uploads</p>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
