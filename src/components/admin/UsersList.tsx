@@ -58,7 +58,7 @@ const UsersList = () => {
     return (
       user.id.toString().includes(searchTerm) ||
       user.personalInfo?.fullName?.toLowerCase().includes(searchLower) ||
-      ""
+      user.email.toLowerCase().includes(searchLower)
     );
   });
 
