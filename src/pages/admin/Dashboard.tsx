@@ -1,54 +1,71 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { Users, FileText, ArrowRight } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // Fetch users count from localStorage only
   const { data: usersCount } = useQuery({
     queryKey: ['usersCount'],
     queryFn: () => {
       const localStorageUsers = JSON.parse(localStorage.getItem('users') || '[]');
       return localStorageUsers.length;
     },
-    refetchInterval: 5000, // Refresh every 5 seconds
+    refetchInterval: 5000,
   });
 
-  // For demo purposes, we'll use a mock reports count with automatic refresh
   const { data: reportsCount } = useQuery({
     queryKey: ['reportsCount'],
     queryFn: () => {
-      return 5; // Mock value for demonstration
+      return 5;
     },
-    refetchInterval: 5000, // Refresh every 5 seconds
+    refetchInterval: 5000,
   });
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+    <div className="space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
+        <p className="text-gray-500">Here's an overview of your admin dashboard</p>
+      </div>
       
-      {/* Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow" 
-              onClick={() => navigate('/admin/users')}>
-          <CardHeader>
-            <CardTitle>Manage Users</CardTitle>
+        <Card 
+          className="group hover:shadow-lg transition-all duration-200 cursor-pointer border-gray-100" 
+          onClick={() => navigate('/admin/users')}
+        >
+          <CardHeader className="space-y-1">
+            <div className="flex items-center justify-between">
+              <div className="bg-primary/10 p-3 rounded-lg">
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+              <ArrowRight className="h-5 w-5 text-gray-400 group-hover:translate-x-1 transition-transform duration-200" />
+            </div>
+            <CardTitle className="text-xl mt-4">Manage Users</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600">Create, edit, and manage user accounts</p>
-            <p className="mt-4 text-2xl font-bold text-blue-600">{usersCount || 0} Users</p>
+            <p className="text-sm text-gray-500 mb-2">Total registered users in the system</p>
+            <p className="text-3xl font-bold text-primary">{usersCount || 0}</p>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => navigate('/admin/reports')}>
-          <CardHeader>
-            <CardTitle>Reports</CardTitle>
+        <Card 
+          className="group hover:shadow-lg transition-all duration-200 cursor-pointer border-gray-100" 
+          onClick={() => navigate('/admin/reports')}
+        >
+          <CardHeader className="space-y-1">
+            <div className="flex items-center justify-between">
+              <div className="bg-blue-500/10 p-3 rounded-lg">
+                <FileText className="h-6 w-6 text-blue-500" />
+              </div>
+              <ArrowRight className="h-5 w-5 text-gray-400 group-hover:translate-x-1 transition-transform duration-200" />
+            </div>
+            <CardTitle className="text-xl mt-4">Reports</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600">View and respond to user reports</p>
-            <p className="mt-4 text-2xl font-bold text-green-600">{reportsCount || 0} Reports</p>
+            <p className="text-sm text-gray-500 mb-2">Active reports requiring attention</p>
+            <p className="text-3xl font-bold text-blue-500">{reportsCount || 0}</p>
           </CardContent>
         </Card>
       </div>
