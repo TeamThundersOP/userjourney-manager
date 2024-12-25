@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { User } from "@/types/user";
+import { User, Phase0, Phase1, Phase2 } from "@/types/user";
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -25,11 +25,19 @@ const Dashboard = () => {
     );
   }
 
-  const calculateProgress = (phase: Record<string, boolean | string>) => {
-    const total = Object.keys(phase).length;
-    const completed = Object.values(phase).filter(value => 
-      typeof value === 'boolean' ? value : value === 'approved'
-    ).length;
+  const calculateProgress = (phase: Phase0 | Phase1 | Phase2): number => {
+    const entries = Object.entries(phase);
+    const total = entries.length;
+    const completed = entries.filter(([_, value]) => {
+      if (typeof value === 'boolean') {
+        return value;
+      }
+      if (typeof value === 'string') {
+        return value === 'approved';
+      }
+      return false;
+    }).length;
+    
     return (completed / total) * 100;
   };
 
