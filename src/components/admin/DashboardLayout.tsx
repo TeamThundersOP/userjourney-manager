@@ -15,13 +15,11 @@ const DashboardLayout = () => {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    // Check if dark mode is enabled on mount
     const isDarkMode = document.documentElement.classList.contains('dark');
     setIsDark(isDarkMode);
   }, []);
 
   useEffect(() => {
-    // Close sidebar by default on mobile
     if (isMobile) {
       setSidebarOpen(false);
     } else {
@@ -45,7 +43,6 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
-      {/* Mobile Menu Button */}
       <button
         onClick={toggleSidebar}
         className="fixed top-4 left-4 z-50 md:hidden bg-white dark:bg-gray-800 p-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"
@@ -57,7 +54,6 @@ const DashboardLayout = () => {
         )}
       </button>
 
-      {/* Overlay for mobile */}
       {isSidebarOpen && isMobile && (
         <div
           className="fixed inset-0 bg-black/50 z-30 md:hidden"
@@ -65,26 +61,34 @@ const DashboardLayout = () => {
         />
       )}
 
-      {/* Modern Sidebar */}
       <aside className={`fixed top-0 left-0 h-screen w-64 bg-white dark:bg-gray-800 shadow-lg border-r border-gray-100 dark:border-gray-700 transition-all duration-200 z-40 ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } md:translate-x-0`}>
-        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-            Admin Dashboard
-          </h1>
-          <Toggle 
-            pressed={isDark}
-            onPressedChange={toggleTheme}
-            aria-label="Toggle theme"
-            className="ml-2"
-          >
-            {isDark ? (
-              <Moon className="h-4 w-4" />
-            ) : (
-              <Sun className="h-4 w-4" />
-            )}
-          </Toggle>
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/lovable-uploads/17a49967-e711-4d5a-b8fe-fb02e4469a2a.png" 
+                alt="Funelli Logo" 
+                className="h-8 w-auto"
+              />
+              <span className="text-xl font-bold font-araboto-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Funelli
+              </span>
+            </div>
+            <Toggle 
+              pressed={isDark}
+              onPressedChange={toggleTheme}
+              aria-label="Toggle theme"
+              className="ml-2"
+            >
+              {isDark ? (
+                <Moon className="h-4 w-4" />
+              ) : (
+                <Sun className="h-4 w-4" />
+              )}
+            </Toggle>
+          </div>
         </div>
         <nav className="mt-6 space-y-2 px-3">
           <Button
@@ -145,7 +149,6 @@ const DashboardLayout = () => {
         </nav>
       </aside>
 
-      {/* Main content with modern styling */}
       <main className={`min-h-screen p-8 transition-all duration-200 ${
         isSidebarOpen ? 'md:ml-64' : ''
       }`}>
