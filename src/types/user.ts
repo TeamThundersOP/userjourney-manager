@@ -62,7 +62,6 @@ export interface Phase0 {
   travelDocumentsUploaded: boolean;
   visaCopyUploaded: boolean;
   ukContactUpdated: boolean;
-  phase0Complete: boolean;
 }
 
 export interface Phase1 {

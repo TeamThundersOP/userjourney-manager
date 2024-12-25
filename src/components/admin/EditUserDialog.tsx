@@ -100,8 +100,7 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave }: EditUserDialogProp
           travelDetailsUpdated: false,
           travelDocumentsUploaded: false,
           visaCopyUploaded: false,
-          ukContactUpdated: false,
-          phase0Complete: false
+          ukContactUpdated: false
         },
         phase1: {
           hmrcChecklist: false,
