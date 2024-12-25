@@ -8,9 +8,9 @@ interface FormSectionProps {
 
 const FormSection = ({ title, children }: FormSectionProps) => {
   return (
-    <Card className="mb-6 border-none shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white/50 backdrop-blur-lg">
+    <Card className="features-small-item mb-6">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-[#8B5CF6]">{title}</CardTitle>
+        <CardTitle className="text-lg font-semibold">{title}</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {children}
