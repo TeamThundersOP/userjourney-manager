@@ -1,7 +1,7 @@
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from "@/components/ui/button";
 import { useNavigate, Outlet } from 'react-router-dom';
-import { Users, FileText, LogOut } from 'lucide-react';
+import { Users, LogOut } from 'lucide-react';
 
 const DashboardLayout = () => {
   const { logout } = useAdminAuth();
@@ -22,14 +22,6 @@ const DashboardLayout = () => {
           >
             <Users className="mr-2 h-4 w-4" />
             Users
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start px-6 py-3 text-left"
-            onClick={() => navigate('/admin/documents')}
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            Documents
           </Button>
           <Button
             variant="ghost"
