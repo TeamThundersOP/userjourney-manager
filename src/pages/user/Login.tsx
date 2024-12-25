@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import ResetPasswordDialog from '@/components/user/ResetPasswordDialog';
 
 const UserLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -18,15 +21,13 @@ const UserLogin = () => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find((u: any) => u.email === email);
     
-    if (user) {
-      // In a real app, we would hash passwords and compare them securely
-      localStorage.setItem('userAuth', 'true');
-      localStorage.setItem('userId', user.id.toString());
-      toast({
-        title: "Success",
-        description: "Successfully logged in",
-      });
-      navigate('/dashboard'); // We'll create the user dashboard next
+    if (user && user.password === password) {
+      if (!user.hasResetPassword) {
+        setCurrentUserId(user.id);
+        setShowResetDialog(true);
+      } else {
+        completeLogin(user.id);
+      }
     } else {
       toast({
         title: "Error",
@@ -34,6 +35,16 @@ const UserLogin = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const completeLogin = (userId: number) => {
+    localStorage.setItem('userAuth', 'true');
+    localStorage.setItem('userId', userId.toString());
+    toast({
+      title: "Success",
+      description: "Successfully logged in",
+    });
+    navigate('/dashboard');
   };
 
   return (
@@ -74,6 +85,18 @@ const UserLogin = () => {
           </form>
         </CardContent>
       </Card>
+
+      {showResetDialog && currentUserId && (
+        <ResetPasswordDialog
+          open={showResetDialog}
+          onOpenChange={setShowResetDialog}
+          userId={currentUserId}
+          onSuccess={() => {
+            setShowResetDialog(false);
+            completeLogin(currentUserId);
+          }}
+        />
+      )}
     </div>
   );
 };
