@@ -3,25 +3,16 @@ export interface User {
   email: string;
   status: string;
   personalInfo?: {
-    familyName?: string;
-    givenName?: string;
-    otherNames?: string;
+    fullName?: string;
     nationality?: string;
-    placeOfBirth?: string;
     dateOfBirth?: string;
     gender?: string;
-    countryOfResidence?: string;
     passportNumber?: string;
-    passportIssueDate?: string;
-    passportExpiryDate?: string;
-    passportPlaceOfIssue?: string;
     address?: string;
     city?: string;
     postalCode?: string;
     country?: string;
     phone?: string;
-    email?: string;
-    fullName?: string;
   };
   onboarding?: {
     currentPhase: number;

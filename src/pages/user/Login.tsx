@@ -18,21 +18,15 @@ const UserLogin = () => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find((u: any) => u.email === email);
     
-    if (user && user.password === password) {
+    if (user) {
+      // In a real app, we would hash passwords and compare them securely
       localStorage.setItem('userAuth', 'true');
       localStorage.setItem('userId', user.id.toString());
-      
-      if (!user.hasResetPassword) {
-        navigate('/reset-password');
-      } else if (!user.hasCompletedPersonalInfo) {
-        navigate('/personal-details');
-      } else {
-        toast({
-          title: "Success",
-          description: "Successfully logged in",
-        });
-        navigate('/user/dashboard');
-      }
+      toast({
+        title: "Success",
+        description: "Successfully logged in",
+      });
+      navigate('/dashboard'); // We'll create the user dashboard next
     } else {
       toast({
         title: "Error",

@@ -13,14 +13,10 @@ const Reports = () => {
   const [filterDate, setFilterDate] = useState<Date>();
   const [filterSender, setFilterSender] = useState<string>("");
 
-  // Initialize empty reports array in localStorage if it doesn't exist
-  useState(() => {
-    localStorage.setItem('reports', '[]');
-  });
-
   const { data: reports, refetch } = useQuery({
     queryKey: ['reports'],
     queryFn: () => {
+      // Get reports from localStorage or return empty array if none exist
       return JSON.parse(localStorage.getItem('reports') || '[]');
     },
     refetchInterval: 5000,
@@ -33,6 +29,7 @@ const Reports = () => {
 
   const handleStatusChange = (newStatus: string) => {
     if (selectedReport) {
+      // Update report status in localStorage
       const updatedReports = reports.map((report: any) => 
         report.id === selectedReport.id 
           ? { ...report, status: newStatus }
