@@ -39,6 +39,7 @@ const App = () => (
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="users" element={<Users />} />
               <Route path="users/:userId" element={<ViewUser />} />
+              <Route path="reports" element={<Navigate to="/admin/dashboard" replace />} />
               <Route index element={<Navigate to="dashboard" replace />} />
             </Route>
           </Routes>
