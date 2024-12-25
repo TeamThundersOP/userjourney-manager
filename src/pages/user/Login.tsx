@@ -1,48 +1,57 @@
-import { useState } from "react";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { useToast } from "@/components/ui/use-toast";
 
 const UserLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Get users from localStorage
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find((u: any) => u.email === email);
     
-    if (user) {
+    if (user && user.password === password) {
       localStorage.setItem('userAuth', 'true');
-      localStorage.setItem('userEmail', email);
+      localStorage.setItem('userId', user.id.toString());
       
       if (!user.hasResetPassword) {
         navigate('/reset-password');
       } else if (!user.hasCompletedPersonalInfo) {
-        navigate('/user/profile');
+        navigate('/personal-details');
       } else {
-        toast.success("Successfully logged in");
-        navigate('/user/dashboard');
+        toast({
+          title: "Success",
+          description: "Successfully logged in",
+        });
+        navigate('/dashboard');
       }
     } else {
-      toast.error("Invalid credentials or user not found");
+      toast({
+        title: "Error",
+        description: "Invalid credentials or user not found",
+        variant: "destructive",
+      });
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl text-center">Login</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">
                 Email
               </label>
               <Input
@@ -51,11 +60,10 @@ const UserLogin = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1"
               />
             </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium">
                 Password
               </label>
               <Input
@@ -64,7 +72,6 @@ const UserLogin = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="mt-1"
               />
             </div>
             <Button type="submit" className="w-full">

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,7 +15,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const Reports = () => {
@@ -29,23 +29,17 @@ const Reports = () => {
       return;
     }
 
-    // Get existing reports or initialize empty array
-    const existingReports = JSON.parse(localStorage.getItem('reports') || '[]');
-    
+    const reports = JSON.parse(localStorage.getItem('reports') || '[]');
     const newReport = {
       id: Date.now(),
       type,
       description,
       status: 'Open',
-      date: new Date().toISOString().split('T')[0],
-      sender: localStorage.getItem('userEmail') || 'anonymous',
+      date: new Date().toISOString(),
+      sender: localStorage.getItem('userEmail'),
     };
 
-    // Add new report to existing reports
-    const updatedReports = [...existingReports, newReport];
-    
-    // Save back to localStorage
-    localStorage.setItem('reports', JSON.stringify(updatedReports));
+    localStorage.setItem('reports', JSON.stringify([...reports, newReport]));
     
     setType("");
     setDescription("");
@@ -70,9 +64,10 @@ const Reports = () => {
                   <SelectValue placeholder="Select report type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Bug Report">Technical Issue</SelectItem>
-                  <SelectItem value="Feature Request">Feature Request</SelectItem>
-                  <SelectItem value="Support Ticket">Support Ticket</SelectItem>
+                  <SelectItem value="Technical Issue">Technical Issue</SelectItem>
+                  <SelectItem value="Documentation">Documentation</SelectItem>
+                  <SelectItem value="Process Related">Process Related</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
