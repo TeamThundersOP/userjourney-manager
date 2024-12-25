@@ -22,19 +22,19 @@ const mockUser: User = {
     phone: "+44 123 456 7890"
   },
   onboarding: {
-    currentPhase: 1,
+    currentPhase: 0,
     phase0: {
-      personalDetailsCompleted: true,
-      cvSubmitted: true,
-      interviewCompleted: true,
+      personalDetailsCompleted: false,
+      cvSubmitted: false,
+      interviewCompleted: false,
       jobStatus: 'pending',
-      passportUploaded: true,
-      pccUploaded: true,
-      otherDocumentsUploaded: true,
-      offerLetterSent: true,
+      passportUploaded: false,
+      pccUploaded: false,
+      otherDocumentsUploaded: false,
+      offerLetterSent: false,
       cosSent: false,
-      rightToWorkSent: true,
-      documentsUploaded: true,
+      rightToWorkSent: false,
+      documentsUploaded: false,
       visaStatus: 'pending',
       travelDetailsUpdated: false,
       travelDocumentsUploaded: false,
@@ -42,11 +42,11 @@ const mockUser: User = {
       ukContactUpdated: false
     },
     phase1: {
-      hmrcChecklist: true,
+      hmrcChecklist: false,
       companyAgreements: false,
       pensionScheme: false,
-      bankStatements: true,
-      vaccinationProof: true
+      bankStatements: false,
+      vaccinationProof: false
     },
     phase2: {
       rightToWork: false,
