@@ -50,7 +50,9 @@ const defaultPhase1Data: Phase1 = {
 };
 
 const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
-  const [phase1Data, setPhase1Data] = useState<Phase1>(defaultPhase1Data);
+  const [phase1Data, setPhase1Data] = useState<Phase1>(
+    user?.onboarding?.phase1 || defaultPhase1Data
+  );
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -61,7 +63,7 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
 
   useEffect(() => {
     const calculateProgress = () => {
-      const totalSteps = 10; // Total number of main steps
+      const totalSteps = 10;
       let completedSteps = 0;
 
       if (phase1Data.cvSubmitted) completedSteps++;
@@ -89,8 +91,6 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        // Here you would typically upload the file to your server
-        // For now, we'll just show a success message
         if (type === 'cv') {
           setPhase1Data(prev => ({ ...prev, cvSubmitted: true }));
           toast.success('CV uploaded successfully');
@@ -105,6 +105,11 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
   };
 
   const handleSave = () => {
+    if (!user) {
+      toast.error('User data not available');
+      return;
+    }
+
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const updatedUsers = users.map((u: User) =>
       u.id === user.id
@@ -126,12 +131,13 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
       toast.error('Please complete all steps before proceeding');
       return;
     }
-    if (!user.onboarding?.approvals.phase1) {
+    if (!user?.onboarding?.approvals.phase1) {
       toast.info('Please wait for admin approval before proceeding to next phase');
       return;
     }
-    // Handle navigation to next phase
   };
+
+  // ... keep existing code (JSX for the form UI)
 
   return (
     <Card>
@@ -164,7 +170,7 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
           <div className="flex items-center space-x-2">
             <Checkbox
               checked={phase1Data.personalDetailsCompleted}
-              disabled={true} // Always disabled since it's completed by default
+              disabled={true}
               onCheckedChange={(checked) =>
                 setPhase1Data(prev => ({ ...prev, personalDetailsCompleted: checked as boolean }))
               }
@@ -334,9 +340,10 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
               />
             </div>
           </div>
+
         </div>
 
-        {!user.onboarding?.approvals.phase1 && progress === 100 && (
+        {!user?.onboarding?.approvals.phase1 && progress === 100 && (
           <div className="bg-yellow-50 p-4 rounded-md">
             <p className="text-yellow-800">
               All steps completed. Waiting for admin approval before proceeding to next phase.
@@ -346,7 +353,7 @@ const Phase1Onboarding = ({ user }: Phase1OnboardingProps) => {
 
         <div className="flex justify-end space-x-4">
           <Button onClick={handleSave}>Save Progress</Button>
-          <Button onClick={handleNext} disabled={progress < 100 || !user.onboarding?.approvals.phase1}>
+          <Button onClick={handleNext} disabled={progress < 100 || !user?.onboarding?.approvals.phase1}>
             Next Phase
           </Button>
         </div>
