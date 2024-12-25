@@ -1,35 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { PenSquare } from "lucide-react";
 import { User } from "@/types/user";
 import { calculatePhaseProgress } from "@/utils/onboarding";
-import { useState } from "react";
-import EditOnboardingDialog from "./EditOnboardingDialog";
 
 interface UserOnboardingProps {
   user: User;
 }
 
-const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [user, setUser] = useState(initialUser);
-
+const UserOnboarding = ({ user }: UserOnboardingProps) => {
   if (!user.onboarding) return null;
 
   const phase0Progress = calculatePhaseProgress(user.onboarding.phase0);
   const phase1Progress = calculatePhaseProgress(user.onboarding.phase1);
   const phase2Progress = calculatePhaseProgress(user.onboarding.phase2);
-
-  const handleSaveOnboarding = (updatedUser: User) => {
-    setUser(updatedUser);
-    // Update localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const updatedUsers = users.map((u: User) => 
-      u.id === updatedUser.id ? updatedUser : u
-    );
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-  };
 
   // Check if phase is complete (100% progress)
   const isPhase0Complete = phase0Progress === 100;
@@ -37,15 +20,8 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader>
         <CardTitle>Onboarding Progress</CardTitle>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setIsEditDialogOpen(true)}
-        >
-          <PenSquare className="h-4 w-4" />
-        </Button>
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
@@ -105,13 +81,6 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
           </div>
         )}
       </CardContent>
-
-      <EditOnboardingDialog
-        user={user}
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        onSave={handleSaveOnboarding}
-      />
     </Card>
   );
 };

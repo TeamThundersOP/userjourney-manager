@@ -24,17 +24,25 @@ export interface User {
 
 export interface Phase0 {
   cvSubmitted: boolean;
-  interviewStatus: 'pending' | 'accepted' | 'rejected';
+  interviewCompleted: boolean;
   offerLetterSent: boolean;
   cosSent: boolean;
   rightToWorkSent: boolean;
+  documentsUploaded: boolean;
+  visaStatus: 'pending' | 'approved' | 'rejected';
 }
 
 export interface Phase1 {
-  shareCodeUploaded: boolean;
-  dbsUploaded: boolean;
+  hmrcChecklist: boolean;
+  companyAgreements: boolean;
+  pensionScheme: boolean;
+  bankStatements: boolean;
+  vaccinationProof: boolean;
 }
 
 export interface Phase2 {
+  rightToWork: boolean;
+  shareCode: boolean;
+  dbs: boolean;
   onboardingComplete: boolean;
 }

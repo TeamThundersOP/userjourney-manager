@@ -25,16 +25,24 @@ const mockUser: User = {
     currentPhase: 1,
     phase0: {
       cvSubmitted: true,
-      interviewStatus: 'pending',
+      interviewCompleted: true,
       offerLetterSent: true,
       cosSent: false,
-      rightToWorkSent: true
+      rightToWorkSent: true,
+      documentsUploaded: true,
+      visaStatus: 'pending'
     },
     phase1: {
-      shareCodeUploaded: true,
-      dbsUploaded: false
+      hmrcChecklist: true,
+      companyAgreements: false,
+      pensionScheme: false,
+      bankStatements: true,
+      vaccinationProof: true
     },
     phase2: {
+      rightToWork: false,
+      shareCode: false,
+      dbs: false,
       onboardingComplete: false
     }
   }
