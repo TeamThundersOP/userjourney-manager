@@ -29,6 +29,7 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
     if (username === DEMO_USERNAME && password === DEMO_PASSWORD) {
       setIsAuthenticated(true);
       localStorage.setItem('adminAuth', 'true');
+      localStorage.setItem('userRole', 'admin');
       navigate('/admin/dashboard');
     } else {
       throw new Error('Invalid credentials');
@@ -38,6 +39,7 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   const logout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('adminAuth');
+    localStorage.removeItem('userRole');
     navigate('/admin/login');
   };
 

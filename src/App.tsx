@@ -14,9 +14,19 @@ import Reports from "./pages/admin/Reports";
 
 const queryClient = new QueryClient();
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = localStorage.getItem('adminAuth') === 'true';
-  return isAuthenticated ? <>{children}</> : <Navigate to="/admin/login" />;
+  const isAdmin = localStorage.getItem('userRole') === 'admin';
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/admin/login" />;
+  }
+  
+  if (!isAdmin) {
+    return <Navigate to="/" />;
+  }
+  
+  return <>{children}</>;
 };
 
 const App = () => (
@@ -32,9 +42,9 @@ const App = () => (
             <Route
               path="/admin/*"
               element={
-                <ProtectedRoute>
+                <ProtectedAdminRoute>
                   <DashboardLayout />
-                </ProtectedRoute>
+                </ProtectedAdminRoute>
               }
             >
               <Route path="dashboard" element={<Dashboard />} />
