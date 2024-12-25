@@ -16,50 +16,6 @@ import Reports from "./pages/admin/Reports";
 
 const queryClient = new QueryClient();
 
-// Initialize dummy data if not exists
-const initializeDummyData = () => {
-  // Check if users already exist
-  const existingUsers = localStorage.getItem('users');
-  if (!existingUsers) {
-    const dummyUser = {
-      id: 1,
-      email: "user@example.com",
-      password: "password123", // Added password for login
-      status: "Active",
-      personalInfo: {
-        fullName: "John Doe",
-        phone: "+1234567890",
-        address: "123 Main St",
-        city: "New York",
-        postalCode: "10001",
-        nationality: "American",
-        dateOfBirth: "1990-01-01",
-        gender: "Male",
-        passportNumber: "AB123456",
-        country: "United States"
-      }
-    };
-    localStorage.setItem('users', JSON.stringify([dummyUser]));
-  }
-
-  // Check if reports already exist
-  const existingReports = localStorage.getItem('reports');
-  if (!existingReports) {
-    const dummyReport = {
-      id: 1,
-      type: "Technical Issue",
-      status: "Pending",
-      date: new Date().toISOString(),
-      sender: "user@example.com",
-      description: "Having trouble accessing the dashboard"
-    };
-    localStorage.setItem('reports', JSON.stringify([dummyReport]));
-  }
-};
-
-// Initialize dummy data
-initializeDummyData();
-
 const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = localStorage.getItem('adminAuth') === 'true';
   const isAdmin = localStorage.getItem('userRole') === 'admin';
