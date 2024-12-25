@@ -7,8 +7,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, Trash2, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 interface User {
   id: number;
@@ -32,46 +34,112 @@ const UsersList = () => {
     queryKey: ['users'],
     queryFn: fetchUsers,
   });
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   if (isLoading) {
-    return <div>Loading users...</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-gray-500">Loading users...</div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error loading users</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-red-500">Error loading users</div>
+      </div>
+    );
   }
 
+  const handleView = (userId: number) => {
+    // For now, just show a toast since we haven't implemented the view page yet
+    toast({
+      title: "View User",
+      description: `Viewing user with ID: ${userId}`,
+    });
+  };
+
+  const handleEdit = (userId: number) => {
+    toast({
+      title: "Edit User",
+      description: `Editing user with ID: ${userId}`,
+    });
+  };
+
+  const handleDelete = (userId: number) => {
+    // Get existing users from localStorage
+    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    // Filter out the deleted user
+    const updatedUsers = existingUsers.filter((user: User) => user.id !== userId);
+    // Update localStorage
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    
+    toast({
+      title: "Success",
+      description: "User deleted successfully",
+    });
+    
+    // Refetch users
+    window.location.reload();
+  };
+
   return (
-    <div className="border rounded-lg">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>User ID</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.id}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.status}</TableCell>
-              <TableCell>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="icon">
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
+    <div className="space-y-4">
+      <div className="rounded-lg border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">User ID</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell className="font-medium">#{user.id}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>
+                  <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {user.status}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleView(user.id)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleEdit(user.id)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleDelete(user.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };
