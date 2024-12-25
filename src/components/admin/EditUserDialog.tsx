@@ -52,6 +52,8 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave }: EditUserDialogProp
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const isFirstTimeFillingInfo = !user.onboarding;
+    
     const updatedUser: User = {
       ...user,
       email: formData.email,
@@ -78,10 +80,46 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave }: EditUserDialogProp
       },
     };
 
+    // Initialize onboarding if it's the first time filling personal info
+    if (isFirstTimeFillingInfo) {
+      updatedUser.onboarding = {
+        currentPhase: 0,
+        phase0: {
+          cvSubmitted: false,
+          interviewCompleted: false,
+          offerLetterSent: false,
+          cosSent: false,
+          rightToWorkSent: false,
+          documentsUploaded: false,
+          visaStatus: 'pending'
+        },
+        phase1: {
+          hmrcChecklist: false,
+          companyAgreements: false,
+          pensionScheme: false,
+          bankStatements: false,
+          vaccinationProof: false
+        },
+        phase2: {
+          rightToWork: false,
+          shareCode: false,
+          dbs: false,
+          onboardingComplete: false
+        },
+        approvals: {
+          phase0: false,
+          phase1: false,
+          phase2: false
+        }
+      };
+    }
+
     onSave(updatedUser);
     toast({
       title: "Success",
-      description: "User profile updated successfully",
+      description: isFirstTimeFillingInfo 
+        ? "Personal information saved and onboarding initialized"
+        : "User profile updated successfully",
     });
     onOpenChange(false);
   };

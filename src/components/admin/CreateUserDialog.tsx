@@ -19,15 +19,16 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Create new user object with password
+    // Create new user object without onboarding data
     const newUser = {
       id: Date.now(),
       email,
-      password, // Now including password in the stored data
+      password,
       status: "Pending",
       personalInfo: {
         email: email,
-      }
+      },
+      files: [] // Initialize empty files array
     };
 
     // Get existing users from localStorage
@@ -36,16 +37,13 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
     // Add new user to the list
     localStorage.setItem('users', JSON.stringify([...existingUsers, newUser]));
 
-    // Show success toast
     toast({
       title: "Success",
       description: "User created successfully",
     });
 
-    // Invalidate and refetch users query
     queryClient.invalidateQueries({ queryKey: ['users'] });
 
-    // Reset form and close dialog
     setEmail("");
     setPassword("");
     onOpenChange(false);

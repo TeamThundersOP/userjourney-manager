@@ -2,6 +2,7 @@ export interface User {
   id: number;
   email: string;
   status: string;
+  files?: UserFile[];
   personalInfo?: {
     familyName?: string;
     givenName?: string;
@@ -33,6 +34,15 @@ export interface User {
       phase2: boolean;
     };
   };
+}
+
+export interface UserFile {
+  id: number;
+  name: string;
+  type: string;
+  uploadedAt: string;
+  size: string;
+  category: string;
 }
 
 export interface Phase0 {
