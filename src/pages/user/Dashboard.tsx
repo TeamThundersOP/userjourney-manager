@@ -7,14 +7,14 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 const UserDashboard = () => {
-  const { user } = useUserAuth();
+  const { userId } = useUserAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const { data: userData } = useQuery({
-    queryKey: ['user', user?.id],
+    queryKey: ['user', userId],
     queryFn: async () => {
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      return users.find((u: any) => u.id === user?.id) || null;
+      return users.find((u: any) => u.id === userId) || null;
     },
   });
 
@@ -26,7 +26,7 @@ const UserDashboard = () => {
       
       // Update the current user's data
       const updatedUsers = users.map((u: any) => {
-        if (u.id === user?.id) {
+        if (u.id === userId) {
           return {
             ...u,
             onboarding: {
