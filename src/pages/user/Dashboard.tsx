@@ -10,23 +10,15 @@ const Dashboard = () => {
   useEffect(() => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const currentUser = users.find((u: User) => u.email === userEmail);
-    setUser(currentUser);
+    setUser(currentUser || null);
   }, [userEmail]);
 
-  if (!user?.onboarding) {
-    return (
-      <Card>
-        <CardContent className="py-6">
-          <div className="text-center text-gray-500">
-            No onboarding information available
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const calculateProgress = (phase: Phase0 | Phase1 | Phase2): number => {
+  const calculateProgress = (phase: Phase0 | Phase1 | Phase2 | undefined): number => {
+    if (!phase) return 0;
+    
     const entries = Object.entries(phase);
+    if (entries.length === 0) return 0;
+    
     const total = entries.length;
     const completed = entries.filter(([_, value]) => {
       if (typeof value === 'boolean') {
@@ -40,6 +32,18 @@ const Dashboard = () => {
     
     return (completed / total) * 100;
   };
+
+  if (!user?.onboarding) {
+    return (
+      <Card>
+        <CardContent className="py-6">
+          <div className="text-center text-gray-500">
+            No onboarding information available
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -60,7 +64,7 @@ const Dashboard = () => {
             <Progress value={calculateProgress(user.onboarding.phase0)} />
           </div>
 
-          {user.onboarding.approvals.phase0 && (
+          {user.onboarding.approvals?.phase0 && (
             <div>
               <div className="flex justify-between mb-2">
                 <h3 className="font-medium">Phase 1: Documentation</h3>
@@ -72,7 +76,7 @@ const Dashboard = () => {
             </div>
           )}
 
-          {user.onboarding.approvals.phase1 && (
+          {user.onboarding.approvals?.phase1 && (
             <div>
               <div className="flex justify-between mb-2">
                 <h3 className="font-medium">Phase 2: Final Steps</h3>
