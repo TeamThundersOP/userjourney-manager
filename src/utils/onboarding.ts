@@ -1,8 +1,13 @@
 import { Phase0, Phase1, Phase2 } from "@/types/user";
 
-export const calculatePhaseProgress = (phase: Phase0 | Phase1 | Phase2): number => {
-  const totalFields = Object.keys(phase).length;
-  const completedFields = Object.entries(phase).reduce((count, [currentKey, value]) => {
+export const calculatePhaseProgress = (phase: Phase0 | Phase1 | Phase2 | undefined): number => {
+  if (!phase) return 0;
+  
+  const entries = Object.entries(phase);
+  if (entries.length === 0) return 0;
+  
+  const totalFields = entries.length;
+  const completedFields = entries.reduce((count, [currentKey, value]) => {
     // Skip visaStatus field in calculation
     if (currentKey === 'visaStatus') return count;
     return count + (value === true ? 1 : 0);

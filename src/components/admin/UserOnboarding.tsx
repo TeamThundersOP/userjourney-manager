@@ -17,7 +17,7 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [user, setUser] = useState(initialUser);
 
-  if (!user.onboarding) {
+  if (!user?.onboarding) {
     return (
       <Card>
         <CardContent className="py-6">
@@ -29,17 +29,19 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
     );
   }
 
-  const phase0Progress = calculatePhaseProgress(user.onboarding.phase0);
-  const phase1Progress = calculatePhaseProgress(user.onboarding.phase1);
-  const phase2Progress = calculatePhaseProgress(user.onboarding.phase2);
+  const phase0Progress = calculatePhaseProgress(user.onboarding?.phase0);
+  const phase1Progress = calculatePhaseProgress(user.onboarding?.phase1);
+  const phase2Progress = calculatePhaseProgress(user.onboarding?.phase2);
 
   const handleApprovePhase = (phase: number) => {
+    if (!user.onboarding) return;
+
     const updatedUser = {
       ...user,
       onboarding: {
-        ...user.onboarding!,
+        ...user.onboarding,
         approvals: {
-          ...user.onboarding!.approvals,
+          ...user.onboarding.approvals,
           [`phase${phase}`]: true
         },
         currentPhase: phase + 1
@@ -67,13 +69,15 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
     localStorage.setItem('users', JSON.stringify(updatedUsers));
   };
 
-  const canApprovePhase = (phase: number) => {
+  const canApprovePhase = (phase: number): boolean => {
+    if (!user.onboarding?.approvals) return false;
+
     if (phase === 0) {
-      return phase0Progress === 100 && !user.onboarding?.approvals.phase0;
+      return phase0Progress === 100 && !user.onboarding.approvals.phase0;
     } else if (phase === 1) {
-      return phase1Progress === 100 && user.onboarding?.approvals.phase0 && !user.onboarding?.approvals.phase1;
+      return phase1Progress === 100 && user.onboarding.approvals.phase0 && !user.onboarding.approvals.phase1;
     } else if (phase === 2) {
-      return phase2Progress === 100 && user.onboarding?.approvals.phase1 && !user.onboarding?.approvals.phase2;
+      return phase2Progress === 100 && user.onboarding.approvals.phase1 && !user.onboarding.approvals.phase2;
     }
     return false;
   };
