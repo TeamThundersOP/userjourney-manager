@@ -69,30 +69,22 @@ const DashboardLayout = () => {
       <aside className={`fixed top-0 left-0 h-screen w-64 bg-white dark:bg-gray-800 shadow-lg border-r border-gray-100 dark:border-gray-700 transition-all duration-200 z-40 ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } md:translate-x-0`}>
-        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-          <div className="flex items-center space-x-3 mb-4">
-            <img 
-              src="/lovable-uploads/4f937dde-95b9-4052-a5e4-6de19a6aecc1.png" 
-              alt="Funelli Logo" 
-              className="h-8 w-8"
-            />
-            <h1 className="text-xl font-bold font-araboto-bold">
-              Funelli
-            </h1>
-          </div>
-          <div className="flex justify-end">
-            <Toggle 
-              pressed={isDark}
-              onPressedChange={toggleTheme}
-              aria-label="Toggle theme"
-            >
-              {isDark ? (
-                <Moon className="h-4 w-4" />
-              ) : (
-                <Sun className="h-4 w-4" />
-              )}
-            </Toggle>
-          </div>
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+            Admin Dashboard
+          </h1>
+          <Toggle 
+            pressed={isDark}
+            onPressedChange={toggleTheme}
+            aria-label="Toggle theme"
+            className="ml-2"
+          >
+            {isDark ? (
+              <Moon className="h-4 w-4" />
+            ) : (
+              <Sun className="h-4 w-4" />
+            )}
+          </Toggle>
         </div>
         <nav className="mt-6 space-y-2 px-3">
           <Button
