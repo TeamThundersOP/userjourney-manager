@@ -7,6 +7,7 @@ import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import Index from "./pages/Index";
 import AdminLogin from "./pages/admin/Login";
 import UserLogin from "./pages/user/Login";
+import ResetPassword from "./pages/user/ResetPassword";
 import DashboardLayout from "./components/admin/DashboardLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
@@ -30,6 +31,21 @@ const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const ProtectedResetPasswordRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = localStorage.getItem('userAuth') === 'true';
+  const isPasswordReset = localStorage.getItem('passwordReset') === 'true';
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  if (isPasswordReset) {
+    return <Navigate to="/dashboard" />;
+  }
+  
+  return <>{children}</>;
+};
+
 const App = () => (
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
@@ -40,6 +56,11 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<UserLogin />} />
+            <Route path="/reset-password" element={
+              <ProtectedResetPasswordRoute>
+                <ResetPassword />
+              </ProtectedResetPasswordRoute>
+            } />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
               path="/admin/*"

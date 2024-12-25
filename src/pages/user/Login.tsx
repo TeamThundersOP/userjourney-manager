@@ -19,14 +19,24 @@ const UserLogin = () => {
     const user = users.find((u: any) => u.email === email);
     
     if (user) {
+      // Check if this is first login (password hasn't been reset)
+      const isPasswordReset = localStorage.getItem('passwordReset');
+      
       // In a real app, we would hash passwords and compare them securely
       localStorage.setItem('userAuth', 'true');
       localStorage.setItem('userId', user.id.toString());
+      
       toast({
         title: "Success",
         description: "Successfully logged in",
       });
-      navigate('/dashboard'); // We'll create the user dashboard next
+
+      // If first login, redirect to reset password page
+      if (!isPasswordReset) {
+        navigate('/reset-password');
+      } else {
+        navigate('/dashboard');
+      }
     } else {
       toast({
         title: "Error",
