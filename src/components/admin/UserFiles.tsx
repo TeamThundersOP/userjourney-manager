@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { FileText } from "lucide-react";
+import { FileText, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface UserFile {
   id: number;
@@ -29,6 +31,12 @@ const mockFiles: UserFile[] = [
 ];
 
 const UserFiles = () => {
+  const handleDownload = (file: UserFile) => {
+    // In a real application, this would trigger a download from your backend
+    // For now, we'll just show a toast notification
+    toast.success(`Downloading ${file.name}`);
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -48,6 +56,7 @@ const UserFiles = () => {
                 <TableHead>Type</TableHead>
                 <TableHead>Upload Date</TableHead>
                 <TableHead>Size</TableHead>
+                <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -57,6 +66,17 @@ const UserFiles = () => {
                   <TableCell>{file.type}</TableCell>
                   <TableCell>{file.uploadedAt}</TableCell>
                   <TableCell>{file.size}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDownload(file)}
+                      className="flex items-center gap-2"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
