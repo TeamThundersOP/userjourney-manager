@@ -14,6 +14,9 @@ import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
 import ViewUser from "./pages/admin/ViewUser";
 import Reports from "./pages/admin/Reports";
+import Dashboard from "./pages/user/Dashboard";
+import Report from "./pages/user/Report";
+import Profile from "./pages/user/Profile";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +70,16 @@ const ProtectedPersonalInfoRoute = ({ children }: { children: React.ReactNode })
   return <>{children}</>;
 };
 
+const ProtectedUserRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = localStorage.getItem('userAuth') === 'true';
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  return <>{children}</>;
+};
+
 const App = () => (
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
@@ -87,6 +100,22 @@ const App = () => (
                 <PersonalInfo />
               </ProtectedPersonalInfoRoute>
             } />
+            
+            {/* User Dashboard Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedUserRoute>
+                  <DashboardLayout />
+                </ProtectedUserRoute>
+              }
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="report" element={<Report />} />
+              <Route path="profile" element={<Profile />} />
+            </Route>
+
+            {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
               path="/admin/*"
