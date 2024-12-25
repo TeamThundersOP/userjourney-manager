@@ -47,27 +47,6 @@ export interface Phase0 {
 }
 
 export interface Phase1 {
-  cvSubmitted: boolean;
-  personalDetailsCompleted: boolean;
-  interviewStatus: 'pending' | 'completed' | 'rejected';
-  jobStatus: 'pending' | 'accepted' | 'rejected';
-  documents: {
-    passport: boolean;
-    pcc: boolean;
-    other: boolean;
-  };
-  offerLetterSent: boolean;
-  cosSent: boolean;
-  visaStatus: 'pending' | 'approved' | 'rejected';
-  ukTravel: {
-    ticket: boolean;
-    visaCopy: boolean;
-  };
-  ukContact: {
-    phone: string;
-    address: string;
-  };
-  completed: boolean;
   hmrcChecklist: boolean;
   companyAgreements: boolean;
   pensionScheme: boolean;
