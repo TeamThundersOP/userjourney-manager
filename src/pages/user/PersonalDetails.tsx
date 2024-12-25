@@ -28,6 +28,9 @@ const PersonalDetails = () => {
     phone: "",
   });
 
+  const [initialFormData, setInitialFormData] = useState(formData);
+  const [hasChanges, setHasChanges] = useState(false);
+
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -43,7 +46,7 @@ const PersonalDetails = () => {
     const user = users.find((u: User) => u.email === userEmail);
     
     if (user && user.personalInfo) {
-      setFormData({
+      const userData = {
         familyName: user.personalInfo.familyName || "",
         givenName: user.personalInfo.givenName || "",
         otherNames: user.personalInfo.otherNames || "",
@@ -62,14 +65,25 @@ const PersonalDetails = () => {
         country: user.personalInfo.country || "",
         email: user.email || "",
         phone: user.personalInfo.phone || "",
-      });
+      };
+      setFormData(userData);
+      setInitialFormData(userData);
     } else {
       setFormData(prev => ({
         ...prev,
         email: userEmail
       }));
+      setInitialFormData(prev => ({
+        ...prev,
+        email: userEmail
+      }));
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const hasFormChanges = JSON.stringify(formData) !== JSON.stringify(initialFormData);
+    setHasChanges(hasFormChanges);
+  }, [formData, initialFormData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,6 +109,8 @@ const PersonalDetails = () => {
         : user
     );
     localStorage.setItem("users", JSON.stringify(updatedUsers));
+    setInitialFormData(formData);
+    setHasChanges(false);
 
     toast({
       title: "Success",
@@ -113,7 +129,7 @@ const PersonalDetails = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <PersonalDetailsForm formData={formData} setFormData={setFormData} />
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={!hasChanges}>
               Save Details
             </Button>
           </form>
