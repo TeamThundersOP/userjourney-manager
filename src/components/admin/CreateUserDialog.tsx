@@ -21,8 +21,9 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
     
     // Create new user object
     const newUser = {
-      id: Date.now(), // Generate a unique ID
+      id: Date.now(),
       email,
+      password, // Save the password
       status: "Pending",
     };
 
@@ -70,6 +71,7 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
             />
           </div>
           <Button type="submit" className="w-full">
