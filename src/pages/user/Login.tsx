@@ -3,13 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 const UserLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,27 +17,20 @@ const UserLogin = () => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find((u: any) => u.email === email);
     
-    if (user && user.password === password) {
+    if (user) {
       localStorage.setItem('userAuth', 'true');
       localStorage.setItem('userEmail', email);
       
       if (!user.hasResetPassword) {
         navigate('/reset-password');
       } else if (!user.hasCompletedPersonalInfo) {
-        navigate('/personal-details');
+        navigate('/user/personal-details');
       } else {
-        toast({
-          title: "Success",
-          description: "Successfully logged in",
-        });
+        toast.success("Successfully logged in");
         navigate('/user/dashboard');
       }
     } else {
-      toast({
-        title: "Error",
-        description: "Invalid credentials or user not found",
-        variant: "destructive",
-      });
+      toast.error("Invalid credentials or user not found");
     }
   };
 
