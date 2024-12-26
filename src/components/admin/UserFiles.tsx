@@ -8,6 +8,7 @@ import { User } from "@/types/user";
 
 interface UserFile {
   id: number;
+  userId: number;
   name: string;
   type: string;
   uploadedAt: string;
@@ -25,7 +26,12 @@ const UserFiles = ({ user }: UserFilesProps) => {
   // Get files from localStorage
   const getUserFiles = () => {
     const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
-    return allFiles.filter((file: UserFile) => file.userId === user.id);
+    // Initialize userId if it doesn't exist in stored files
+    const filesWithUserId = allFiles.map((file: UserFile) => ({
+      ...file,
+      userId: file.userId || user.id
+    }));
+    return filesWithUserId.filter((file: UserFile) => file.userId === user.id);
   };
 
   const files = getUserFiles();
