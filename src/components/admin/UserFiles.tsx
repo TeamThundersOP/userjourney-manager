@@ -23,15 +23,36 @@ interface UserFilesProps {
 const UserFiles = ({ user }: UserFilesProps) => {
   const queryClient = useQueryClient();
 
-  // Get files from localStorage
+  // Get files from localStorage with proper type checking and initialization
   const getUserFiles = () => {
-    const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
-    // Initialize userId if it doesn't exist in stored files
-    const filesWithUserId = allFiles.map((file: UserFile) => ({
-      ...file,
-      userId: file.userId || user.id
-    }));
-    return filesWithUserId.filter((file: UserFile) => file.userId === user.id);
+    try {
+      const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
+      console.log('All files from storage:', allFiles); // Debug log
+      
+      // Ensure each file has the required properties
+      const filesWithUserId = allFiles.map((file: any) => ({
+        id: file.id,
+        userId: file.userId || user.id,
+        name: file.name,
+        type: file.type,
+        uploadedAt: file.uploadedAt || new Date().toISOString(),
+        size: file.size,
+        category: file.category || 'general'
+      }));
+      
+      console.log('Files with userId:', filesWithUserId); // Debug log
+      
+      // Filter files for the current user
+      const userFiles = filesWithUserId.filter((file: UserFile) => 
+        String(file.userId) === String(user.id)
+      );
+      
+      console.log('Filtered user files:', userFiles); // Debug log
+      return userFiles;
+    } catch (error) {
+      console.error('Error getting user files:', error);
+      return [];
+    }
   };
 
   const files = getUserFiles();
