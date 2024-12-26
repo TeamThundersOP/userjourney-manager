@@ -7,6 +7,7 @@ import { User } from "@/types/user";
 import { calculatePhaseProgress } from "@/utils/onboarding";
 import { useState } from "react";
 import EditOnboardingDialog from "./EditOnboardingDialog";
+import Phase0Details from "./onboarding/Phase0Details";
 import { toast } from "sonner";
 
 interface UserOnboardingProps {
@@ -111,28 +112,7 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
             ) : null}
           </div>
           <Progress value={phase0Progress} className="mb-2" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {Object.entries(user.onboarding.phase0).map(([key, value]) => (
-              <div key={key} className="flex items-center">
-                <div className={`w-2 h-2 rounded-full mr-2 ${
-                  key === 'visaStatus' 
-                    ? value === 'approved' 
-                      ? 'bg-green-500' 
-                      : value === 'rejected'
-                      ? 'bg-red-500'
-                      : 'bg-yellow-500'
-                    : value 
-                    ? 'bg-green-500' 
-                    : 'bg-gray-300'
-                }`} />
-                <span className="text-sm capitalize">
-                  {key === 'visaStatus' 
-                    ? `Visa Status: ${value}` 
-                    : key.replace(/([A-Z])/g, ' $1')}
-                </span>
-              </div>
-            ))}
-          </div>
+          <Phase0Details user={user} />
         </div>
 
         {user.onboarding?.approvals.phase0 && (
