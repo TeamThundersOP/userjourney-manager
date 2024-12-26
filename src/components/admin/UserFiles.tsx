@@ -22,6 +22,14 @@ interface UserFilesProps {
 const UserFiles = ({ user }: UserFilesProps) => {
   const queryClient = useQueryClient();
 
+  // Get files from localStorage
+  const getUserFiles = () => {
+    const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
+    return allFiles.filter((file: UserFile) => file.userId === user.id);
+  };
+
+  const files = getUserFiles();
+
   const handleDownload = (file: UserFile) => {
     toast.success(`Downloading ${file.name}`);
   };
@@ -32,7 +40,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
         <CardTitle>Uploaded Files</CardTitle>
       </CardHeader>
       <CardContent>
-        {(!user.files || user.files.length === 0) ? (
+        {(!files || files.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-8 text-gray-500">
             <FileText className="h-12 w-12 mb-2" />
             <p>No files uploaded yet</p>
@@ -49,7 +57,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {user.files.map((file) => (
+              {files.map((file: UserFile) => (
                 <TableRow key={file.id}>
                   <TableCell className="font-medium">{file.name}</TableCell>
                   <TableCell>{file.type}</TableCell>
