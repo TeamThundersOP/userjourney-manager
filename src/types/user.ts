@@ -38,6 +38,7 @@ export interface User {
 
 export interface UserFile {
   id: number;
+  userId: number;  // Added this line
   name: string;
   type: string;
   uploadedAt: string;
