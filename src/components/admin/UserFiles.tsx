@@ -8,6 +8,7 @@ import { User } from "@/types/user";
 
 interface UserFile {
   id: number;
+  userId: number;
   name: string;
   type: string;
   uploadedAt: string;
@@ -22,10 +23,15 @@ interface UserFilesProps {
 const UserFiles = ({ user }: UserFilesProps) => {
   const queryClient = useQueryClient();
 
-  // Get files from localStorage
-  const getUserFiles = () => {
-    const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
-    return allFiles.filter((file: UserFile) => file.userId === user.id);
+  // Get files from localStorage with proper type checking
+  const getUserFiles = (): UserFile[] => {
+    try {
+      const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
+      return allFiles.filter((file) => file.userId === user.id);
+    } catch (error) {
+      console.error('Error parsing user files:', error);
+      return [];
+    }
   };
 
   const files = getUserFiles();
@@ -57,7 +63,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {files.map((file: UserFile) => (
+              {files.map((file) => (
                 <TableRow key={file.id}>
                   <TableCell className="font-medium">{file.name}</TableCell>
                   <TableCell>{file.type}</TableCell>
