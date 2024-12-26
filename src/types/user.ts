@@ -38,7 +38,7 @@ export interface User {
 
 export interface UserFile {
   id: number;
-  userId: number;  // Added this line
+  userId: number;
   name: string;
   type: string;
   uploadedAt: string;
@@ -63,6 +63,8 @@ export interface Phase0 {
   travelDocumentsUploaded: boolean;
   visaCopyUploaded: boolean;
   ukContactUpdated: boolean;
+  ukContactNumber?: string;
+  ukAddress?: string;
 }
 
 export interface Phase1 {
