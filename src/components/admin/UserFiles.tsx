@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { User } from "@/types/user";
+import { useState, useEffect } from "react";
 
 interface UserFile {
   id: number;
@@ -22,6 +23,7 @@ interface UserFilesProps {
 
 const UserFiles = ({ user }: UserFilesProps) => {
   const queryClient = useQueryClient();
+  const [files, setFiles] = useState<UserFile[]>([]);
 
   // Get files from localStorage with proper type checking
   const getUserFiles = (): UserFile[] => {
@@ -35,7 +37,10 @@ const UserFiles = ({ user }: UserFilesProps) => {
     }
   };
 
-  const files = getUserFiles();
+  // Load files on component mount and when they change
+  useEffect(() => {
+    setFiles(getUserFiles());
+  }, [user.id]);
 
   const handleDownload = async (file: UserFile) => {
     try {
@@ -81,6 +86,9 @@ const UserFiles = ({ user }: UserFilesProps) => {
       const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
       const updatedFiles = allFiles.filter((f) => f.id !== file.id);
       localStorage.setItem('userFiles', JSON.stringify(updatedFiles));
+      
+      // Update local state to trigger re-render
+      setFiles(getUserFiles());
       
       // Invalidate and refetch queries to update UI
       queryClient.invalidateQueries({ queryKey: ['userFiles'] });
