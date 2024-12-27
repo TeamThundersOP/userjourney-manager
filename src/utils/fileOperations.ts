@@ -15,6 +15,7 @@ export const getUserFiles = (userId: number): UserFile[] => {
       return fileUserId === targetUserId;
     });
     
+    console.log('User ID being searched for:', userId); // Debug log
     console.log('Filtered user files:', userFiles); // Debug log
     return userFiles;
   } catch (error) {
