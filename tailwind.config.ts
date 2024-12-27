@@ -25,15 +25,15 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#af1626",
+          DEFAULT: "#9b87f5",
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#4B5563",
+          DEFAULT: "#7E69AB",
           foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#fb0918",
+          DEFAULT: "#8B5CF6",
           foreground: "#FFFFFF",
         },
         destructive: {
@@ -54,22 +54,23 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["ArabotoNormal", "sans-serif"],
-        araboto: {
-          thin: ["ArabotoThin", "sans-serif"],
-          light: ["ArabotoLight", "sans-serif"],
-          normal: ["ArabotoNormal", "sans-serif"],
-          bold: ["ArabotoBold", "sans-serif"],
-        },
+        sans: ["Inter", "sans-serif"],
+        heading: ["Poppins", "sans-serif"],
+      },
+      fontSize: {
+        xs: ["0.75rem", { lineHeight: "1rem" }],
+        sm: ["0.875rem", { lineHeight: "1.25rem" }],
+        base: ["1rem", { lineHeight: "1.5rem" }],
+        lg: ["1.125rem", { lineHeight: "1.75rem" }],
+        xl: ["1.25rem", { lineHeight: "1.75rem" }],
+        "2xl": ["1.5rem", { lineHeight: "2rem" }],
+        "3xl": ["1.875rem", { lineHeight: "2.25rem" }],
+        "4xl": ["2.25rem", { lineHeight: "2.5rem" }],
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-      },
-      gradientColorStops: {
-        'primary-start': '#af1626',
-        'primary-end': '#fb0918',
       },
     },
   },

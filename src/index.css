@@ -3,34 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  @font-face {
-    font-family: 'ArabotoBold';
-    src: url('/fonts/Araboto-Bold.otf') format('opentype');
-    font-weight: bold;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: 'ArabotoLight';
-    src: url('/fonts/Araboto-Light.otf') format('opentype');
-    font-weight: 300;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: 'ArabotoNormal';
-    src: url('/fonts/Araboto-Normal.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: 'ArabotoThin';
-    src: url('/fonts/Araboto-Thin.otf') format('opentype');
-    font-weight: 100;
-    font-style: normal;
-  }
-
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -38,20 +10,20 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 0 68.2% 38.6%;
+    --primary: 262 84% 75%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 13% 91%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 262 29% 54%;
+    --secondary-foreground: 0 0% 100%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 262 91% 66%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 0 68.2% 38.6%;
-    --radius: 0.5rem;
+    --ring: 262 84% 75%;
+    --radius: 0.75rem;
   }
 
   .dark {
@@ -61,19 +33,19 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 0 68.2% 38.6%;
+    --primary: 262 84% 75%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 262 29% 54%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 262 91% 66%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 0 68.2% 38.6%;
+    --ring: 262 84% 75%;
   }
 
   * {
@@ -81,44 +53,63 @@
   }
 
   body {
-    font-family: "ArabotoNormal", sans-serif;
     @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "ArabotoBold", sans-serif;
+    @apply font-heading font-semibold;
   }
 }
 
-.btn-primary-line {
-  @apply bg-gradient-to-r from-[#af1626] to-[#fb0918] text-white rounded-[100px_0px_100px_100px] shadow-lg hover:bg-gradient-to-l transition-all duration-300;
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/90;
+  }
+
+  .gradient-bg {
+    @apply bg-gradient-to-br from-primary/20 via-background to-secondary/20;
+  }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl;
+  }
+
+  .heading-1 {
+    @apply text-4xl font-heading font-bold tracking-tight;
+  }
+
+  .heading-2 {
+    @apply text-3xl font-heading font-semibold tracking-tight;
+  }
+
+  .heading-3 {
+    @apply text-2xl font-heading font-semibold;
+  }
+
+  .text-body {
+    @apply text-base leading-7;
+  }
+
+  .text-small {
+    @apply text-sm leading-6;
+  }
 }
 
-.btn-white-line {
-  @apply bg-white text-[#af1626] rounded-[100px_0px_100px_100px] hover:bg-[#fff7f5] transition-all duration-300;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.features-small-item {
-  @apply bg-white rounded-[40px_0_40px_40px] shadow-lg p-8 text-center transition-all duration-300 relative overflow-hidden mb-8;
+::-webkit-scrollbar-track {
+  @apply bg-muted;
 }
 
-.features-small-item:before {
-  content: "";
-  @apply absolute inset-0 bg-gradient-to-r from-[#af1626] to-[#fb0918] opacity-0 transition-all duration-300;
-}
-
-.features-small-item:hover:before {
-  @apply opacity-100;
-}
-
-.features-small-item:hover * {
-  @apply text-white relative z-10;
-}
-
-.custom-card {
-  @apply transition-all duration-300 cursor-pointer shadow-md hover:-translate-y-2 hover:shadow-lg;
-}
-
-.glass-morphism {
-  @apply backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)];
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/50 rounded-full hover:bg-primary/70;
 }
