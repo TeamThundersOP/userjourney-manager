@@ -81,6 +81,8 @@ export interface OnboardingPhase1 {
 
 export interface OnboardingPhase2 {
   rightToWork: boolean;
+  shareCode: boolean;
   dbs: boolean;
+  onboardingComplete: boolean;
   feedback?: string;
 }

@@ -25,6 +25,16 @@ const Phase2Form = ({ phase2, onUpdate }: Phase2FormProps) => {
         </div>
         <div className="flex items-center space-x-2">
           <Checkbox
+            id="shareCode"
+            checked={phase2.shareCode}
+            onCheckedChange={(checked) =>
+              onUpdate({ shareCode: checked as boolean })
+            }
+          />
+          <Label htmlFor="shareCode">Share Code</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox
             id="dbs"
             checked={phase2.dbs}
             onCheckedChange={(checked) =>
@@ -32,6 +42,16 @@ const Phase2Form = ({ phase2, onUpdate }: Phase2FormProps) => {
             }
           />
           <Label htmlFor="dbs">DBS</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="onboardingComplete"
+            checked={phase2.onboardingComplete}
+            onCheckedChange={(checked) =>
+              onUpdate({ onboardingComplete: checked as boolean })
+            }
+          />
+          <Label htmlFor="onboardingComplete">Onboarding Complete</Label>
         </div>
       </div>
 
