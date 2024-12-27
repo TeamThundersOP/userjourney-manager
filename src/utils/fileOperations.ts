@@ -9,13 +9,30 @@ export const getUserFiles = (userId: number): UserFile[] => {
     console.log('All files from localStorage:', allFiles); // Debug log
     
     // Filter files for specific user and ensure userId comparison works with both string and number types
-    const userFiles = allFiles.filter((file) => Number(file.userId) === Number(userId));
-    console.log('Filtered user files:', userFiles); // Debug log
+    const userFiles = allFiles.filter((file) => {
+      const fileUserId = typeof file.userId === 'string' ? parseInt(file.userId) : file.userId;
+      const targetUserId = typeof userId === 'string' ? parseInt(userId as string) : userId;
+      return fileUserId === targetUserId;
+    });
     
+    console.log('Filtered user files:', userFiles); // Debug log
     return userFiles;
   } catch (error) {
     console.error('Error parsing user files:', error);
     return [];
+  }
+};
+
+export const saveUserFile = (file: UserFile) => {
+  try {
+    const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
+    const updatedFiles = [...allFiles, file];
+    localStorage.setItem('userFiles', JSON.stringify(updatedFiles));
+    console.log('Saved file to localStorage:', file); // Debug log
+    return true;
+  } catch (error) {
+    console.error('Error saving file:', error);
+    return false;
   }
 };
 
@@ -60,7 +77,11 @@ export const handleFileDelete = (file: UserFile): UserFile[] => {
     console.log('Updated files after deletion:', updatedFiles); // Debug log
     
     toast.success(`${file.name} deleted successfully`);
-    return updatedFiles.filter((f) => Number(f.userId) === Number(file.userId));
+    return updatedFiles.filter((f) => {
+      const fileUserId = typeof f.userId === 'string' ? parseInt(f.userId) : f.userId;
+      const targetUserId = typeof file.userId === 'string' ? parseInt(file.userId) : file.userId;
+      return fileUserId === targetUserId;
+    });
   } catch (error) {
     console.error('Error deleting file:', error);
     toast.error("Error deleting file");
