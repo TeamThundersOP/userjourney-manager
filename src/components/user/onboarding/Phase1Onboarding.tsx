@@ -39,12 +39,45 @@ const Phase1Onboarding = ({ userData, onSave, isLoading }: Phase1OnboardingProps
   };
 
   const handleBack = () => {
+    // Set currentPhase to 0 in localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map((u: User) => {
+      if (u.id === userData?.id) {
+        return {
+          ...u,
+          onboarding: {
+            ...u.onboarding,
+            currentPhase: 0
+          }
+        };
+      }
+      return u;
+    });
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
     navigate('/user/dashboard');
   };
 
   const handleNext = () => {
     onSave(formData);
-    navigate('/user/dashboard');
+    // Only navigate to phase 2 if phase 1 is approved
+    if (userData?.onboarding?.approvals?.phase1) {
+      // Update currentPhase to 2 in localStorage
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const updatedUsers = users.map((u: User) => {
+        if (u.id === userData?.id) {
+          return {
+            ...u,
+            onboarding: {
+              ...u.onboarding,
+              currentPhase: 2
+            }
+          };
+        }
+        return u;
+      });
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+      navigate('/user/dashboard');
+    }
   };
 
   return (
@@ -111,7 +144,7 @@ const Phase1Onboarding = ({ userData, onSave, isLoading }: Phase1OnboardingProps
           </Button>
           <Button
             onClick={handleNext}
-            disabled={isLoading}
+            disabled={isLoading || !userData?.onboarding?.approvals?.phase1}
           >
             Next
           </Button>
