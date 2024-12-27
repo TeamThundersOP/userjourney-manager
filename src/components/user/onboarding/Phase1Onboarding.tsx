@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { User } from "@/types/user";
 import { FileUpload } from "./FileUpload";
 import PhaseFeedback from "./PhaseFeedback";
+import { useNavigate } from 'react-router-dom';
 
 interface Phase1OnboardingProps {
   userData: User | null;
@@ -12,6 +13,7 @@ interface Phase1OnboardingProps {
 }
 
 const Phase1Onboarding = ({ userData, onSave, isLoading }: Phase1OnboardingProps) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     hmrcChecklist: false,
     companyAgreements: false,
@@ -34,6 +36,15 @@ const Phase1Onboarding = ({ userData, onSave, isLoading }: Phase1OnboardingProps
       ...prev,
       [type]: true
     }));
+  };
+
+  const handleBack = () => {
+    navigate('/user/dashboard');
+  };
+
+  const handleNext = () => {
+    onSave(formData);
+    navigate('/user/dashboard');
   };
 
   return (
@@ -82,14 +93,29 @@ const Phase1Onboarding = ({ userData, onSave, isLoading }: Phase1OnboardingProps
         />
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between pt-6">
         <Button
           variant="outline"
-          onClick={() => onSave(formData)}
+          onClick={handleBack}
           disabled={isLoading}
         >
-          Save Progress
+          Back
         </Button>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => onSave(formData)}
+            disabled={isLoading}
+          >
+            Save
+          </Button>
+          <Button
+            onClick={handleNext}
+            disabled={isLoading}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );
