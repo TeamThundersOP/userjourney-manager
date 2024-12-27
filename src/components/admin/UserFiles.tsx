@@ -19,7 +19,8 @@ const UserFiles = ({ user }: UserFilesProps) => {
   useEffect(() => {
     const fetchFiles = () => {
       console.log('Fetching files for user:', user.id); // Debug log
-      const userFiles = getUserFiles(user.id);
+      // Convert user.id to string to ensure consistent comparison
+      const userFiles = getUserFiles(user.id.toString());
       console.log('Retrieved user files:', userFiles); // Debug log
       setFiles(userFiles);
       

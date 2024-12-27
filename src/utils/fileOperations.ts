@@ -2,14 +2,16 @@ import { User } from "@/types/user";
 import { UserFile } from "@/types/userFile";
 import { toast } from "sonner";
 
-export const getUserFiles = (userId: number): UserFile[] => {
+export const getUserFiles = (userId: string | number): UserFile[] => {
   try {
     const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
     console.log('All files from localStorage:', allFiles);
     
+    // Convert both IDs to strings for comparison
     const userFiles = allFiles.filter((file) => {
-      const fileUserId = typeof file.userId === 'string' ? parseInt(file.userId) : file.userId;
-      const targetUserId = typeof userId === 'string' ? parseInt(userId as string) : userId;
+      const fileUserId = file.userId?.toString();
+      const targetUserId = userId.toString();
+      console.log('Comparing file userId:', fileUserId, 'with target userId:', targetUserId);
       return fileUserId === targetUserId;
     });
     
