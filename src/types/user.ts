@@ -65,6 +65,7 @@ export interface Phase0 {
   ukContactUpdated: boolean;
   ukContactNumber?: string;
   ukAddress?: string;
+  feedback?: string;
 }
 
 export interface Phase1 {
@@ -73,6 +74,7 @@ export interface Phase1 {
   pensionScheme: boolean;
   bankStatements: boolean;
   vaccinationProof: boolean;
+  feedback?: string;
 }
 
 export interface Phase2 {
@@ -80,4 +82,5 @@ export interface Phase2 {
   shareCode: boolean;
   dbs: boolean;
   onboardingComplete: boolean;
+  feedback?: string;
 }

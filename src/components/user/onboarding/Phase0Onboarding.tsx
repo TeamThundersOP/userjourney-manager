@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { FileUpload } from "./FileUpload";
 import { Progress } from "@/components/ui/progress";
 import { User } from "@/types/user";
+import PhaseFeedback from "./PhaseFeedback";
 
 interface Phase0OnboardingProps {
   userData: User | null;
@@ -71,6 +72,12 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
         <Progress value={
           Object.values(formData).filter(Boolean).length / Object.values(formData).length * 100
         } />
+        
+        {/* Display admin feedback if available */}
+        <PhaseFeedback 
+          feedback={userData?.onboarding?.phase0?.feedback} 
+          phase={0}
+        />
       </div>
 
       <div className="space-y-6">

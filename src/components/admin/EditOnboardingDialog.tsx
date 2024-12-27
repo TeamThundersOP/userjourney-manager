@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { User } from "@/types/user";
 import { useState } from "react";
@@ -52,6 +53,7 @@ const EditOnboardingDialog = ({
       travelDocumentsUploaded: false,
       visaCopyUploaded: false,
       ukContactUpdated: false,
+      feedback: user.onboarding?.phase0?.feedback || '',
       ...user.onboarding?.phase0
     },
     phase1: {
@@ -60,6 +62,7 @@ const EditOnboardingDialog = ({
       pensionScheme: false,
       bankStatements: false,
       vaccinationProof: false,
+      feedback: user.onboarding?.phase1?.feedback || '',
       ...user.onboarding?.phase1
     },
     phase2: {
@@ -67,6 +70,7 @@ const EditOnboardingDialog = ({
       shareCode: false,
       dbs: false,
       onboardingComplete: false,
+      feedback: user.onboarding?.phase2?.feedback || '',
       ...user.onboarding?.phase2
     },
     approvals: {
@@ -100,20 +104,23 @@ const EditOnboardingDialog = ({
           travelDetailsUpdated: onboarding?.phase0?.travelDetailsUpdated || false,
           travelDocumentsUploaded: onboarding?.phase0?.travelDocumentsUploaded || false,
           visaCopyUploaded: onboarding?.phase0?.visaCopyUploaded || false,
-          ukContactUpdated: onboarding?.phase0?.ukContactUpdated || false
+          ukContactUpdated: onboarding?.phase0?.ukContactUpdated || false,
+          feedback: onboarding?.phase0?.feedback || ''
         },
         phase1: onboarding?.phase1 || {
           hmrcChecklist: false,
           companyAgreements: false,
           pensionScheme: false,
           bankStatements: false,
-          vaccinationProof: false
+          vaccinationProof: false,
+          feedback: ''
         },
         phase2: onboarding?.phase2 || {
           rightToWork: false,
           shareCode: false,
           dbs: false,
-          onboardingComplete: false
+          onboardingComplete: false,
+          feedback: ''
         },
         approvals: onboarding?.approvals || {
           phase0: false,
@@ -343,136 +350,185 @@ const EditOnboardingDialog = ({
                   <Label htmlFor="ukContactUpdated">UK Contact Updated</Label>
                 </div>
               </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="font-semibold">Phase 1: Documentation</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="hmrcChecklist"
-                    checked={onboarding?.phase1.hmrcChecklist}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase1: { ...prev!.phase1, hmrcChecklist: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="hmrcChecklist">HMRC Checklist</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="companyAgreements"
-                    checked={onboarding?.phase1.companyAgreements}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase1: { ...prev!.phase1, companyAgreements: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="companyAgreements">Company Agreements</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="pensionScheme"
-                    checked={onboarding?.phase1.pensionScheme}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase1: { ...prev!.phase1, pensionScheme: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="pensionScheme">Pension Scheme</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="bankStatements"
-                    checked={onboarding?.phase1.bankStatements}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase1: { ...prev!.phase1, bankStatements: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="bankStatements">Bank Statements</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="vaccinationProof"
-                    checked={onboarding?.phase1.vaccinationProof}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase1: { ...prev!.phase1, vaccinationProof: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="vaccinationProof">Vaccination Proof</Label>
-                </div>
+              <div className="col-span-2 space-y-2">
+                <Label htmlFor="phase0-feedback">Feedback for Phase 0</Label>
+                <Textarea
+                  id="phase0-feedback"
+                  value={onboarding.phase0.feedback}
+                  onChange={(e) =>
+                    setOnboarding((prev) => ({
+                      ...prev,
+                      phase0: { ...prev.phase0, feedback: e.target.value },
+                    }))
+                  }
+                  placeholder="Enter feedback for the user..."
+                  className="min-h-[100px]"
+                />
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="font-semibold">Phase 2: Final Steps</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="rightToWork"
-                    checked={onboarding?.phase2.rightToWork}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase2: { ...prev!.phase2, rightToWork: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="rightToWork">Right to Work</Label>
+            {user.onboarding?.approvals.phase0 && (
+              <div className="space-y-4">
+                <h3 className="font-semibold">Phase 1: Documentation</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="hmrcChecklist"
+                      checked={onboarding?.phase1.hmrcChecklist}
+                      onCheckedChange={(checked) =>
+                        setOnboarding((prev) => ({
+                          ...prev!,
+                          phase1: { ...prev!.phase1, hmrcChecklist: checked as boolean },
+                        }))
+                      }
+                    />
+                    <Label htmlFor="hmrcChecklist">HMRC Checklist</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="companyAgreements"
+                      checked={onboarding?.phase1.companyAgreements}
+                      onCheckedChange={(checked) =>
+                        setOnboarding((prev) => ({
+                          ...prev!,
+                          phase1: { ...prev!.phase1, companyAgreements: checked as boolean },
+                        }))
+                      }
+                    />
+                    <Label htmlFor="companyAgreements">Company Agreements</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="pensionScheme"
+                      checked={onboarding?.phase1.pensionScheme}
+                      onCheckedChange={(checked) =>
+                        setOnboarding((prev) => ({
+                          ...prev!,
+                          phase1: { ...prev!.phase1, pensionScheme: checked as boolean },
+                        }))
+                      }
+                    />
+                    <Label htmlFor="pensionScheme">Pension Scheme</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="bankStatements"
+                      checked={onboarding?.phase1.bankStatements}
+                      onCheckedChange={(checked) =>
+                        setOnboarding((prev) => ({
+                          ...prev!,
+                          phase1: { ...prev!.phase1, bankStatements: checked as boolean },
+                        }))
+                      }
+                    />
+                    <Label htmlFor="bankStatements">Bank Statements</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="vaccinationProof"
+                      checked={onboarding?.phase1.vaccinationProof}
+                      onCheckedChange={(checked) =>
+                        setOnboarding((prev) => ({
+                          ...prev!,
+                          phase1: { ...prev!.phase1, vaccinationProof: checked as boolean },
+                        }))
+                      }
+                    />
+                    <Label htmlFor="vaccinationProof">Vaccination Proof</Label>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="shareCode"
-                    checked={onboarding?.phase2.shareCode}
-                    onCheckedChange={(checked) =>
+                <div className="col-span-2 space-y-2">
+                  <Label htmlFor="phase1-feedback">Feedback for Phase 1</Label>
+                  <Textarea
+                    id="phase1-feedback"
+                    value={onboarding.phase1.feedback}
+                    onChange={(e) =>
                       setOnboarding((prev) => ({
-                        ...prev!,
-                        phase2: { ...prev!.phase2, shareCode: checked as boolean },
+                        ...prev,
+                        phase1: { ...prev.phase1, feedback: e.target.value },
                       }))
                     }
+                    placeholder="Enter feedback for the user..."
+                    className="min-h-[100px]"
                   />
-                  <Label htmlFor="shareCode">Share Code</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="dbs"
-                    checked={onboarding?.phase2.dbs}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase2: { ...prev!.phase2, dbs: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="dbs">DBS</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="onboardingComplete"
-                    checked={onboarding?.phase2.onboardingComplete}
-                    onCheckedChange={(checked) =>
-                      setOnboarding((prev) => ({
-                        ...prev!,
-                        phase2: { ...prev!.phase2, onboardingComplete: checked as boolean },
-                      }))
-                    }
-                  />
-                  <Label htmlFor="onboardingComplete">Onboarding Complete</Label>
                 </div>
               </div>
-            </div>
+            )}
+
+            {user.onboarding?.approvals.phase1 && (
+              <div className="space-y-4">
+                <h3 className="font-semibold">Phase 2: Final Steps</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="rightToWork"
+                      checked={onboarding?.phase2.rightToWork}
+                      onCheckedChange={(checked) =>
+                        setOnboarding((prev) => ({
+                          ...prev!,
+                          phase2: { ...prev!.phase2, rightToWork: checked as boolean },
+                        }))
+                      }
+                    />
+                    <Label htmlFor="rightToWork">Right to Work</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="shareCode"
+                      checked={onboarding?.phase2.shareCode}
+                      onCheckedChange={(checked) =>
+                        setOnboarding((prev) => ({
+                          ...prev!,
+                          phase2: { ...prev!.phase2, shareCode: checked as boolean },
+                        }))
+                      }
+                    />
+                    <Label htmlFor="shareCode">Share Code</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="dbs"
+                      checked={onboarding?.phase2.dbs}
+                      onCheckedChange={(checked) =>
+                        setOnboarding((prev) => ({
+                          ...prev!,
+                          phase2: { ...prev!.phase2, dbs: checked as boolean },
+                        }))
+                      }
+                    />
+                    <Label htmlFor="dbs">DBS</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="onboardingComplete"
+                      checked={onboarding?.phase2.onboardingComplete}
+                      onCheckedChange={(checked) =>
+                        setOnboarding((prev) => ({
+                          ...prev!,
+                          phase2: { ...prev!.phase2, onboardingComplete: checked as boolean },
+                        }))
+                      }
+                    />
+                    <Label htmlFor="onboardingComplete">Onboarding Complete</Label>
+                  </div>
+                </div>
+                <div className="col-span-2 space-y-2">
+                  <Label htmlFor="phase2-feedback">Feedback for Phase 2</Label>
+                  <Textarea
+                    id="phase2-feedback"
+                    value={onboarding.phase2.feedback}
+                    onChange={(e) =>
+                      setOnboarding((prev) => ({
+                        ...prev,
+                        phase2: { ...prev.phase2, feedback: e.target.value },
+                      }))
+                    }
+                    placeholder="Enter feedback for the user..."
+                    className="min-h-[100px]"
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button type="submit">Save changes</Button>
