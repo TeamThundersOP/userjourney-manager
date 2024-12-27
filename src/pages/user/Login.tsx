@@ -26,20 +26,20 @@ const UserLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center gradient-bg p-4">
+      <Card className="w-full max-w-md glass-card">
         <CardHeader className="space-y-2">
-          <CardTitle className="text-2xl font-bold text-center text-gray-900">
+          <CardTitle className="heading-2 text-center text-primary">
             Welcome Back
           </CardTitle>
-          <CardDescription className="text-center text-gray-500">
+          <CardDescription className="text-center text-muted-foreground">
             Enter your credentials to access your account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="text-sm font-medium text-foreground">
                 Email
               </label>
               <Input
@@ -48,12 +48,12 @@ const UserLogin = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full"
+                className="w-full bg-background/50 border-input"
                 placeholder="Enter your email"
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="text-sm font-medium text-foreground">
                 Password
               </label>
               <Input
@@ -62,19 +62,19 @@ const UserLogin = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full"
+                className="w-full bg-background/50 border-input"
                 placeholder="Enter your password"
               />
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-end">
               <Link 
                 to="/user/reset-password" 
-                className="text-sm text-primary hover:underline"
+                className="text-sm text-primary hover:text-primary/90 hover:underline"
               >
                 Forgot password?
               </Link>
             </div>
-            <Button type="submit" className="w-full btn-primary-line">
+            <Button type="submit" className="w-full btn-primary">
               Sign In
             </Button>
           </form>
