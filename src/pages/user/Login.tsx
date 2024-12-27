@@ -21,7 +21,7 @@ const UserLogin = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -31,13 +31,12 @@ const UserLogin = () => {
         throw error;
       }
 
-      if (data.user) {
-        toast({
-          title: "Success",
-          description: "Successfully logged in",
-        });
-        navigate('/user/dashboard');
-      }
+      toast({
+        title: "Success",
+        description: "Successfully logged in",
+      });
+      
+      navigate('/user/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
