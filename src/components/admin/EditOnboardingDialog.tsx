@@ -141,9 +141,9 @@ const EditOnboardingDialog = ({
         <DialogHeader>
           <DialogTitle>Edit Onboarding Progress</DialogTitle>
         </DialogHeader>
-        <div className="overflow-y-auto flex-1 pr-6 -mr-6">
-          <form onSubmit={handleSubmit}>
-          <div className="grid gap-6 py-4">
+        <form onSubmit={handleSubmit} className="flex flex-col h-full">
+          <div className="overflow-y-auto flex-1 pr-6 -mr-6">
+            <div className="grid gap-6 py-4">
             <div className="space-y-4">
               <h3 className="font-semibold">Phase 0: Initial Setup</h3>
               <div className="grid grid-cols-2 gap-4">
@@ -531,11 +531,12 @@ const EditOnboardingDialog = ({
               </div>
             )}
           </div>
-          </form>
-        </div>
-        <DialogFooter className="sticky bottom-0 bg-white py-4">
-          <Button type="submit">Save changes</Button>
-        </DialogFooter>
+            </div>
+          </div>
+          <DialogFooter className="sticky bottom-0 bg-white py-4">
+            <Button type="submit">Save changes</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
