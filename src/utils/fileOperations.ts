@@ -4,19 +4,17 @@ import { toast } from "sonner";
 
 export const getUserFiles = (userId: number): UserFile[] => {
   try {
-    // Get all files from localStorage
     const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
-    console.log('All files from localStorage:', allFiles); // Debug log
+    console.log('All files from localStorage:', allFiles);
     
-    // Filter files for specific user and ensure userId comparison works with both string and number types
     const userFiles = allFiles.filter((file) => {
       const fileUserId = typeof file.userId === 'string' ? parseInt(file.userId) : file.userId;
       const targetUserId = typeof userId === 'string' ? parseInt(userId as string) : userId;
       return fileUserId === targetUserId;
     });
     
-    console.log('User ID being searched for:', userId); // Debug log
-    console.log('Filtered user files:', userFiles); // Debug log
+    console.log('User ID being searched for:', userId);
+    console.log('Filtered user files:', userFiles);
     return userFiles;
   } catch (error) {
     console.error('Error parsing user files:', error);
@@ -27,9 +25,26 @@ export const getUserFiles = (userId: number): UserFile[] => {
 export const saveUserFile = (file: UserFile) => {
   try {
     const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
-    const updatedFiles = [...allFiles, file];
-    localStorage.setItem('userFiles', JSON.stringify(updatedFiles));
-    console.log('Saved file to localStorage:', file); // Debug log
+    
+    // Check if a file with the same category exists for this user
+    const existingFileIndex = allFiles.findIndex((f) => {
+      const fileUserId = typeof f.userId === 'string' ? parseInt(f.userId) : f.userId;
+      const newFileUserId = typeof file.userId === 'string' ? parseInt(file.userId) : file.userId;
+      return fileUserId === newFileUserId && f.category === file.category;
+    });
+
+    if (existingFileIndex !== -1) {
+      // Remove the old file data
+      localStorage.removeItem(`file_${allFiles[existingFileIndex].id}`);
+      // Replace the old file with the new one
+      allFiles[existingFileIndex] = file;
+    } else {
+      // Add new file
+      allFiles.push(file);
+    }
+
+    localStorage.setItem('userFiles', JSON.stringify(allFiles));
+    console.log('Saved/Updated file:', file);
     return true;
   } catch (error) {
     console.error('Error saving file:', error);
@@ -75,7 +90,7 @@ export const handleFileDelete = (file: UserFile): UserFile[] => {
     const updatedFiles = allFiles.filter((f) => f.id !== file.id);
     localStorage.setItem('userFiles', JSON.stringify(updatedFiles));
     
-    console.log('Updated files after deletion:', updatedFiles); // Debug log
+    console.log('Updated files after deletion:', updatedFiles);
     
     toast.success(`${file.name} deleted successfully`);
     return updatedFiles.filter((f) => {
