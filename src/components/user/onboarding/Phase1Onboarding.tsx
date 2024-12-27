@@ -39,7 +39,7 @@ const Phase1Onboarding = ({ userData, onSave, isLoading }: Phase1OnboardingProps
   };
 
   const handleBack = () => {
-    // Set currentPhase to 0 in localStorage
+    // Update currentPhase to 0 in localStorage
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const updatedUsers = users.map((u: User) => {
       if (u.id === userData?.id) {
