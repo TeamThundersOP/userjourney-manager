@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Input } from "@/components/ui/input";
 import { FileUpload } from "./FileUpload";
 import { Progress } from "@/components/ui/progress";
 import { User } from "@/types/user";
 import PhaseFeedback from "./PhaseFeedback";
+import ContactDetailsSection from "./ContactDetailsSection";
 
 interface Phase0OnboardingProps {
   userData: User | null;
@@ -17,7 +17,7 @@ interface Phase0OnboardingProps {
 
 const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps) => {
   const [formData, setFormData] = useState({
-    personalDetailsCompleted: true, // Always true and disabled
+    personalDetailsCompleted: true,
     cvSubmitted: false,
     interviewCompleted: false,
     jobStatus: 'pending',
@@ -30,14 +30,22 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
     travelDetailsUpdated: false,
     travelDocumentsUploaded: false,
     visaCopyUploaded: false,
-    ukContactUpdated: false
+    ukContactUpdated: false,
+    ukContactNumber: '',
+    ukAddress: '',
+    usContactNumber: '',
+    usAddress: ''
   });
 
   useEffect(() => {
     if (userData?.onboarding?.phase0) {
       setFormData(prev => ({
         ...prev,
-        ...userData.onboarding.phase0
+        ...userData.onboarding.phase0,
+        ukContactNumber: userData.onboarding.phase0.ukContactNumber || '',
+        ukAddress: userData.onboarding.phase0.ukAddress || '',
+        usContactNumber: userData.onboarding.phase0.usContactNumber || '',
+        usAddress: userData.onboarding.phase0.usAddress || ''
       }));
     }
   }, [userData]);
@@ -59,6 +67,21 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
     }));
   };
 
+  const handleUKContactChange = (field: 'ukContactNumber' | 'ukAddress', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+      ukContactUpdated: true
+    }));
+  };
+
+  const handleUSContactChange = (field: 'usContactNumber' | 'usAddress', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   const isNextEnabled = userData?.onboarding?.approvals?.phase0 || false;
 
   const handleNext = () => {
@@ -73,7 +96,6 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
           Object.values(formData).filter(Boolean).length / Object.values(formData).length * 100
         } />
         
-        {/* Display admin feedback if available */}
         <PhaseFeedback 
           feedback={userData?.onboarding?.phase0?.feedback} 
           phase={0}
@@ -206,24 +228,14 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>UK Contact Details</Label>
-              <Input
-                placeholder="Phone number"
-                type="tel"
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  ukContactUpdated: e.target.value.length > 0 
-                }))}
-              />
-              <Input
-                placeholder="UK Address"
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  ukContactUpdated: e.target.value.length > 0 
-                }))}
-              />
-            </div>
+            <ContactDetailsSection
+              ukContactNumber={formData.ukContactNumber}
+              ukAddress={formData.ukAddress}
+              usContactNumber={formData.usContactNumber}
+              usAddress={formData.usAddress}
+              onUKContactChange={handleUKContactChange}
+              onUSContactChange={handleUSContactChange}
+            />
           </div>
         </div>
       </div>
