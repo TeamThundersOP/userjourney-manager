@@ -7,6 +7,7 @@ import Phase2Onboarding from '@/components/user/onboarding/Phase2Onboarding';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User } from '@/types/user';
+import { Check } from "lucide-react";
 
 const UserDashboard = () => {
   const { userId } = useUserAuth();
@@ -106,44 +107,30 @@ const UserDashboard = () => {
     }
   };
 
-  const renderCurrentPhase = () => {
-    const currentPhase = userData?.onboarding?.currentPhase || 0;
+  const isOnboardingComplete = userData?.onboarding?.approvals?.phase0 && 
+                             userData?.onboarding?.approvals?.phase1 && 
+                             userData?.onboarding?.approvals?.phase2;
 
-    switch (currentPhase) {
-      case 0:
-        return (
-          <Phase0Onboarding 
-            userData={userData}
-            onSave={handleSave}
-            isLoading={isLoading}
-          />
-        );
-      case 1:
-        if (userData?.onboarding?.approvals?.phase0) {
-          return (
-            <Phase1Onboarding 
-              userData={userData}
-              onSave={handleSave}
-              isLoading={isLoading}
-            />
-          );
-        }
-        return null;
-      case 2:
-        if (userData?.onboarding?.approvals?.phase1) {
-          return (
-            <Phase2Onboarding 
-              userData={userData}
-              onSave={handleSave}
-              isLoading={isLoading}
-            />
-          );
-        }
-        return null;
-      default:
-        return null;
-    }
-  };
+  if (isOnboardingComplete) {
+    return (
+      <Card className="bg-green-50 border-green-200">
+        <CardContent className="pt-6">
+          <div className="flex flex-col items-center justify-center text-center space-y-4">
+            <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+              <Check className="h-6 w-6 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-semibold text-green-800">
+              Onboarding Complete!
+            </h2>
+            <p className="text-green-600">
+              Congratulations! You have successfully completed all onboarding phases.
+              Welcome to the team!
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -152,7 +139,29 @@ const UserDashboard = () => {
           <CardTitle>Welcome to Your Dashboard</CardTitle>
         </CardHeader>
         <CardContent>
-          {renderCurrentPhase()}
+          {userData?.onboarding?.currentPhase === 0 && (
+            <Phase0Onboarding 
+              userData={userData}
+              onSave={handleSave}
+              isLoading={isLoading}
+            />
+          )}
+
+          {userData?.onboarding?.currentPhase === 1 && userData?.onboarding?.approvals?.phase0 && (
+            <Phase1Onboarding 
+              userData={userData}
+              onSave={handleSave}
+              isLoading={isLoading}
+            />
+          )}
+
+          {userData?.onboarding?.currentPhase === 2 && userData?.onboarding?.approvals?.phase1 && (
+            <Phase2Onboarding 
+              userData={userData}
+              onSave={handleSave}
+              isLoading={isLoading}
+            />
+          )}
         </CardContent>
       </Card>
     </div>
