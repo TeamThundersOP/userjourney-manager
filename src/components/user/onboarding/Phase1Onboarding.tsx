@@ -82,19 +82,13 @@ const Phase1Onboarding = ({ userData, onSave, isLoading }: Phase1OnboardingProps
         />
       </div>
 
-      <div className="flex justify-end space-x-4">
+      <div className="flex justify-end">
         <Button
           variant="outline"
           onClick={() => onSave(formData)}
           disabled={isLoading}
         >
           Save Progress
-        </Button>
-        <Button
-          onClick={() => {}}
-          disabled={!userData?.onboarding?.approvals?.phase1}
-        >
-          Next Phase
         </Button>
       </div>
     </div>

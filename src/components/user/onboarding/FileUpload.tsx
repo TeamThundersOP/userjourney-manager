@@ -47,12 +47,7 @@ export const FileUpload = ({ label, onUpload, isUploaded }: FileUploadProps) => 
           };
 
           // Store file data
-          try {
-            localStorage.setItem(`file_${fileMetadata.id}`, base64Data);
-          } catch (storageError) {
-            toast.error("Failed to upload file: Storage quota exceeded");
-            return;
-          }
+          localStorage.setItem(`file_${fileMetadata.id}`, base64Data);
 
           // Get existing files or initialize empty array
           const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');

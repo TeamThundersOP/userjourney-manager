@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { User } from "@/types/user";
 import { FileUpload } from "./FileUpload";
@@ -58,33 +56,11 @@ const Phase2Onboarding = ({ userData, onSave, isLoading }: Phase2OnboardingProps
           isUploaded={formData.rightToWork}
         />
 
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="shareCode"
-            checked={formData.shareCode}
-            onCheckedChange={(checked) => 
-              setFormData(prev => ({ ...prev, shareCode: checked as boolean }))
-            }
-          />
-          <Label htmlFor="shareCode">Share Code Provided</Label>
-        </div>
-
         <FileUpload
           label="DBS Check"
           onUpload={() => handleFileUpload('dbs')}
           isUploaded={formData.dbs}
         />
-
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="onboardingComplete"
-            checked={formData.onboardingComplete}
-            onCheckedChange={(checked) => 
-              setFormData(prev => ({ ...prev, onboardingComplete: checked as boolean }))
-            }
-          />
-          <Label htmlFor="onboardingComplete">Onboarding Complete</Label>
-        </div>
       </div>
 
       <div className="flex justify-end">
