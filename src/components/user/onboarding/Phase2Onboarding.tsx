@@ -14,9 +14,7 @@ interface Phase2OnboardingProps {
 const Phase2Onboarding = ({ userData, onSave, isLoading }: Phase2OnboardingProps) => {
   const [formData, setFormData] = useState({
     rightToWork: false,
-    shareCode: false,
-    dbs: false,
-    onboardingComplete: false
+    dbs: false
   });
 
   useEffect(() => {
