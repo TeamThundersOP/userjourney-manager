@@ -21,15 +21,25 @@ const UserLogin = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Login error:', error);
+        throw error;
+      }
 
-      navigate('/user/dashboard');
+      if (data.user) {
+        toast({
+          title: "Success",
+          description: "Successfully logged in",
+        });
+        navigate('/user/dashboard');
+      }
     } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         variant: "destructive",
         title: "Error",
