@@ -6,28 +6,28 @@
   @font-face {
     font-family: 'ArabotoBold';
     src: url('/fonts/Araboto-Bold.otf') format('opentype');
-    font-weight: bold;
+    font-weight: 400;
     font-style: normal;
   }
 
   @font-face {
     font-family: 'ArabotoLight';
     src: url('/fonts/Araboto-Light.otf') format('opentype');
-    font-weight: 300;
+    font-weight: 400;
     font-style: normal;
   }
 
   @font-face {
     font-family: 'ArabotoNormal';
     src: url('/fonts/Araboto-Normal.otf') format('opentype');
-    font-weight: normal;
+    font-weight: 400;
     font-style: normal;
   }
 
   @font-face {
     font-family: 'ArabotoThin';
     src: url('/fonts/Araboto-Thin.otf') format('opentype');
-    font-weight: 100;
+    font-weight: 400;
     font-style: normal;
   }
 
@@ -85,8 +85,34 @@
     @apply bg-background text-foreground antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1 {
     font-family: "ArabotoBold", sans-serif;
+    @apply text-heading-1 text-[#212529];
+  }
+
+  h2 {
+    font-family: "ArabotoLight", sans-serif;
+    @apply text-heading-2 text-[#212529];
+  }
+
+  h3 {
+    font-family: "ArabotoThin", sans-serif;
+    @apply text-heading-3 text-[#212529];
+  }
+
+  .body-large {
+    font-family: "ArabotoNormal", sans-serif;
+    @apply text-body-large text-white;
+  }
+
+  .body {
+    font-family: "ArabotoNormal", sans-serif;
+    @apply text-body text-[#fff7f5];
+  }
+
+  .accent-text {
+    font-family: "ArabotoNormal", sans-serif;
+    @apply text-heading-3 text-primary;
   }
 }
 

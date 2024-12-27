@@ -37,7 +37,7 @@ const UserLogin = () => {
               className="h-12 w-auto"
             />
           </div>
-          <CardTitle className="text-2xl text-center font-araboto-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <CardTitle className="font-araboto-bold text-heading-1 text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Welcome Back
           </CardTitle>
         </CardHeader>
@@ -75,11 +75,11 @@ const UserLogin = () => {
                 },
               },
               className: {
-                button: 'btn-primary-line',
+                button: 'btn-primary-line body-large',
                 container: 'space-y-4',
-                label: 'text-gray-700 font-medium',
-                input: 'rounded-lg border-gray-200 focus:ring-2 focus:ring-primary/20 transition-shadow',
-                message: 'text-sm text-gray-600',
+                label: 'text-gray-700 font-medium font-araboto-normal',
+                input: 'rounded-lg border-gray-200 focus:ring-2 focus:ring-primary/20 transition-shadow font-araboto-normal',
+                message: 'text-sm text-gray-600 font-araboto-normal',
               },
             }}
             providers={[]}
