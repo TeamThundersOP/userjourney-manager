@@ -46,14 +46,30 @@ export const FileUpload = ({ label, onUpload, isUploaded }: FileUploadProps) => 
             category: label
           };
 
-          // Store file data
-          localStorage.setItem(`file_${fileMetadata.id}`, base64Data);
-
-          // Get existing files or initialize empty array
+          // Get existing files
           const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
           
-          // Add new file metadata
-          localStorage.setItem('userFiles', JSON.stringify([...existingFiles, fileMetadata]));
+          // Find and remove any existing file with the same category and userId
+          const filteredFiles = existingFiles.filter((existingFile: any) => 
+            !(existingFile.category === label && 
+              String(existingFile.userId) === String(fileMetadata.userId))
+          );
+
+          // If we found and removed an old file, also remove its data
+          const removedFile = existingFiles.find((existingFile: any) => 
+            existingFile.category === label && 
+            String(existingFile.userId) === String(fileMetadata.userId)
+          );
+          
+          if (removedFile) {
+            localStorage.removeItem(`file_${removedFile.id}`);
+          }
+
+          // Store new file data
+          localStorage.setItem(`file_${fileMetadata.id}`, base64Data);
+
+          // Add new file metadata to the filtered list
+          localStorage.setItem('userFiles', JSON.stringify([...filteredFiles, fileMetadata]));
           
           onUpload(selectedFile);
           toast.success(`${label} uploaded successfully`);
