@@ -57,8 +57,8 @@ const Dashboard = () => {
         >
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-between">
-              <div className="bg-blue-500/10 p-3 rounded-lg">
-                <FileText className="h-6 w-6 text-blue-500" />
+              <div className="bg-primary/10 p-3 rounded-lg">
+                <FileText className="h-6 w-6 text-primary" />
               </div>
               <ArrowRight className="h-5 w-5 text-gray-400 group-hover:translate-x-1 transition-transform duration-200" />
             </div>
@@ -66,7 +66,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-500 mb-2">Active reports requiring attention</p>
-            <p className="text-3xl font-bold text-blue-500">{reportsCount || 0}</p>
+            <p className="text-3xl font-bold text-primary">{reportsCount || 0}</p>
           </CardContent>
         </Card>
       </div>
