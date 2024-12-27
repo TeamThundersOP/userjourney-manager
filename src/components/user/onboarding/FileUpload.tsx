@@ -11,6 +11,8 @@ interface FileUploadProps {
   isUploaded: boolean;
 }
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+
 export const FileUpload = ({ label, onUpload, isUploaded }: FileUploadProps) => {
   const [file, setFile] = useState<File | null>(null);
   const queryClient = useQueryClient();
@@ -18,39 +20,60 @@ export const FileUpload = ({ label, onUpload, isUploaded }: FileUploadProps) => 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
+
+      // Check file size
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        toast.error(`File size must be less than 5MB. Current size: ${(selectedFile.size / (1024 * 1024)).toFixed(2)}MB`);
+        return;
+      }
+
       setFile(selectedFile);
       
       // Convert file to base64
       const reader = new FileReader();
       reader.onload = async () => {
-        const base64Data = reader.result as string;
-        
-        // Create file metadata
-        const fileMetadata = {
-          id: Date.now(),
-          userId: localStorage.getItem('userId'),
-          name: selectedFile.name,
-          type: selectedFile.type,
-          uploadedAt: new Date().toISOString(),
-          size: `${(selectedFile.size / 1024).toFixed(2)} KB`,
-          category: label
-        };
+        try {
+          const base64Data = reader.result as string;
+          
+          // Create file metadata
+          const fileMetadata = {
+            id: Date.now(),
+            userId: localStorage.getItem('userId'),
+            name: selectedFile.name,
+            type: selectedFile.type,
+            uploadedAt: new Date().toISOString(),
+            size: `${(selectedFile.size / 1024).toFixed(2)} KB`,
+            category: label
+          };
 
-        // Store file data
-        localStorage.setItem(`file_${fileMetadata.id}`, base64Data);
+          // Store file data
+          try {
+            localStorage.setItem(`file_${fileMetadata.id}`, base64Data);
+          } catch (storageError) {
+            toast.error("Failed to upload file: Storage quota exceeded");
+            return;
+          }
 
-        // Get existing files or initialize empty array
-        const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
-        
-        // Add new file metadata
-        localStorage.setItem('userFiles', JSON.stringify([...existingFiles, fileMetadata]));
-        
-        onUpload(selectedFile);
-        toast.success(`${label} uploaded successfully`);
+          // Get existing files or initialize empty array
+          const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
+          
+          // Add new file metadata
+          localStorage.setItem('userFiles', JSON.stringify([...existingFiles, fileMetadata]));
+          
+          onUpload(selectedFile);
+          toast.success(`${label} uploaded successfully`);
 
-        // Invalidate queries to update both admin and user views
-        queryClient.invalidateQueries({ queryKey: ['userFiles'] });
-        queryClient.invalidateQueries({ queryKey: ['user'] });
+          // Invalidate queries to update both admin and user views
+          queryClient.invalidateQueries({ queryKey: ['userFiles'] });
+          queryClient.invalidateQueries({ queryKey: ['user'] });
+        } catch (error) {
+          console.error('Error processing file:', error);
+          toast.error("Failed to process file");
+        }
+      };
+
+      reader.onerror = () => {
+        toast.error("Error reading file");
       };
 
       reader.readAsDataURL(selectedFile);
@@ -87,7 +110,7 @@ export const FileUpload = ({ label, onUpload, isUploaded }: FileUploadProps) => 
       </div>
       {file && (
         <p className="text-sm text-gray-500">
-          Selected: {file.name}
+          Selected: {file.name} ({(file.size / (1024 * 1024)).toFixed(2)}MB)
         </p>
       )}
     </div>
