@@ -48,9 +48,9 @@ const DashboardLayout = () => {
         className="fixed top-4 left-4 z-50 md:hidden bg-white dark:bg-gray-800 p-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"
       >
         {isSidebarOpen ? (
-          <X className="h-6 w-6" />
+          <X className="h-6 w-6 text-primary" />
         ) : (
-          <Menu className="h-6 w-6" />
+          <Menu className="h-6 w-6 text-primary" />
         )}
       </button>
 
@@ -83,9 +83,9 @@ const DashboardLayout = () => {
               className="ml-2"
             >
               {isDark ? (
-                <Moon className="h-4 w-4" />
+                <Moon className="h-4 w-4 text-primary" />
               ) : (
-                <Sun className="h-4 w-4" />
+                <Sun className="h-4 w-4 text-primary" />
               )}
             </Toggle>
           </div>
@@ -103,7 +103,7 @@ const DashboardLayout = () => {
               isMobile && setSidebarOpen(false);
             }}
           >
-            <Home className="mr-2 h-4 w-4" />
+            <Home className="mr-2 h-4 w-4 text-primary" />
             Home
           </Button>
           <Button
@@ -118,7 +118,7 @@ const DashboardLayout = () => {
               isMobile && setSidebarOpen(false);
             }}
           >
-            <Users className="mr-2 h-4 w-4" />
+            <Users className="mr-2 h-4 w-4 text-primary" />
             Users
           </Button>
           <Button
@@ -133,7 +133,7 @@ const DashboardLayout = () => {
               isMobile && setSidebarOpen(false);
             }}
           >
-            <FileText className="mr-2 h-4 w-4" />
+            <FileText className="mr-2 h-4 w-4 text-primary" />
             Reports
           </Button>
           <div className="absolute bottom-8 left-0 w-full px-3">
@@ -142,7 +142,7 @@ const DashboardLayout = () => {
               className="w-full justify-start px-4 py-2 text-left text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 transition-all duration-200"
               onClick={logout}
             >
-              <LogOut className="mr-2 h-4 w-4" />
+              <LogOut className="mr-2 h-4 w-4 text-primary" />
               Logout
             </Button>
           </div>

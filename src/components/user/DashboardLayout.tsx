@@ -58,7 +58,7 @@ const DashboardLayout = () => {
             }`}
             onClick={() => navigate('/user/dashboard')}
           >
-            <Home className="mr-2 h-4 w-4" />
+            <Home className="mr-2 h-4 w-4 text-primary" />
             Home
           </Button>
           <Button
@@ -70,7 +70,7 @@ const DashboardLayout = () => {
             }`}
             onClick={() => navigate('/user/reports')}
           >
-            <MessageSquare className="mr-2 h-4 w-4" />
+            <MessageSquare className="mr-2 h-4 w-4 text-primary" />
             Reports
           </Button>
           <Button
@@ -82,7 +82,7 @@ const DashboardLayout = () => {
             }`}
             onClick={() => navigate('/user/profile')}
           >
-            <UserRound className="mr-2 h-4 w-4" />
+            <UserRound className="mr-2 h-4 w-4 text-primary" />
             My Profile
           </Button>
           <div className="absolute bottom-8 left-0 w-full px-3">
@@ -91,7 +91,7 @@ const DashboardLayout = () => {
               className="w-full justify-start px-4 py-2 text-left text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 transition-all duration-200"
               onClick={logout}
             >
-              <LogOut className="mr-2 h-4 w-4" />
+              <LogOut className="mr-2 h-4 w-4 text-primary" />
               Logout
             </Button>
           </div>
