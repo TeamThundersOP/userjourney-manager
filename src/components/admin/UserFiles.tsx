@@ -40,7 +40,20 @@ const UserFiles = ({ user }: UserFilesProps) => {
         const updatedUser = { ...u };
         if (!updatedUser.onboarding) return updatedUser;
 
-        // Update onboarding status based on file categories
+        // Reset all file-related statuses first
+        updatedUser.onboarding.phase0 = {
+          ...updatedUser.onboarding.phase0,
+          cvSubmitted: false,
+          rightToWorkSent: false,
+          travelDocumentsUploaded: false,
+          passportUploaded: false,
+          pccUploaded: false,
+          visaCopyUploaded: false,
+          otherDocumentsUploaded: false,
+          documentsUploaded: false
+        };
+
+        // Update onboarding status based on actual files present
         userFiles.forEach(file => {
           switch (file.category.toLowerCase()) {
             case 'cv':
@@ -66,6 +79,12 @@ const UserFiles = ({ user }: UserFilesProps) => {
               break;
           }
         });
+
+        // Update overall documents status
+        updatedUser.onboarding.phase0.documentsUploaded = 
+          updatedUser.onboarding.phase0.passportUploaded &&
+          updatedUser.onboarding.phase0.pccUploaded &&
+          updatedUser.onboarding.phase0.otherDocumentsUploaded;
 
         return updatedUser;
       }
@@ -104,53 +123,17 @@ const UserFiles = ({ user }: UserFilesProps) => {
     }
   };
 
-  const updateUserOnboardingStatus = (file: UserFile) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const updatedUsers = users.map((u: User) => {
-      if (String(u.id) === String(user.id)) {
-        const updatedUser = { ...u };
-        if (!updatedUser.onboarding) return updatedUser;
-
-        switch (file.category.toLowerCase()) {
-          case 'passport':
-            updatedUser.onboarding.phase0.passportUploaded = false;
-            break;
-          case 'pcc':
-            updatedUser.onboarding.phase0.pccUploaded = false;
-            break;
-          case 'visa':
-            updatedUser.onboarding.phase0.visaCopyUploaded = false;
-            break;
-          case 'travel documents':
-            updatedUser.onboarding.phase0.travelDocumentsUploaded = false;
-            break;
-          case 'other documents':
-            updatedUser.onboarding.phase0.otherDocumentsUploaded = false;
-            break;
-          case 'cv':
-            updatedUser.onboarding.phase0.cvSubmitted = false;
-            break;
-          case 'right to work':
-            updatedUser.onboarding.phase0.rightToWorkSent = false;
-            break;
-        }
-        return updatedUser;
-      }
-      return u;
-    });
-
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-    queryClient.invalidateQueries({ queryKey: ['user'] });
-  };
-
   const handleDelete = (file: UserFile) => {
     try {
       localStorage.removeItem(`file_${file.id}`);
       const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
       const updatedFiles = allFiles.filter((f) => f.id !== file.id);
       localStorage.setItem('userFiles', JSON.stringify(updatedFiles));
-      setFiles(getUserFiles());
-      updateUserOnboardingStatus(file);
+      
+      const userFiles = getUserFiles();
+      setFiles(userFiles);
+      updateOnboardingStatus(userFiles);
+      
       queryClient.invalidateQueries({ queryKey: ['userFiles'] });
       toast.success(`${file.name} deleted successfully`);
     } catch (error) {
