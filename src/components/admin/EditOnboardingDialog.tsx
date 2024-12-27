@@ -87,13 +87,13 @@ const EditOnboardingDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[90vh] overflow-hidden">
+      <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Edit Onboarding Progress</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col h-full">
-          <div className="overflow-y-auto flex-1 pr-6 -mr-6">
-            <div className="space-y-8 py-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto">
+            <div className="space-y-8 py-4 px-6">
               <Phase0Form
                 phase0={onboarding.phase0}
                 onUpdate={(updates) =>
@@ -129,7 +129,7 @@ const EditOnboardingDialog = ({
               )}
             </div>
           </div>
-          <DialogFooter className="sticky bottom-0 bg-white py-4 mt-6">
+          <DialogFooter className="sticky bottom-0 bg-white py-4 px-6 border-t">
             <Button type="submit">Save changes</Button>
           </DialogFooter>
         </form>
