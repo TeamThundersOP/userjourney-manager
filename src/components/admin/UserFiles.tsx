@@ -37,8 +37,39 @@ const UserFiles = ({ user }: UserFilesProps) => {
 
   const files = getUserFiles();
 
-  const handleDownload = (file: UserFile) => {
-    toast.success(`Downloading ${file.name}`);
+  const handleDownload = async (file: UserFile) => {
+    try {
+      // Get the file data from localStorage
+      const fileData = localStorage.getItem(`file_${file.id}`);
+      
+      if (!fileData) {
+        toast.error("File data not found");
+        return;
+      }
+
+      // Create a blob from the base64 data
+      const base64Response = await fetch(fileData);
+      const blob = await base64Response.blob();
+
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name; // Set the file name
+      
+      // Append to body, click and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up the URL
+      window.URL.revokeObjectURL(url);
+      
+      toast.success(`Downloading ${file.name}`);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      toast.error("Error downloading file");
+    }
   };
 
   return (
