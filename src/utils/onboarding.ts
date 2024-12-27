@@ -1,6 +1,6 @@
-import { Phase0, Phase1, Phase2 } from "@/types/user";
+import { OnboardingPhase0, OnboardingPhase1, OnboardingPhase2 } from "@/types/user";
 
-export const calculatePhaseProgress = (phase: Phase0 | Phase1 | Phase2): number => {
+export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase1 | OnboardingPhase2): number => {
   // Fields to exclude from progress calculation
   const excludedFields = ['feedback', 'jobStatus', 'visaStatus', 'ukContactNumber', 'ukAddress'];
   
