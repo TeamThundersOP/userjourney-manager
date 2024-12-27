@@ -29,6 +29,13 @@ const UserLogin = () => {
     <div className="min-h-screen flex items-center justify-center gradient-bg p-4">
       <Card className="w-full max-w-md glass-card">
         <CardHeader className="space-y-2">
+          <div className="flex justify-center mb-6">
+            <img 
+              src="/lovable-uploads/2906d348-43aa-4456-a306-855eb66b60d1.png"
+              alt="Funelli Logo"
+              className="h-12 w-auto"
+            />
+          </div>
           <CardTitle className="heading-2 text-center text-primary">
             Welcome Back
           </CardTitle>
