@@ -7,6 +7,7 @@ import Phase2Onboarding from '@/components/user/onboarding/Phase2Onboarding';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User } from '@/types/user';
+import { CheckCircle2 } from 'lucide-react';
 
 const UserDashboard = () => {
   const { userId } = useUserAuth();
@@ -144,6 +145,28 @@ const UserDashboard = () => {
         return null;
     }
   };
+
+  const isOnboardingComplete = userData?.onboarding?.approvals?.phase2;
+
+  if (isOnboardingComplete) {
+    return (
+      <Card className="bg-green-50 dark:bg-green-900/10">
+        <CardContent className="pt-6">
+          <div className="flex flex-col items-center justify-center text-center space-y-4">
+            <CheckCircle2 className="h-16 w-16 text-green-500" />
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-green-700 dark:text-green-300">
+                Onboarding Complete!
+              </h2>
+              <p className="text-green-600 dark:text-green-400">
+                Thank you for completing your onboarding process. Welcome to the team!
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
