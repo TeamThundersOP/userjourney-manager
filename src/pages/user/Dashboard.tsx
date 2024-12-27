@@ -150,21 +150,23 @@ const UserDashboard = () => {
 
   if (isOnboardingComplete) {
     return (
-      <Card className="bg-green-50 dark:bg-green-900/10">
-        <CardContent className="pt-6">
-          <div className="flex flex-col items-center justify-center text-center space-y-4">
-            <CheckCircle2 className="h-16 w-16 text-green-500" />
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-green-700 dark:text-green-300">
-                Onboarding Complete!
-              </h2>
-              <p className="text-green-600 dark:text-green-400">
-                Thank you for completing your onboarding process. Welcome to the team!
-              </p>
+      <div className="h-screen flex items-center justify-center">
+        <Card className="bg-green-50 dark:bg-green-900/10">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center justify-center text-center space-y-4">
+              <CheckCircle2 className="h-16 w-16 text-green-500" />
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold text-green-700 dark:text-green-300">
+                  Onboarding Complete!
+                </h2>
+                <p className="text-green-600 dark:text-green-400">
+                  Thank you for completing your onboarding process.
+                </p>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
