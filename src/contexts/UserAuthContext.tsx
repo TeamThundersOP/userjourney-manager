@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 
 interface UserAuthContextType {
   isAuthenticated: boolean;
@@ -33,56 +32,58 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check initial auth state
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setIsAuthenticated(true);
-        setUserId(session.user.id);
-      }
-    };
-    
-    checkAuth();
+    const storedAuth = localStorage.getItem('userAuth');
+    const storedUserId = localStorage.getItem('userId');
+    const storedHasResetPassword = localStorage.getItem('hasResetPassword') === 'true';
+    const storedHasFilledPersonalInfo = localStorage.getItem('hasFilledPersonalInfo') === 'true';
 
-    // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        setIsAuthenticated(true);
-        setUserId(session.user.id);
-      } else if (event === 'SIGNED_OUT') {
-        setIsAuthenticated(false);
-        setUserId(null);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    if (storedAuth === 'true' && storedUserId) {
+      setIsAuthenticated(true);
+      setUserId(storedUserId);
+      setHasResetPassword(storedHasResetPassword);
+      setHasFilledPersonalInfo(storedHasFilledPersonalInfo);
+    }
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { data: { user }, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    // For demo purposes, we'll use the users from localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find((u: any) => u.email === email);
 
-    if (error) {
-      throw error;
+    if (!user || user.password !== password) {
+      throw new Error('Invalid credentials');
     }
 
-    if (user) {
-      setIsAuthenticated(true);
-      setUserId(user.id);
+    setIsAuthenticated(true);
+    setUserId(user.id.toString());
+    setIsFirstLogin(!user.hasLoggedInBefore);
+
+    localStorage.setItem('userAuth', 'true');
+    localStorage.setItem('userId', user.id.toString());
+
+    // Update user's first login status
+    if (!user.hasLoggedInBefore) {
+      const updatedUsers = users.map((u: any) => 
+        u.id === user.id ? { ...u, hasLoggedInBefore: true } : u
+      );
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+      navigate('/user/reset-password');
+    } else if (!user.hasResetPassword) {
+      navigate('/user/reset-password');
+    } else if (!user.hasFilledPersonalInfo) {
+      navigate('/user/personal-info');
+    } else {
       navigate('/user/dashboard');
     }
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
+  const logout = () => {
     setIsAuthenticated(false);
     setUserId(null);
     setHasResetPassword(false);
     setHasFilledPersonalInfo(false);
+    localStorage.removeItem('userAuth');
+    localStorage.removeItem('userId');
     navigate('/user/login');
   };
 

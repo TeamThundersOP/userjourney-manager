@@ -62,13 +62,6 @@ export default {
           bold: ["ArabotoBold", "sans-serif"],
         },
       },
-      fontSize: {
-        'heading-1': ['32px', { lineHeight: '48px', fontWeight: '400' }],
-        'heading-2': ['28px', { lineHeight: '42px', fontWeight: '400' }],
-        'heading-3': ['20px', { lineHeight: '30px', fontWeight: '400' }],
-        'body-large': ['18px', { lineHeight: '22px', fontWeight: '500' }],
-        'body': ['14px', { lineHeight: '26px', fontWeight: '400' }],
-      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
