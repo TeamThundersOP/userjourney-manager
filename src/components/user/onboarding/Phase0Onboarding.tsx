@@ -32,9 +32,7 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
     visaCopyUploaded: false,
     ukContactUpdated: false,
     ukContactNumber: '',
-    ukAddress: '',
-    usContactNumber: '',
-    usAddress: ''
+    ukAddress: ''
   });
 
   useEffect(() => {
@@ -43,9 +41,7 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
         ...prev,
         ...userData.onboarding.phase0,
         ukContactNumber: userData.onboarding.phase0.ukContactNumber || '',
-        ukAddress: userData.onboarding.phase0.ukAddress || '',
-        usContactNumber: userData.onboarding.phase0.usContactNumber || '',
-        usAddress: userData.onboarding.phase0.usAddress || ''
+        ukAddress: userData.onboarding.phase0.ukAddress || ''
       }));
     }
   }, [userData]);
@@ -72,13 +68,6 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
       ...prev,
       [field]: value,
       ukContactUpdated: true
-    }));
-  };
-
-  const handleUSContactChange = (field: 'usContactNumber' | 'usAddress', value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
     }));
   };
 
@@ -231,10 +220,7 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
             <ContactDetailsSection
               ukContactNumber={formData.ukContactNumber}
               ukAddress={formData.ukAddress}
-              usContactNumber={formData.usContactNumber}
-              usAddress={formData.usAddress}
               onUKContactChange={handleUKContactChange}
-              onUSContactChange={handleUSContactChange}
             />
           </div>
         </div>
