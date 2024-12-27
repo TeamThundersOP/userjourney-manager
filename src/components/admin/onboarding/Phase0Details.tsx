@@ -11,26 +11,17 @@ const Phase0Details = ({ user }: Phase0DetailsProps) => {
       <h3 className="text-lg font-semibold">Phase 0 Details</h3>
       
       {/* Show US Contact Information */}
-      {(user.personalInfo?.phone || user.personalInfo?.address) && (
+      {(user.onboarding?.phase0?.usContactNumber || user.onboarding?.phase0?.usAddress) && (
         <Card className="p-4 space-y-2">
           <h4 className="font-medium">US Contact Information</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-gray-500">Contact Number</p>
-              <p className="font-medium">{user.personalInfo?.phone || "Not provided"}</p>
+              <p className="font-medium">{user.onboarding?.phase0?.usContactNumber || "Not provided"}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Address</p>
-              <p className="font-medium">
-                {[
-                  user.personalInfo?.address,
-                  user.personalInfo?.city,
-                  user.personalInfo?.postalCode,
-                  user.personalInfo?.country
-                ]
-                  .filter(Boolean)
-                  .join(", ") || "Not provided"}
-              </p>
+              <p className="font-medium">{user.onboarding?.phase0?.usAddress || "Not provided"}</p>
             </div>
           </div>
         </Card>
