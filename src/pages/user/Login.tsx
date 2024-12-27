@@ -1,30 +1,49 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserAuth } from '@/contexts/UserAuthContext';
 
 const UserLogin = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useUserAuth();
+  const { toast } = useToast();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (isAuthenticated) {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
       navigate('/user/dashboard');
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to sign in",
+      });
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
-        navigate('/user/dashboard');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate, isAuthenticated]);
+  if (isAuthenticated) {
+    navigate('/user/dashboard');
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5">
@@ -42,49 +61,41 @@ const UserLogin = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Auth
-            supabaseClient={supabase}
-            appearance={{ 
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: '#af1626',
-                    brandAccent: '#fb0918',
-                    brandButtonText: 'white',
-                    defaultButtonBackground: '#f1f5f9',
-                    defaultButtonBackgroundHover: '#e2e8f0',
-                    inputBackground: 'white',
-                    inputBorder: '#e2e8f0',
-                    inputBorderHover: '#af1626',
-                    inputBorderFocus: '#fb0918',
-                  },
-                  radii: {
-                    buttonBorderRadius: '100px 0px 100px 100px',
-                    inputBorderRadius: '8px',
-                  },
-                  fonts: {
-                    buttonFontFamily: 'ArabotoNormal, sans-serif',
-                    inputFontFamily: 'ArabotoNormal, sans-serif',
-                    labelFontFamily: 'ArabotoNormal, sans-serif',
-                  },
-                  space: {
-                    buttonPadding: '10px 20px',
-                    inputPadding: '10px 14px',
-                  },
-                },
-              },
-              className: {
-                button: 'btn-primary-line body-large',
-                container: 'space-y-4',
-                label: 'text-gray-700 font-medium font-araboto-normal',
-                input: 'rounded-lg border-gray-200 focus:ring-2 focus:ring-primary/20 transition-shadow font-araboto-normal',
-                message: 'text-sm text-gray-600 font-araboto-normal',
-              },
-            }}
-            providers={[]}
-            redirectTo={`${window.location.origin}/user/dashboard`}
-          />
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-gray-700 font-medium font-araboto-normal">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="rounded-lg border-gray-200 focus:ring-2 focus:ring-primary/20 transition-shadow font-araboto-normal"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-gray-700 font-medium font-araboto-normal">
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="rounded-lg border-gray-200 focus:ring-2 focus:ring-primary/20 transition-shadow font-araboto-normal"
+                required
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full btn-primary-line body-large"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>
