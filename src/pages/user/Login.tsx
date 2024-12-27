@@ -60,13 +60,13 @@ const UserLogin = () => {
                     inputBorderFocus: '#fb0918',
                   },
                   radii: {
-                    borderRadius: '100px 0px 100px 100px',
+                    buttonBorderRadius: '100px 0px 100px 100px',
                     inputBorderRadius: '8px',
                   },
                   fonts: {
-                    bodyFontSize: '14px',
-                    buttonFontSize: '14px',
-                    inputFontSize: '14px',
+                    buttonFontFamily: 'ArabotoNormal, sans-serif',
+                    inputFontFamily: 'ArabotoNormal, sans-serif',
+                    labelFontFamily: 'ArabotoNormal, sans-serif',
                   },
                   space: {
                     buttonPadding: '10px 20px',
