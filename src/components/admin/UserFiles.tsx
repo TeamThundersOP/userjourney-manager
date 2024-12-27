@@ -43,6 +43,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
         // Update onboarding status based on file categories
         userFiles.forEach(file => {
           switch (file.category.toLowerCase()) {
+            // Phase 0 files
             case 'cv':
               updatedUser.onboarding.phase0.cvSubmitted = true;
               break;
@@ -63,6 +64,19 @@ const UserFiles = ({ user }: UserFilesProps) => {
               break;
             case 'other documents':
               updatedUser.onboarding.phase0.otherDocumentsUploaded = true;
+              break;
+            // Phase 1 files
+            case 'hmrc checklist':
+              updatedUser.onboarding.phase1.hmrcChecklist = true;
+              break;
+            case 'company agreements':
+              updatedUser.onboarding.phase1.companyAgreements = true;
+              break;
+            case 'bank statements':
+              updatedUser.onboarding.phase1.bankStatements = true;
+              break;
+            case 'vaccination proof':
+              updatedUser.onboarding.phase1.vaccinationProof = true;
               break;
           }
         });
@@ -112,6 +126,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
         if (!updatedUser.onboarding) return updatedUser;
 
         switch (file.category.toLowerCase()) {
+          // Phase 0 files
           case 'passport':
             updatedUser.onboarding.phase0.passportUploaded = false;
             break;
@@ -132,6 +147,19 @@ const UserFiles = ({ user }: UserFilesProps) => {
             break;
           case 'right to work':
             updatedUser.onboarding.phase0.rightToWorkSent = false;
+            break;
+          // Phase 1 files
+          case 'hmrc checklist':
+            updatedUser.onboarding.phase1.hmrcChecklist = false;
+            break;
+          case 'company agreements':
+            updatedUser.onboarding.phase1.companyAgreements = false;
+            break;
+          case 'bank statements':
+            updatedUser.onboarding.phase1.bankStatements = false;
+            break;
+          case 'vaccination proof':
+            updatedUser.onboarding.phase1.vaccinationProof = false;
             break;
         }
         return updatedUser;
