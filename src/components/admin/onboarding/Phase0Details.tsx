@@ -10,8 +10,8 @@ const Phase0Details = ({ user }: Phase0DetailsProps) => {
     <div className="mt-4 space-y-4">
       <h3 className="text-lg font-semibold">Phase 0 Details</h3>
       
-      {/* Show UK Contact Information only if it's been updated */}
-      {user.onboarding?.phase0?.ukContactUpdated && (
+      {/* Show UK Contact Information if it exists */}
+      {user.onboarding?.phase0?.ukContactNumber || user.onboarding?.phase0?.ukAddress ? (
         <Card className="p-4 space-y-2">
           <h4 className="font-medium">UK Contact Information</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
