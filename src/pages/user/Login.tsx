@@ -59,13 +59,14 @@ const UserLogin = () => {
                     inputBorderHover: '#af1626',
                     inputBorderFocus: '#fb0918',
                   },
-                  borderRadii: {
-                    button: '100px 0px 100px 100px',
-                    input: '8px',
+                  radii: {
+                    borderRadius: '100px 0px 100px 100px',
+                    inputBorderRadius: '8px',
                   },
-                  fontSizes: {
-                    baseButtonSize: '14px',
-                    baseInputSize: '14px',
+                  fonts: {
+                    bodyFontSize: '14px',
+                    buttonFontSize: '14px',
+                    inputFontSize: '14px',
                   },
                   space: {
                     buttonPadding: '10px 20px',
