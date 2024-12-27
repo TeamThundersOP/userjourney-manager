@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 import { FileUpload } from "./FileUpload";
+import { Progress } from "@/components/ui/progress";
 import { User } from "@/types/user";
-import UKContactSection from "./UKContactSection";
 
 interface Phase0OnboardingProps {
   userData: User | null;
@@ -16,7 +16,7 @@ interface Phase0OnboardingProps {
 
 const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps) => {
   const [formData, setFormData] = useState({
-    personalDetailsCompleted: true,
+    personalDetailsCompleted: true, // Always true and disabled
     cvSubmitted: false,
     interviewCompleted: false,
     jobStatus: 'pending',
@@ -29,9 +29,7 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
     travelDetailsUpdated: false,
     travelDocumentsUploaded: false,
     visaCopyUploaded: false,
-    ukContactUpdated: false,
-    ukContactNumber: '',
-    ukAddress: ''
+    ukContactUpdated: false
   });
 
   useEffect(() => {
@@ -57,14 +55,6 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
     setFormData(prev => ({
       ...prev,
       [fieldMap[type]]: true
-    }));
-  };
-
-  const handleUKContactChange = (field: 'ukContactNumber' | 'ukAddress', value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-      ukContactUpdated: value.length > 0 || (field === 'ukContactNumber' ? prev.ukAddress : prev.ukContactNumber).length > 0
     }));
   };
 
@@ -209,11 +199,24 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
               />
             </div>
 
-            <UKContactSection
-              ukContactNumber={formData.ukContactNumber}
-              ukAddress={formData.ukAddress}
-              onUKContactChange={handleUKContactChange}
-            />
+            <div className="space-y-2">
+              <Label>UK Contact Details</Label>
+              <Input
+                placeholder="Phone number"
+                type="tel"
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  ukContactUpdated: e.target.value.length > 0 
+                }))}
+              />
+              <Input
+                placeholder="UK Address"
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  ukContactUpdated: e.target.value.length > 0 
+                }))}
+              />
+            </div>
           </div>
         </div>
       </div>
