@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { User } from "@/types/user";
 import { FileUpload } from "./FileUpload";
