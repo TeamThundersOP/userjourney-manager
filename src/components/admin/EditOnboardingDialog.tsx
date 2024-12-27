@@ -60,9 +60,7 @@ const EditOnboardingDialog = ({
     },
     phase2: {
       rightToWork: false,
-      shareCode: false,
       dbs: false,
-      onboardingComplete: false,
       feedback: user.onboarding?.phase2?.feedback || '',
       ...user.onboarding?.phase2
     },
