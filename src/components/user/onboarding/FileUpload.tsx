@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Upload, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useQueryClient } from '@tanstack/react-query';
 
 interface FileUploadProps {
   label: string;
@@ -12,6 +13,7 @@ interface FileUploadProps {
 
 export const FileUpload = ({ label, onUpload, isUploaded }: FileUploadProps) => {
   const [file, setFile] = useState<File | null>(null);
+  const queryClient = useQueryClient();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -45,6 +47,10 @@ export const FileUpload = ({ label, onUpload, isUploaded }: FileUploadProps) => 
         
         onUpload(selectedFile);
         toast.success(`${label} uploaded successfully`);
+
+        // Invalidate queries to update both admin and user views
+        queryClient.invalidateQueries({ queryKey: ['userFiles'] });
+        queryClient.invalidateQueries({ queryKey: ['user'] });
       };
 
       reader.readAsDataURL(selectedFile);
