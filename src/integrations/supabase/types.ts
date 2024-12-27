@@ -33,6 +33,305 @@ export type Database = {
         }
         Relationships: []
       }
+      files: {
+        Row: {
+          category: string
+          id: string
+          name: string
+          size: string
+          storage_path: string
+          type: string
+          uploaded_at: string
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          id?: string
+          name: string
+          size: string
+          storage_path: string
+          type: string
+          uploaded_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          id?: string
+          name?: string
+          size?: string
+          storage_path?: string
+          type?: string
+          uploaded_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding: {
+        Row: {
+          created_at: string
+          current_phase: number | null
+          phase0_completed: boolean | null
+          phase0_feedback: string | null
+          phase1_completed: boolean | null
+          phase1_feedback: string | null
+          phase2_completed: boolean | null
+          phase2_feedback: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_phase?: number | null
+          phase0_completed?: boolean | null
+          phase0_feedback?: string | null
+          phase1_completed?: boolean | null
+          phase1_feedback?: string | null
+          phase2_completed?: boolean | null
+          phase2_feedback?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_phase?: number | null
+          phase0_completed?: boolean | null
+          phase0_feedback?: string | null
+          phase1_completed?: boolean | null
+          phase1_feedback?: string | null
+          phase2_completed?: boolean | null
+          phase2_feedback?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_details: {
+        Row: {
+          bank_statements: boolean | null
+          company_agreements: boolean | null
+          cos_sent: boolean | null
+          created_at: string
+          cv_submitted: boolean | null
+          dbs: boolean | null
+          documents_uploaded: boolean | null
+          hmrc_checklist: boolean | null
+          interview_completed: boolean | null
+          job_status: string | null
+          offer_letter_sent: boolean | null
+          onboarding_complete: boolean | null
+          other_documents_uploaded: boolean | null
+          passport_uploaded: boolean | null
+          pcc_uploaded: boolean | null
+          pension_scheme: boolean | null
+          personal_details_completed: boolean | null
+          right_to_work: boolean | null
+          right_to_work_sent: boolean | null
+          share_code: boolean | null
+          travel_details_updated: boolean | null
+          travel_documents_uploaded: boolean | null
+          uk_address: string | null
+          uk_contact_number: string | null
+          uk_contact_updated: boolean | null
+          updated_at: string
+          user_id: string
+          vaccination_proof: boolean | null
+          visa_copy_uploaded: boolean | null
+          visa_status: string | null
+        }
+        Insert: {
+          bank_statements?: boolean | null
+          company_agreements?: boolean | null
+          cos_sent?: boolean | null
+          created_at?: string
+          cv_submitted?: boolean | null
+          dbs?: boolean | null
+          documents_uploaded?: boolean | null
+          hmrc_checklist?: boolean | null
+          interview_completed?: boolean | null
+          job_status?: string | null
+          offer_letter_sent?: boolean | null
+          onboarding_complete?: boolean | null
+          other_documents_uploaded?: boolean | null
+          passport_uploaded?: boolean | null
+          pcc_uploaded?: boolean | null
+          pension_scheme?: boolean | null
+          personal_details_completed?: boolean | null
+          right_to_work?: boolean | null
+          right_to_work_sent?: boolean | null
+          share_code?: boolean | null
+          travel_details_updated?: boolean | null
+          travel_documents_uploaded?: boolean | null
+          uk_address?: string | null
+          uk_contact_number?: string | null
+          uk_contact_updated?: boolean | null
+          updated_at?: string
+          user_id: string
+          vaccination_proof?: boolean | null
+          visa_copy_uploaded?: boolean | null
+          visa_status?: string | null
+        }
+        Update: {
+          bank_statements?: boolean | null
+          company_agreements?: boolean | null
+          cos_sent?: boolean | null
+          created_at?: string
+          cv_submitted?: boolean | null
+          dbs?: boolean | null
+          documents_uploaded?: boolean | null
+          hmrc_checklist?: boolean | null
+          interview_completed?: boolean | null
+          job_status?: string | null
+          offer_letter_sent?: boolean | null
+          onboarding_complete?: boolean | null
+          other_documents_uploaded?: boolean | null
+          passport_uploaded?: boolean | null
+          pcc_uploaded?: boolean | null
+          pension_scheme?: boolean | null
+          personal_details_completed?: boolean | null
+          right_to_work?: boolean | null
+          right_to_work_sent?: boolean | null
+          share_code?: boolean | null
+          travel_details_updated?: boolean | null
+          travel_documents_uploaded?: boolean | null
+          uk_address?: string | null
+          uk_contact_number?: string | null
+          uk_contact_updated?: boolean | null
+          updated_at?: string
+          user_id?: string
+          vaccination_proof?: boolean | null
+          visa_copy_uploaded?: boolean | null
+          visa_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_details_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          address: string | null
+          city: string | null
+          country: string | null
+          country_of_residence: string | null
+          created_at: string
+          date_of_birth: string | null
+          family_name: string | null
+          gender: string | null
+          given_name: string | null
+          nationality: string | null
+          other_names: string | null
+          passport_expiry_date: string | null
+          passport_issue_date: string | null
+          passport_number: string | null
+          passport_place_of_issue: string | null
+          phone: string | null
+          place_of_birth: string | null
+          postal_code: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          country_of_residence?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          family_name?: string | null
+          gender?: string | null
+          given_name?: string | null
+          nationality?: string | null
+          other_names?: string | null
+          passport_expiry_date?: string | null
+          passport_issue_date?: string | null
+          passport_number?: string | null
+          passport_place_of_issue?: string | null
+          phone?: string | null
+          place_of_birth?: string | null
+          postal_code?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          country_of_residence?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          family_name?: string | null
+          gender?: string | null
+          given_name?: string | null
+          nationality?: string | null
+          other_names?: string | null
+          passport_expiry_date?: string | null
+          passport_issue_date?: string | null
+          passport_number?: string | null
+          passport_place_of_issue?: string | null
+          phone?: string | null
+          place_of_birth?: string | null
+          postal_code?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          password_hash: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          password_hash: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          password_hash?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
