@@ -73,8 +73,22 @@ const PersonalInfoForm = () => {
     }
   }, [formData, initialFormData]);
 
+  const isBasicInfoComplete = () => {
+    return formData.familyName.trim() !== '' && 
+           formData.givenName.trim() !== '';
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isBasicInfoComplete()) {
+      toast({
+        title: "Error",
+        description: "Please fill in at least your Family Name and Given Name",
+        variant: "destructive"
+      });
+      return;
+    }
 
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const updatedUsers = users.map((u: any) => {

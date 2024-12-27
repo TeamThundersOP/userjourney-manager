@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface UserAuthContextType {
   isAuthenticated: boolean;
@@ -30,6 +30,7 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
   const [hasResetPassword, setHasResetPassword] = useState(false);
   const [hasFilledPersonalInfo, setHasFilledPersonalInfo] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const storedAuth = localStorage.getItem('userAuth');
@@ -45,8 +46,17 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, []);
 
+  // Protect routes that require basic information
+  useEffect(() => {
+    const protectedPaths = ['/user/dashboard', '/user/reports', '/user/profile'];
+    
+    if (isAuthenticated && !hasFilledPersonalInfo && 
+        protectedPaths.some(path => location.pathname.startsWith(path))) {
+      navigate('/user/personal-info');
+    }
+  }, [isAuthenticated, hasFilledPersonalInfo, location.pathname, navigate]);
+
   const login = async (email: string, password: string) => {
-    // For demo purposes, we'll use the users from localStorage
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find((u: any) => u.email === email);
 
@@ -57,11 +67,11 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
     setIsAuthenticated(true);
     setUserId(user.id.toString());
     setIsFirstLogin(!user.hasLoggedInBefore);
+    setHasFilledPersonalInfo(!!user.hasFilledPersonalInfo);
 
     localStorage.setItem('userAuth', 'true');
     localStorage.setItem('userId', user.id.toString());
 
-    // Update user's first login status
     if (!user.hasLoggedInBefore) {
       const updatedUsers = users.map((u: any) => 
         u.id === user.id ? { ...u, hasLoggedInBefore: true } : u
