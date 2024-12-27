@@ -7,7 +7,7 @@ import { FileUpload } from "./FileUpload";
 import { Progress } from "@/components/ui/progress";
 import { User } from "@/types/user";
 import PhaseFeedback from "./PhaseFeedback";
-import ContactDetailsSection from "./ContactDetailsSection";
+import UKContactDetails from "./UKContactDetails";
 
 interface Phase0OnboardingProps {
   userData: User | null;
@@ -69,12 +69,6 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
       [field]: value,
       ukContactUpdated: true
     }));
-  };
-
-  const isNextEnabled = userData?.onboarding?.approvals?.phase0 || false;
-
-  const handleNext = () => {
-    // Handle navigation to next phase
   };
 
   return (
@@ -217,7 +211,7 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
               />
             </div>
 
-            <ContactDetailsSection
+            <UKContactDetails
               ukContactNumber={formData.ukContactNumber}
               ukAddress={formData.ukAddress}
               onUKContactChange={handleUKContactChange}
@@ -235,8 +229,8 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
           Save Progress
         </Button>
         <Button
-          onClick={handleNext}
-          disabled={!isNextEnabled}
+          onClick={() => {}}
+          disabled={!userData?.onboarding?.approvals?.phase0}
         >
           Next Phase
         </Button>
