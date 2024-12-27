@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { FileText, Download } from "lucide-react";
+import { FileText, Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -55,7 +55,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = file.name; // Set the file name
+      link.download = file.name;
       
       // Append to body, click and remove
       document.body.appendChild(link);
@@ -69,6 +69,26 @@ const UserFiles = ({ user }: UserFilesProps) => {
     } catch (error) {
       console.error('Error downloading file:', error);
       toast.error("Error downloading file");
+    }
+  };
+
+  const handleDelete = (file: UserFile) => {
+    try {
+      // Remove file data
+      localStorage.removeItem(`file_${file.id}`);
+      
+      // Remove file metadata from userFiles array
+      const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
+      const updatedFiles = allFiles.filter((f) => f.id !== file.id);
+      localStorage.setItem('userFiles', JSON.stringify(updatedFiles));
+      
+      // Invalidate and refetch queries to update UI
+      queryClient.invalidateQueries({ queryKey: ['userFiles'] });
+      
+      toast.success(`${file.name} deleted successfully`);
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      toast.error("Error deleting file");
     }
   };
 
@@ -91,7 +111,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
                 <TableHead>Type</TableHead>
                 <TableHead>Upload Date</TableHead>
                 <TableHead>Size</TableHead>
-                <TableHead>Action</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -102,15 +122,26 @@ const UserFiles = ({ user }: UserFilesProps) => {
                   <TableCell>{new Date(file.uploadedAt).toLocaleDateString()}</TableCell>
                   <TableCell>{file.size}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDownload(file)}
-                      className="flex items-center gap-2"
-                    >
-                      <Download className="h-4 w-4" />
-                      Download
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDownload(file)}
+                        className="flex items-center gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        Download
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(file)}
+                        className="flex items-center gap-2 text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
