@@ -2,7 +2,6 @@ import { useUserAuth } from '@/contexts/UserAuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import Phase0Onboarding from '@/components/user/onboarding/Phase0Onboarding';
-import Phase1Onboarding from '@/components/user/onboarding/Phase1Onboarding';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User } from '@/types/user';
@@ -16,8 +15,10 @@ const UserDashboard = () => {
     queryKey: ['user', userId],
     queryFn: async () => {
       const users = JSON.parse(localStorage.getItem('users') || '[]');
+      // Ensure both IDs are strings for comparison
       const user = users.find((u: any) => String(u.id) === String(userId));
       
+      // If user exists but doesn't have onboarding data, initialize it
       if (user && !user.onboarding) {
         user.onboarding = {
           currentPhase: 0,
@@ -59,6 +60,7 @@ const UserDashboard = () => {
           }
         };
         
+        // Save the initialized user back to localStorage
         const updatedUsers = users.map((u: User) => 
           String(u.id) === String(userId) ? user : u
         );
@@ -67,11 +69,13 @@ const UserDashboard = () => {
       
       return user || null;
     },
+    // Enable automatic background refresh
     refetchInterval: 2000,
+    // Refresh when window regains focus
     refetchOnWindowFocus: true,
   });
 
-  const handleSave = async (formData: any, phase: number) => {
+  const handleSave = async (formData: any) => {
     setIsLoading(true);
     try {
       const users = JSON.parse(localStorage.getItem('users') || '[]');
@@ -81,8 +85,8 @@ const UserDashboard = () => {
             ...u,
             onboarding: {
               ...u.onboarding,
-              [`phase${phase}`]: {
-                ...u.onboarding?.[`phase${phase}`],
+              phase0: {
+                ...u.onboarding?.phase0,
                 ...formData
               }
             }
@@ -93,6 +97,7 @@ const UserDashboard = () => {
 
       localStorage.setItem('users', JSON.stringify(updatedUsers));
       
+      // Invalidate and refetch queries to update both user and admin views
       await queryClient.invalidateQueries({ queryKey: ['user'] });
       await queryClient.invalidateQueries({ queryKey: ['users'] });
       
@@ -114,19 +119,9 @@ const UserDashboard = () => {
         <CardContent>
           <Phase0Onboarding 
             userData={userData}
-            onSave={(formData) => handleSave(formData, 0)}
+            onSave={handleSave}
             isLoading={isLoading}
           />
-
-          {userData?.onboarding?.approvals?.phase0 && (
-            <div className="mt-8">
-              <Phase1Onboarding 
-                userData={userData}
-                onSave={(formData) => handleSave(formData, 1)}
-                isLoading={isLoading}
-              />
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>

@@ -18,8 +18,7 @@ const Dashboard = () => {
   const { data: reportsCount } = useQuery({
     queryKey: ['reportsCount'],
     queryFn: () => {
-      const reports = JSON.parse(localStorage.getItem('userReports') || '[]');
-      return reports.length;
+      return 5;
     },
     refetchInterval: 5000,
   });

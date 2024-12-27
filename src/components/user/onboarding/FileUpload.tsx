@@ -1,70 +1,118 @@
+import { useState } from 'react';
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Upload, X } from "lucide-react";
+import { Upload, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useQueryClient } from '@tanstack/react-query';
 
 interface FileUploadProps {
   label: string;
   onUpload: (file: File) => void;
   isUploaded: boolean;
-  disabled?: boolean;
-  category?: string;
 }
 
-export const FileUpload = ({ label, onUpload, isUploaded, disabled = false, category }: FileUploadProps) => {
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Check file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("File size should not exceed 5MB");
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+
+export const FileUpload = ({ label, onUpload, isUploaded }: FileUploadProps) => {
+  const [file, setFile] = useState<File | null>(null);
+  const queryClient = useQueryClient();
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const selectedFile = e.target.files[0];
+
+      // Check file size
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        toast.error(`File size must be less than 5MB. Current size: ${(selectedFile.size / (1024 * 1024)).toFixed(2)}MB`);
         return;
       }
+
+      setFile(selectedFile);
       
-      // Confirm file replacement if a file is already uploaded
-      if (isUploaded) {
-        if (window.confirm(`Do you want to replace the existing ${label} file?`)) {
-          onUpload(file);
-          toast.success(`${label} file replaced successfully`);
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const base64Data = reader.result as string;
+          
+          // Create file metadata
+          const fileMetadata = {
+            id: Date.now(),
+            userId: localStorage.getItem('userId'),
+            name: selectedFile.name,
+            type: selectedFile.type,
+            uploadedAt: new Date().toISOString(),
+            size: `${(selectedFile.size / 1024).toFixed(2)} KB`,
+            category: label
+          };
+
+          // Store file data
+          try {
+            localStorage.setItem(`file_${fileMetadata.id}`, base64Data);
+          } catch (storageError) {
+            toast.error("Failed to upload file: Storage quota exceeded");
+            return;
+          }
+
+          // Get existing files or initialize empty array
+          const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
+          
+          // Add new file metadata
+          localStorage.setItem('userFiles', JSON.stringify([...existingFiles, fileMetadata]));
+          
+          onUpload(selectedFile);
+          toast.success(`${label} uploaded successfully`);
+
+          // Invalidate queries to update both admin and user views
+          queryClient.invalidateQueries({ queryKey: ['userFiles'] });
+          queryClient.invalidateQueries({ queryKey: ['user'] });
+        } catch (error) {
+          console.error('Error processing file:', error);
+          toast.error("Failed to process file");
         }
-      } else {
-        onUpload(file);
-        toast.success(`${label} file uploaded successfully`);
-      }
+      };
+
+      reader.onerror = () => {
+        toast.error("Error reading file");
+      };
+
+      reader.readAsDataURL(selectedFile);
     }
   };
 
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center space-x-2">
+        <input
+          type="file"
+          onChange={handleFileChange}
+          className="hidden"
+          id={`file-${label}`}
+        />
         <Button
-          type="button"
-          variant={isUploaded ? "outline" : "default"}
-          className={`w-full ${isUploaded ? 'bg-green-50 text-green-600 hover:bg-green-100' : ''}`}
-          disabled={disabled}
+          variant="outline"
+          className="w-full"
           onClick={() => document.getElementById(`file-${label}`)?.click()}
         >
           {isUploaded ? (
             <>
-              <Upload className="mr-2 h-4 w-4" />
-              Replace File
+              <Check className="w-4 h-4 mr-2" />
+              Uploaded
             </>
           ) : (
             <>
-              <Upload className="mr-2 h-4 w-4" />
-              Upload
+              <Upload className="w-4 h-4 mr-2" />
+              Upload {label}
             </>
           )}
         </Button>
-        <input
-          type="file"
-          id={`file-${label}`}
-          className="hidden"
-          onChange={handleFileChange}
-          disabled={disabled}
-        />
       </div>
+      {file && (
+        <p className="text-sm text-gray-500">
+          Selected: {file.name} ({(file.size / (1024 * 1024)).toFixed(2)}MB)
+        </p>
+      )}
     </div>
   );
 };
