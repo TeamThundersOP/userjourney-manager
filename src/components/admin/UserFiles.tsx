@@ -29,7 +29,6 @@ const UserFiles = ({ user }: UserFilesProps) => {
   const getUserFiles = (): UserFile[] => {
     try {
       const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
-      // Convert both IDs to strings for comparison
       return allFiles.filter((file) => String(file.userId) === String(user.id));
     } catch (error) {
       console.error('Error parsing user files:', error);
@@ -77,6 +76,41 @@ const UserFiles = ({ user }: UserFilesProps) => {
     }
   };
 
+  const updateUserOnboardingStatus = (file: UserFile) => {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map((u: User) => {
+      if (String(u.id) === String(user.id)) {
+        const updatedUser = { ...u };
+        if (!updatedUser.onboarding) return updatedUser;
+
+        // Update onboarding status based on file category
+        switch (file.category.toLowerCase()) {
+          case 'passport':
+            updatedUser.onboarding.phase0.passportUploaded = false;
+            break;
+          case 'pcc':
+            updatedUser.onboarding.phase0.pccUploaded = false;
+            break;
+          case 'visa':
+            updatedUser.onboarding.phase0.visaCopyUploaded = false;
+            break;
+          case 'travel documents':
+            updatedUser.onboarding.phase0.travelDocumentsUploaded = false;
+            break;
+          case 'other documents':
+            updatedUser.onboarding.phase0.otherDocumentsUploaded = false;
+            break;
+          // Add more cases as needed
+        }
+        return updatedUser;
+      }
+      return u;
+    });
+
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    queryClient.invalidateQueries({ queryKey: ['user'] });
+  };
+
   const handleDelete = (file: UserFile) => {
     try {
       // Remove file data
@@ -89,6 +123,9 @@ const UserFiles = ({ user }: UserFilesProps) => {
       
       // Update local state to trigger re-render
       setFiles(getUserFiles());
+      
+      // Update onboarding status
+      updateUserOnboardingStatus(file);
       
       // Invalidate and refetch queries to update UI
       queryClient.invalidateQueries({ queryKey: ['userFiles'] });
