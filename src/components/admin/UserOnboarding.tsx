@@ -112,7 +112,7 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
             ) : null}
           </div>
           <Progress value={phase0Progress} className="mb-2" />
-          <Phase0Details user={user} onSave={handleSaveOnboarding} />
+          <Phase0Details user={user} />
         </div>
 
         {user.onboarding?.approvals.phase0 && (
