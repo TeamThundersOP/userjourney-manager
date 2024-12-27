@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { User } from "@/types/user";
 import PhaseFeedback from "./PhaseFeedback";
 import UKContactDetails from "./UKContactDetails";
+import { toast } from "sonner";
 
 interface Phase0OnboardingProps {
   userData: User | null;
@@ -69,6 +70,27 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
       [field]: value,
       ukContactUpdated: true
     }));
+  };
+
+  const handleNext = () => {
+    // Update currentPhase to 1 in localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map((u: User) => {
+      if (u.id === userData?.id) {
+        return {
+          ...u,
+          onboarding: {
+            ...u.onboarding,
+            currentPhase: 1
+          }
+        };
+      }
+      return u;
+    });
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    toast.success("Moving to Phase 1");
+    // Force reload to update the UI
+    window.location.reload();
   };
 
   return (
@@ -229,7 +251,7 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
           Save Progress
         </Button>
         <Button
-          onClick={() => {}}
+          onClick={handleNext}
           disabled={!userData?.onboarding?.approvals?.phase0}
         >
           Next Phase
