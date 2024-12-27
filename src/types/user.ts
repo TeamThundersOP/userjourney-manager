@@ -65,6 +65,8 @@ export interface Phase0 {
   ukContactUpdated: boolean;
   ukContactNumber?: string;
   ukAddress?: string;
+  usContactNumber?: string;
+  usAddress?: string;
   feedback?: string;
 }
 
