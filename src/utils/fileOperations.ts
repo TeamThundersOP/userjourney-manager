@@ -6,17 +6,21 @@ export const getUserFiles = (userId: string | number): UserFile[] => {
   try {
     const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
     console.log('All files from localStorage:', allFiles);
+    console.log('Looking for files with userId:', userId);
     
-    // Convert both IDs to strings for comparison
-    const userFiles = allFiles.filter((file) => {
-      const fileUserId = file.userId?.toString();
-      const targetUserId = userId.toString();
-      console.log('Comparing file userId:', fileUserId, 'with target userId:', targetUserId);
+    // Ensure we're working with strings for comparison
+    const targetUserId = userId?.toString();
+    
+    const userFiles = allFiles.filter(file => {
+      // Handle potential null/undefined userId
+      if (!file.userId) return false;
+      
+      const fileUserId = file.userId.toString();
+      console.log(`Comparing file ${file.name} - fileUserId: ${fileUserId} with targetUserId: ${targetUserId}`);
       return fileUserId === targetUserId;
     });
     
-    console.log('User ID being searched for:', userId);
-    console.log('Filtered user files:', userFiles);
+    console.log('Filtered files:', userFiles);
     return userFiles;
   } catch (error) {
     console.error('Error parsing user files:', error);
@@ -30,8 +34,8 @@ export const saveUserFile = (file: UserFile) => {
     
     // Check if a file with the same category exists for this user
     const existingFileIndex = allFiles.findIndex((f) => {
-      const fileUserId = typeof f.userId === 'string' ? parseInt(f.userId) : f.userId;
-      const newFileUserId = typeof file.userId === 'string' ? parseInt(file.userId) : file.userId;
+      const fileUserId = f.userId?.toString();
+      const newFileUserId = file.userId?.toString();
       return fileUserId === newFileUserId && f.category === file.category;
     });
 
@@ -95,9 +99,11 @@ export const handleFileDelete = (file: UserFile): UserFile[] => {
     console.log('Updated files after deletion:', updatedFiles);
     
     toast.success(`${file.name} deleted successfully`);
-    return updatedFiles.filter((f) => {
-      const fileUserId = typeof f.userId === 'string' ? parseInt(f.userId) : f.userId;
-      const targetUserId = typeof file.userId === 'string' ? parseInt(file.userId) : file.userId;
+    
+    // Filter files for the specific user
+    return updatedFiles.filter(f => {
+      const fileUserId = f.userId?.toString();
+      const targetUserId = file.userId?.toString();
       return fileUserId === targetUserId;
     });
   } catch (error) {

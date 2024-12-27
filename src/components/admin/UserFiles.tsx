@@ -18,10 +18,14 @@ const UserFiles = ({ user }: UserFilesProps) => {
 
   useEffect(() => {
     const fetchFiles = () => {
-      console.log('Fetching files for user:', user.id); // Debug log
-      // Convert user.id to string to ensure consistent comparison
-      const userFiles = getUserFiles(user.id.toString());
-      console.log('Retrieved user files:', userFiles); // Debug log
+      if (!user?.id) {
+        console.log('No user ID provided');
+        return;
+      }
+      
+      console.log('Fetching files for user ID:', user.id);
+      const userFiles = getUserFiles(user.id);
+      console.log('Retrieved files:', userFiles);
       setFiles(userFiles);
       
       const updatedUser = updateOnboardingStatus(user, userFiles);
@@ -41,7 +45,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
     
     // Cleanup interval on component unmount
     return () => clearInterval(interval);
-  }, [user.id, queryClient, user]);
+  }, [user?.id, queryClient, user]);
 
   const onDownload = async (file: UserFile) => {
     await handleFileDownload(file);
