@@ -8,7 +8,7 @@ import { User } from "@/types/user";
 
 interface UserFile {
   id: number;
-  userId: number;
+  userId: string | null;
   name: string;
   type: string;
   uploadedAt: string;
@@ -27,7 +27,8 @@ const UserFiles = ({ user }: UserFilesProps) => {
   const getUserFiles = (): UserFile[] => {
     try {
       const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
-      return allFiles.filter((file) => file.userId === user.id);
+      // Convert both IDs to strings for comparison
+      return allFiles.filter((file) => String(file.userId) === String(user.id));
     } catch (error) {
       console.error('Error parsing user files:', error);
       return [];
