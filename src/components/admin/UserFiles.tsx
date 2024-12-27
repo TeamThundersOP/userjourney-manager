@@ -17,18 +17,29 @@ const UserFiles = ({ user }: UserFilesProps) => {
   const [files, setFiles] = useState<UserFile[]>([]);
 
   useEffect(() => {
-    const userFiles = getUserFiles(user.id);
-    setFiles(userFiles);
+    const fetchFiles = () => {
+      console.log('Fetching files for user:', user.id); // Debug log
+      const userFiles = getUserFiles(user.id);
+      console.log('Retrieved user files:', userFiles); // Debug log
+      setFiles(userFiles);
+      
+      const updatedUser = updateOnboardingStatus(user, userFiles);
+      if (updatedUser !== user) {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const updatedUsers = users.map((u: User) => 
+          u.id === updatedUser.id ? updatedUser : u
+        );
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
+        queryClient.invalidateQueries({ queryKey: ['user'] });
+      }
+    };
+
+    fetchFiles();
+    // Set up an interval to check for new files every 2 seconds
+    const interval = setInterval(fetchFiles, 2000);
     
-    const updatedUser = updateOnboardingStatus(user, userFiles);
-    if (updatedUser !== user) {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const updatedUsers = users.map((u: User) => 
-        u.id === updatedUser.id ? updatedUser : u
-      );
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-    }
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, [user.id, queryClient, user]);
 
   const onDownload = async (file: UserFile) => {
