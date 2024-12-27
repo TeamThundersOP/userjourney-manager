@@ -26,8 +26,55 @@ const UserFiles = ({ user }: UserFilesProps) => {
   };
 
   useEffect(() => {
-    setFiles(getUserFiles());
+    const userFiles = getUserFiles();
+    setFiles(userFiles);
+    updateOnboardingStatus(userFiles);
   }, [user.id]);
+
+  const updateOnboardingStatus = (userFiles: UserFile[]) => {
+    if (!user.onboarding) return;
+
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map((u: User) => {
+      if (String(u.id) === String(user.id)) {
+        const updatedUser = { ...u };
+        if (!updatedUser.onboarding) return updatedUser;
+
+        // Update onboarding status based on file categories
+        userFiles.forEach(file => {
+          switch (file.category.toLowerCase()) {
+            case 'cv':
+              updatedUser.onboarding.phase0.cvSubmitted = true;
+              break;
+            case 'right to work':
+              updatedUser.onboarding.phase0.rightToWorkSent = true;
+              break;
+            case 'travel documents':
+              updatedUser.onboarding.phase0.travelDocumentsUploaded = true;
+              break;
+            case 'passport':
+              updatedUser.onboarding.phase0.passportUploaded = true;
+              break;
+            case 'pcc':
+              updatedUser.onboarding.phase0.pccUploaded = true;
+              break;
+            case 'visa':
+              updatedUser.onboarding.phase0.visaCopyUploaded = true;
+              break;
+            case 'other documents':
+              updatedUser.onboarding.phase0.otherDocumentsUploaded = true;
+              break;
+          }
+        });
+
+        return updatedUser;
+      }
+      return u;
+    });
+
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    queryClient.invalidateQueries({ queryKey: ['user'] });
+  };
 
   const handleDownload = async (file: UserFile) => {
     try {
@@ -79,6 +126,12 @@ const UserFiles = ({ user }: UserFilesProps) => {
             break;
           case 'other documents':
             updatedUser.onboarding.phase0.otherDocumentsUploaded = false;
+            break;
+          case 'cv':
+            updatedUser.onboarding.phase0.cvSubmitted = false;
+            break;
+          case 'right to work':
+            updatedUser.onboarding.phase0.rightToWorkSent = false;
             break;
         }
         return updatedUser;
