@@ -111,9 +111,7 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave }: EditUserDialogProp
         },
         phase2: {
           rightToWork: false,
-          shareCode: false,
-          dbs: false,
-          onboardingComplete: false
+          dbs: false
         },
         approvals: {
           phase0: false,
@@ -334,3 +332,4 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave }: EditUserDialogProp
 };
 
 export default EditUserDialog;
+

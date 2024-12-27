@@ -50,9 +50,7 @@ const mockUser: User = {
     },
     phase2: {
       rightToWork: false,
-      shareCode: false,
-      dbs: false,
-      onboardingComplete: false
+      dbs: false
     },
     approvals: {
       phase0: false,
