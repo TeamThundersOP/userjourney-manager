@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
+import { UserFile } from "@/types/userFile";
 
 interface User {
   id: number;
@@ -103,15 +104,39 @@ const UsersList = () => {
   };
 
   const handleDelete = (userId: number) => {
+    // Delete user from users list
     const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
     const updatedUsers = existingUsers.filter((user: User) => user.id !== userId);
     localStorage.setItem('users', JSON.stringify(updatedUsers));
     
+    // Delete user files
+    const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
+    const updatedFiles = existingFiles.filter((file: UserFile) => String(file.userId) !== String(userId));
+    
+    // Delete file data from localStorage
+    existingFiles.forEach((file: UserFile) => {
+      if (String(file.userId) === String(userId)) {
+        localStorage.removeItem(`file_${file.id}`);
+      }
+    });
+    
+    localStorage.setItem('userFiles', JSON.stringify(updatedFiles));
+    
+    // Delete user reports
+    const existingReports = JSON.parse(localStorage.getItem('reports') || '[]');
+    const updatedReports = existingReports.filter((report: any) => 
+      String(report.userId) !== String(userId)
+    );
+    localStorage.setItem('reports', JSON.stringify(updatedReports));
+    
+    // Update React Query cache
     queryClient.setQueryData(['users'], updatedUsers);
+    queryClient.setQueryData(['userFiles'], updatedFiles);
+    queryClient.setQueryData(['reports'], updatedReports);
     
     toast({
       title: "Success",
-      description: "User deleted successfully",
+      description: "User and all related data deleted successfully",
     });
   };
 
