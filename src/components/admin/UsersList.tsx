@@ -6,19 +6,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Trash2, Eye, Search } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { UserFile } from "@/types/userFile";
+import SearchBar from "./users/SearchBar";
+import UserTableRow from "./users/UserTableRow";
 
 interface User {
   id: number;
   email: string;
-  status: string;
   personalInfo?: {
     fullName?: string;
   };
@@ -28,20 +26,17 @@ interface User {
 const mockUsers = [
   { 
     id: 1, 
-    email: "john.doe@example.com", 
-    status: "Active",
+    email: "john.doe@example.com",
     personalInfo: { fullName: "John Doe" }
   },
   { 
     id: 2, 
-    email: "jane.smith@example.com", 
-    status: "Active",
+    email: "jane.smith@example.com",
     personalInfo: { fullName: "Jane Smith" }
   },
   { 
     id: 3, 
-    email: "mike.wilson@example.com", 
-    status: "Pending",
+    email: "mike.wilson@example.com",
     personalInfo: { fullName: "Mike Wilson" }
   },
 ];
@@ -62,17 +57,13 @@ const fetchUsers = async (): Promise<User[]> => {
 const UsersList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const queryClient = useQueryClient();
-  
-  useEffect(() => {
-    initializeUsers();
-  }, []);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const { data: users = [], isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: fetchUsers,
   });
-  const navigate = useNavigate();
-  const { toast } = useToast();
 
   const filteredUsers = users.filter((user) => {
     const searchLower = searchTerm.toLowerCase();
@@ -142,15 +133,7 @@ const UsersList = () => {
 
   return (
     <div className="space-y-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-        <Input
-          placeholder="Search by ID or name..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
-      </div>
+      <SearchBar value={searchTerm} onChange={setSearchTerm} />
       <div className="rounded-lg border bg-card">
         <Table>
           <TableHeader>
@@ -158,43 +141,17 @@ const UsersList = () => {
               <TableHead className="w-[100px]">User ID</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">#{user.id}</TableCell>
-                <TableCell>{user.personalInfo?.fullName || "N/A"}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {user.status}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleView(user.id)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleDelete(user.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
+              <UserTableRow
+                key={user.id}
+                user={user}
+                onView={handleView}
+                onDelete={handleDelete}
+              />
             ))}
           </TableBody>
         </Table>
