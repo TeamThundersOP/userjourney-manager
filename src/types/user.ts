@@ -25,9 +25,9 @@ export interface User {
   };
   onboarding?: {
     currentPhase: number;
-    phase0: OnboardingPhase0;
-    phase1: OnboardingPhase1;
-    phase2: OnboardingPhase2;
+    phase0: Phase0;
+    phase1: Phase1;
+    phase2: Phase2;
     approvals: {
       phase0: boolean;
       phase1: boolean;
@@ -46,7 +46,7 @@ export interface UserFile {
   category: string;
 }
 
-export interface OnboardingPhase0 {
+export interface Phase0 {
   personalDetailsCompleted: boolean;
   cvSubmitted: boolean;
   interviewCompleted: boolean;
@@ -70,7 +70,7 @@ export interface OnboardingPhase0 {
   feedback?: string;
 }
 
-export interface OnboardingPhase1 {
+export interface Phase1 {
   hmrcChecklist: boolean;
   companyAgreements: boolean;
   pensionScheme: boolean;
@@ -79,7 +79,7 @@ export interface OnboardingPhase1 {
   feedback?: string;
 }
 
-export interface OnboardingPhase2 {
+export interface Phase2 {
   rightToWork: boolean;
   shareCode: boolean;
   dbs: boolean;
