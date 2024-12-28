@@ -50,7 +50,9 @@ const Phase0Actions = ({
             <h4 className="font-medium">Visa Application Status</h4>
             <RadioGroup
               value={formData.visaStatus}
-              onValueChange={onVisaStatusChange}
+              onValueChange={(value: 'pending' | 'approved' | 'rejected') => 
+                onVisaStatusChange && onVisaStatusChange(value)
+              }
               className="flex flex-col space-y-2"
             >
               <div className="flex items-center space-x-2">

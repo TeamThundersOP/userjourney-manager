@@ -59,6 +59,7 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
       ...prev,
       [fieldMap[type]]: true
     }));
+    toast.success(`${type} uploaded successfully`);
   };
 
   const handlePersonalDetailsChange = (checked: boolean) => {
@@ -74,6 +75,14 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
       [field]: value,
       ukContactUpdated: true
     }));
+  };
+
+  const handleVisaStatusChange = (status: 'pending' | 'approved' | 'rejected') => {
+    setFormData(prev => ({
+      ...prev,
+      visaStatus: status
+    }));
+    toast.success(`Visa status updated to ${status}`);
   };
 
   const handleNext = () => {
@@ -114,6 +123,7 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
         onFileUpload={handleFileUpload}
         onPersonalDetailsChange={handlePersonalDetailsChange}
         onUKContactChange={handleUKContactChange}
+        onVisaStatusChange={handleVisaStatusChange}
       />
 
       <div className="flex justify-end space-x-4">
