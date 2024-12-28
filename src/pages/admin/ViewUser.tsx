@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import UserPersonalInfo from '@/components/admin/UserPersonalInfo';
-import UserOnboarding from '@/components/admin/UserOnboarding';
-import UserFiles from '@/components/admin/UserFiles';
 import StatusTabs from '@/components/admin/user/StatusTabs';
+import UserPersonalInfo from '@/components/admin/UserPersonalInfo';
 import ProgressStatus from '@/components/admin/user/ProgressStatus';
+import UserFiles from '@/components/admin/UserFiles';
 import { ReportsTable } from '@/components/admin/reports/ReportsTable';
 import { User } from '@/types/user';
 
@@ -107,16 +106,18 @@ const ViewUser = () => {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['user', userId],
     queryFn: () => fetchUser(userId || ''),
-    refetchInterval: 2000,
-    refetchOnWindowFocus: true,
   });
 
   const { data: reports } = useQuery({
-    queryKey: ['reports', userId],
+    queryKey: ['reports', userId, user?.email],
     queryFn: () => {
       const allReports = JSON.parse(localStorage.getItem('userReports') || '[]');
-      return allReports.filter((report: any) => String(report.userId) === userId);
+      return allReports.filter((report: any) => 
+        String(report.userId) === userId || 
+        (user?.email && report.sender === user.email)
+      );
     },
+    enabled: !!user?.email, // Only run query when user email is available
   });
 
   if (isLoading) {
