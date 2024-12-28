@@ -2,20 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Users, FileText, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'create' | 'view' | 'delete'>('create');
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const { data: usersCount, refetch: refetchUsersCount } = useQuery({
+  const { data: usersCount } = useQuery({
     queryKey: ['usersCount'],
     queryFn: () => {
       const localStorageUsers = JSON.parse(localStorage.getItem('users') || '[]');
@@ -33,69 +24,11 @@ const Dashboard = () => {
     refetchInterval: 5000,
   });
 
-  const handleTabClick = (tab: 'create' | 'view' | 'delete') => {
-    setActiveTab(tab);
-    if (tab === 'create') {
-      setIsCreateDialogOpen(true);
-    }
-  };
-
-  const handleCreateUser = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const newUser = {
-      id: Date.now(),
-      email,
-      password,
-      status: "Pending",
-      personalInfo: {},
-      files: []
-    };
-
-    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    localStorage.setItem('users', JSON.stringify([...existingUsers, newUser]));
-
-    toast.success("Candidate created successfully");
-    refetchUsersCount();
-    setEmail("");
-    setPassword("");
-    setIsCreateDialogOpen(false);
-  };
-
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-primary">Admin Dashboard</h1>
-      </div>
-
-      <div className="flex space-x-4 border-b border-gray-200">
-        <Button
-          variant={activeTab === 'create' ? 'default' : 'ghost'}
-          className={`rounded-none border-b-2 ${
-            activeTab === 'create' ? 'border-primary' : 'border-transparent'
-          }`}
-          onClick={() => handleTabClick('create')}
-        >
-          Create Candidate
-        </Button>
-        <Button
-          variant={activeTab === 'view' ? 'default' : 'ghost'}
-          className={`rounded-none border-b-2 ${
-            activeTab === 'view' ? 'border-primary' : 'border-transparent'
-          }`}
-          onClick={() => handleTabClick('view')}
-        >
-          View Candidates
-        </Button>
-        <Button
-          variant={activeTab === 'delete' ? 'default' : 'ghost'}
-          className={`rounded-none border-b-2 ${
-            activeTab === 'delete' ? 'border-primary' : 'border-transparent'
-          }`}
-          onClick={() => handleTabClick('delete')}
-        >
-          Delete Candidate
-        </Button>
+        <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
+        <p className="text-gray-500">Here's an overview of your admin dashboard</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -137,37 +70,6 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
-
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create New Candidate</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleCreateUser} className="space-y-4">
-            <div>
-              <Input
-                placeholder="Email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Input
-                placeholder="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full">
-              Create Candidate
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

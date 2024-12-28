@@ -1,93 +1,158 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import UserTableRow from "./users/UserTableRow";
-import SearchBar from "./users/SearchBar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Table, TableHeader, TableRow, TableHead, TableBody } from "@/components/ui/table";
+import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
+import { UserFile } from "@/types/userFile";
+import SearchBar from "./users/SearchBar";
+import UserTableRow from "./users/UserTableRow";
+
+interface User {
+  id: number;
+  email: string;
+  personalInfo?: {
+    fullName?: string;
+  };
+}
+
+// Mock data
+const mockUsers = [
+  { 
+    id: 1, 
+    email: "john.doe@example.com",
+    personalInfo: { fullName: "John Doe" }
+  },
+  { 
+    id: 2, 
+    email: "jane.smith@example.com",
+    personalInfo: { fullName: "Jane Smith" }
+  },
+  { 
+    id: 3, 
+    email: "mike.wilson@example.com",
+    personalInfo: { fullName: "Mike Wilson" }
+  },
+];
+
+// Initialize localStorage with mock users if it hasn't been done
+const initializeUsers = () => {
+  const existingUsers = localStorage.getItem('users');
+  if (!existingUsers) {
+    localStorage.setItem('users', JSON.stringify(mockUsers));
+  }
+};
+
+const fetchUsers = async (): Promise<User[]> => {
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  return users;
+};
 
 const UsersList = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const { data: users = [], isLoading, refetch } = useQuery({
+  const { data: users = [], isLoading, error } = useQuery({
     queryKey: ['users'],
-    queryFn: async () => {
-      // Get users from localStorage
-      const storedUsers = localStorage.getItem('users');
-      if (!storedUsers) {
-        return [];
-      }
-      return JSON.parse(storedUsers);
-    },
+    queryFn: fetchUsers,
   });
 
-  const handleViewUser = (id: number) => {
-    navigate(`/admin/users/${id}`);
-  };
-
-  const handleDeleteUser = async (id: number) => {
-    try {
-      const storedUsers = localStorage.getItem('users');
-      if (!storedUsers) return;
-
-      const users = JSON.parse(storedUsers);
-      const updatedUsers = users.filter((user: any) => user.id !== id);
-      
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-      await refetch();
-      
-      toast.success('User deleted successfully');
-    } catch (error) {
-      toast.error('Failed to delete user');
-    }
-  };
-
-  const filteredUsers = users.filter((user: any) =>
-    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredUsers = users.filter((user) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      user.id.toString().includes(searchTerm) ||
+      user.personalInfo?.fullName?.toLowerCase().includes(searchLower) ||
+      user.email.toLowerCase().includes(searchLower)
+    );
+  });
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        {[...Array(5)].map((_, i) => (
-          <Skeleton key={i} className="h-16 w-full" />
-        ))}
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-gray-500">Loading users...</div>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-red-500">Error loading users</div>
+      </div>
+    );
+  }
+
+  const handleView = (userId: number) => {
+    navigate(`/admin/users/${userId}`);
+  };
+
+  const handleDelete = (userId: number) => {
+    // Delete user from users list
+    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = existingUsers.filter((user: User) => user.id !== userId);
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    
+    // Delete user files
+    const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
+    const updatedFiles = existingFiles.filter((file: UserFile) => String(file.userId) !== String(userId));
+    
+    // Delete file data from localStorage
+    existingFiles.forEach((file: UserFile) => {
+      if (String(file.userId) === String(userId)) {
+        localStorage.removeItem(`file_${file.id}`);
+      }
+    });
+    
+    localStorage.setItem('userFiles', JSON.stringify(updatedFiles));
+    
+    // Delete user reports
+    const existingReports = JSON.parse(localStorage.getItem('reports') || '[]');
+    const updatedReports = existingReports.filter((report: any) => 
+      String(report.userId) !== String(userId)
+    );
+    localStorage.setItem('reports', JSON.stringify(updatedReports));
+    
+    // Update React Query cache
+    queryClient.setQueryData(['users'], updatedUsers);
+    queryClient.setQueryData(['userFiles'], updatedFiles);
+    queryClient.setQueryData(['reports'], updatedReports);
+    
+    toast({
+      title: "Success",
+      description: "User and all related data deleted successfully",
+    });
+  };
+
   return (
     <div className="space-y-4">
-      <SearchBar value={searchQuery} onChange={setSearchQuery} />
-      <div className="rounded-md border">
+      <SearchBar value={searchTerm} onChange={setSearchTerm} />
+      <div className="rounded-lg border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
+              <TableHead className="w-[100px]">User ID</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.length === 0 ? (
-              <TableRow>
-                <td colSpan={4} className="p-4 text-center text-muted-foreground">
-                  No users found
-                </td>
-              </TableRow>
-            ) : (
-              filteredUsers.map((user: any) => (
-                <UserTableRow 
-                  key={user.id} 
-                  user={user} 
-                  onView={handleViewUser}
-                  onDelete={handleDeleteUser}
-                />
-              ))
-            )}
+            {filteredUsers.map((user) => (
+              <UserTableRow
+                key={user.id}
+                user={user}
+                onView={handleView}
+                onDelete={handleDelete}
+              />
+            ))}
           </TableBody>
         </Table>
       </div>
