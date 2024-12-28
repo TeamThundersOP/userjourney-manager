@@ -3,8 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Search, Trash2 } from "lucide-react";
+import { Search, Trash2, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { User as UserType } from "@/types/user"; // Added this import
 
 const Users = () => {
   const [searchByID, setSearchByID] = useState(false);
