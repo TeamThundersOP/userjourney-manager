@@ -30,7 +30,7 @@ const ProgressStatus = ({ user }: ProgressStatusProps) => {
     { 
       title: "CoS", 
       completed: phase0?.cosSent,
-      status: phase0?.cosSent ? "Pending",
+      status: phase0?.cosSent ? "Completed" : "Pending",
       uploadable: true
     },
     { 
