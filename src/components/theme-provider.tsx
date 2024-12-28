@@ -17,6 +17,7 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   return (
     <NextThemesProvider
+      attribute="class"
       defaultTheme={defaultTheme}
       storageKey={storageKey}
       {...props}
