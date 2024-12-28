@@ -102,7 +102,7 @@ const fetchUser = async (userId: string): Promise<User> => {
 
 const ViewUser = () => {
   const { userId } = useParams();
-  const [activeTab, setActiveTab] = useState("onboarding");
+  const [activeTab, setActiveTab] = useState("personal");
 
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['user', userId],
@@ -151,11 +151,10 @@ const ViewUser = () => {
         <h1 className="text-3xl font-bold">Candidate Details</h1>
       </div>
       
-      <UserPersonalInfo user={user} />
-      
       <StatusTabs activeTab={activeTab} onTabChange={setActiveTab} />
       
       <div className="mt-6">
+        {activeTab === "personal" && <UserPersonalInfo user={user} />}
         {activeTab === "onboarding" && <ProgressStatus user={user} />}
         {activeTab === "reports" && (
           <div className="space-y-6">

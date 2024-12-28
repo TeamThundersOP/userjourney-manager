@@ -8,7 +8,8 @@ interface StatusTabsProps {
 const StatusTabs = ({ activeTab, onTabChange }: StatusTabsProps) => {
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
-      <TabsList className="grid w-full max-w-[400px] grid-cols-3">
+      <TabsList className="grid w-full max-w-[500px] grid-cols-4">
+        <TabsTrigger value="personal">Personal Info</TabsTrigger>
         <TabsTrigger value="onboarding">Onboarding</TabsTrigger>
         <TabsTrigger value="reports">Reports</TabsTrigger>
         <TabsTrigger value="files">Files</TabsTrigger>
