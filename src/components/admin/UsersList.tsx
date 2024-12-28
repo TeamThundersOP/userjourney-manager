@@ -62,9 +62,9 @@ const UsersList = () => {
       <SearchBar value={searchQuery} onChange={setSearchQuery} />
       <div className="rounded-md border">
         <div className="bg-muted/50 p-4 grid grid-cols-4 gap-4 font-medium">
+          <div>ID</div>
+          <div>Name</div>
           <div>Email</div>
-          <div>Status</div>
-          <div>Created At</div>
           <div className="text-right">Actions</div>
         </div>
         {filteredUsers.length === 0 ? (
