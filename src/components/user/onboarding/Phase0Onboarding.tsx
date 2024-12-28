@@ -119,7 +119,7 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
         <div className="space-y-4">
           <FileUpload
             label="CV"
-            onUpload={(file) => handleFileUpload('cv', file)}
+            onFileUpload={(file) => handleFileUpload('cv', file)}
             isUploaded={formData.cvSubmitted}
           />
 
@@ -159,19 +159,19 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
           <div className="space-y-4">
             <FileUpload
               label="Passport Copy"
-              onUpload={(file) => handleFileUpload('passport', file)}
+              onFileUpload={(file) => handleFileUpload('passport', file)}
               isUploaded={formData.passportUploaded}
             />
             
             <FileUpload
               label="PCC"
-              onUpload={(file) => handleFileUpload('pcc', file)}
+              onFileUpload={(file) => handleFileUpload('pcc', file)}
               isUploaded={formData.pccUploaded}
             />
             
             <FileUpload
               label="Other Documents"
-              onUpload={(file) => handleFileUpload('other', file)}
+              onFileUpload={(file) => handleFileUpload('other', file)}
               isUploaded={formData.otherDocumentsUploaded}
             />
           </div>
@@ -179,7 +179,7 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
           <div className="space-y-4">
             <FileUpload
               label="Offer Letter"
-              onUpload={(file) => handleFileUpload('offerLetter', file)}
+              onFileUpload={(file) => handleFileUpload('offerLetter', file)}
               isUploaded={formData.offerLetterSent}
             />
 
@@ -222,13 +222,13 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
               <Label>Travel Details</Label>
               <FileUpload
                 label="Travel Documents (including ticket)"
-                onUpload={(file) => handleFileUpload('travelDocs', file)}
+                onFileUpload={(file) => handleFileUpload('travelDocs', file)}
                 isUploaded={formData.travelDocumentsUploaded}
               />
               
               <FileUpload
                 label="Visa Copy"
-                onUpload={(file) => handleFileUpload('visaCopy', file)}
+                onFileUpload={(file) => handleFileUpload('visaCopy', file)}
                 isUploaded={formData.visaCopyUploaded}
               />
             </div>

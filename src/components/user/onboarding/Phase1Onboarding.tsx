@@ -97,31 +97,31 @@ const Phase1Onboarding = ({ userData, onSave, isLoading }: Phase1OnboardingProps
       <div className="space-y-6">
         <FileUpload
           label="HMRC Checklist"
-          onUpload={() => handleFileUpload('hmrcChecklist')}
+          onFileUpload={() => handleFileUpload('hmrcChecklist')}
           isUploaded={formData.hmrcChecklist}
         />
 
         <FileUpload
           label="Company Agreements"
-          onUpload={() => handleFileUpload('companyAgreements')}
+          onFileUpload={() => handleFileUpload('companyAgreements')}
           isUploaded={formData.companyAgreements}
         />
 
         <FileUpload
           label="Pension Scheme Documents"
-          onUpload={() => handleFileUpload('pensionScheme')}
+          onFileUpload={() => handleFileUpload('pensionScheme')}
           isUploaded={formData.pensionScheme}
         />
 
         <FileUpload
           label="Bank Statements"
-          onUpload={() => handleFileUpload('bankStatements')}
+          onFileUpload={() => handleFileUpload('bankStatements')}
           isUploaded={formData.bankStatements}
         />
 
         <FileUpload
           label="Vaccination Proof"
-          onUpload={() => handleFileUpload('vaccinationProof')}
+          onFileUpload={() => handleFileUpload('vaccinationProof')}
           isUploaded={formData.vaccinationProof}
         />
       </div>

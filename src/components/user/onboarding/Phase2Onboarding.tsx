@@ -52,13 +52,13 @@ const Phase2Onboarding = ({ userData, onSave, isLoading }: Phase2OnboardingProps
       <div className="space-y-6">
         <FileUpload
           label="Right to Work Document"
-          onUpload={() => handleFileUpload('rightToWork')}
+          onFileUpload={() => handleFileUpload('rightToWork')}
           isUploaded={formData.rightToWork}
         />
 
         <FileUpload
           label="DBS Check"
-          onUpload={() => handleFileUpload('dbs')}
+          onFileUpload={() => handleFileUpload('dbs')}
           isUploaded={formData.dbs}
         />
       </div>
