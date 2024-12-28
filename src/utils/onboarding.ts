@@ -49,7 +49,9 @@ export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase
 
   // Count completed fields
   const completedFields = fieldsToCheck.reduce((count, field) => {
-    return count + (phase[field as keyof typeof phase] === true ? 1 : 0);
+    const value = phase[field as keyof typeof phase];
+    // Only count if the value is explicitly true
+    return count + (value === true ? 1 : 0);
   }, 0);
 
   // Calculate percentage
