@@ -6,6 +6,7 @@ import UserOnboarding from '@/components/admin/UserOnboarding';
 import UserFiles from '@/components/admin/UserFiles';
 import StatusTabs from '@/components/admin/user/StatusTabs';
 import ProgressStatus from '@/components/admin/user/ProgressStatus';
+import { ReportsTable } from '@/components/admin/reports/ReportsTable';
 import { User } from '@/types/user';
 
 const mockUser: User = {
@@ -105,13 +106,22 @@ const fetchUser = async (userId: string): Promise<User> => {
 
 const ViewUser = () => {
   const { userId } = useParams();
-  const [activeTab, setActiveTab] = useState("status");
+  const [activeTab, setActiveTab] = useState("onboarding");
 
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['user', userId],
     queryFn: () => fetchUser(userId || ''),
     refetchInterval: 2000,
     refetchOnWindowFocus: true,
+  });
+
+  // Fetch user reports
+  const { data: reports } = useQuery({
+    queryKey: ['reports', userId],
+    queryFn: () => {
+      const allReports = JSON.parse(localStorage.getItem('userReports') || '[]');
+      return allReports.filter((report: any) => String(report.userId) === userId);
+    },
   });
 
   if (isLoading) {
@@ -149,14 +159,16 @@ const ViewUser = () => {
       <StatusTabs activeTab={activeTab} onTabChange={setActiveTab} />
       
       <div className="mt-6">
-        {activeTab === "status" && <ProgressStatus user={user} />}
-        {activeTab === "personal" && <UserPersonalInfo user={user} />}
-        {activeTab === "report" && (
+        {activeTab === "onboarding" && <ProgressStatus user={user} />}
+        {activeTab === "reports" && (
           <div className="space-y-6">
-            <UserOnboarding user={user} />
-            <UserFiles user={user} />
+            <ReportsTable
+              reports={reports || []}
+              onViewReport={() => {}}
+            />
           </div>
         )}
+        {activeTab === "files" && <UserFiles user={user} />}
       </div>
     </div>
   );
