@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, Lock, Upload } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
 
 interface Phase0StatusItemProps {
   title: string;
@@ -8,7 +9,8 @@ interface Phase0StatusItemProps {
   status: string;
   stateKey: string;
   onStatusChange: (key: string, value: boolean) => void;
-  uploadable?: boolean;
+  isAdminAction?: boolean;
+  isUploadAction?: boolean;
 }
 
 const Phase0StatusItem = ({
@@ -17,7 +19,8 @@ const Phase0StatusItem = ({
   status,
   stateKey,
   onStatusChange,
-  uploadable
+  isAdminAction,
+  isUploadAction
 }: Phase0StatusItemProps) => {
   return (
     <Card className="p-4">
@@ -29,7 +32,21 @@ const Phase0StatusItem = ({
             <XCircle className="h-5 w-5 text-gray-300" />
           )}
           <div>
-            <h4 className="font-medium">{title}</h4>
+            <div className="flex items-center gap-2">
+              <h4 className="font-medium">{title}</h4>
+              {isAdminAction && (
+                <Badge variant="secondary" className="text-xs">
+                  <Lock className="h-3 w-3 mr-1" />
+                  Admin
+                </Badge>
+              )}
+              {isUploadAction && (
+                <Badge variant="outline" className="text-xs">
+                  <Upload className="h-3 w-3 mr-1" />
+                  Upload
+                </Badge>
+              )}
+            </div>
             <p className="text-sm text-gray-500 capitalize">Status: {status}</p>
           </div>
         </div>
