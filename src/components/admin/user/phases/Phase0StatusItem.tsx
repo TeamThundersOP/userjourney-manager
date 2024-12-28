@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle2, XCircle, Lock, Upload } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, XCircle } from 'lucide-react';
+import ActionTypeIndicator from "@/components/shared/onboarding/ActionTypeIndicator";
 
 interface Phase0StatusItemProps {
   title: string;
@@ -9,8 +9,7 @@ interface Phase0StatusItemProps {
   status: string;
   stateKey: string;
   onStatusChange: (key: string, value: boolean) => void;
-  isAdminAction?: boolean;
-  isUploadAction?: boolean;
+  actionType: "admin" | "user" | "upload";
 }
 
 const Phase0StatusItem = ({
@@ -19,8 +18,7 @@ const Phase0StatusItem = ({
   status,
   stateKey,
   onStatusChange,
-  isAdminAction,
-  isUploadAction
+  actionType
 }: Phase0StatusItemProps) => {
   return (
     <Card className="p-4">
@@ -34,18 +32,7 @@ const Phase0StatusItem = ({
           <div>
             <div className="flex items-center gap-2">
               <h4 className="font-medium">{title}</h4>
-              {isAdminAction && (
-                <Badge variant="secondary" className="text-xs">
-                  <Lock className="h-3 w-3 mr-1" />
-                  Admin
-                </Badge>
-              )}
-              {isUploadAction && (
-                <Badge variant="outline" className="text-xs">
-                  <Upload className="h-3 w-3 mr-1" />
-                  Upload
-                </Badge>
-              )}
+              <ActionTypeIndicator type={actionType} />
             </div>
             <p className="text-sm text-gray-500 capitalize">Status: {status}</p>
           </div>
