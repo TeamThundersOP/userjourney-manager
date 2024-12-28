@@ -13,12 +13,63 @@ interface FileUploadProps {
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
+const MAX_IMAGE_DIMENSION = 800; // Maximum width/height for images
+const IMAGE_QUALITY = 0.5; // Reduced image quality for better compression
 
 const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = false }: FileUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImage = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // Calculate new dimensions while maintaining aspect ratio
+          if (width > height) {
+            if (width > MAX_IMAGE_DIMENSION) {
+              height *= MAX_IMAGE_DIMENSION / width;
+              width = MAX_IMAGE_DIMENSION;
+            }
+          } else {
+            if (height > MAX_IMAGE_DIMENSION) {
+              width *= MAX_IMAGE_DIMENSION / height;
+              height = MAX_IMAGE_DIMENSION;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Convert to WebP for better compression if supported
+          const mimeType = 'image/webp';
+          resolve(canvas.toDataURL(mimeType, IMAGE_QUALITY));
+        };
+        
+        img.onerror = () => {
+          reject(new Error('Failed to load image'));
+        };
+      };
+      
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+    });
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -31,97 +82,63 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
     }
 
     setIsUploading(true);
-    const reader = new FileReader();
 
-    reader.onload = async () => {
-      try {
-        const base64String = reader.result as string;
-        const fileSize = (file.size / 1024).toFixed(2) + ' KB';
-        
-        // Generate a smaller preview if it's an image
-        let preview = base64String;
-        if (file.type.startsWith('image/')) {
-          const img = new Image();
-          img.src = base64String;
-          await new Promise((resolve) => {
-            img.onload = resolve;
-          });
-
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          const MAX_WIDTH = 800;
-          const MAX_HEIGHT = 600;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          ctx?.drawImage(img, 0, 0, width, height);
-          preview = canvas.toDataURL(file.type, 0.7);
-        }
-
-        const newFile: UserFile = {
-          id: Date.now(),
-          userId: localStorage.getItem('userId'),
-          name: file.name,
-          type: file.type,
-          uploadedAt: new Date().toISOString(),
-          size: fileSize,
-          category: category,
-        };
-
-        try {
-          // Store file metadata in localStorage
-          const files = JSON.parse(localStorage.getItem('userFiles') || '[]');
-          files.push(newFile);
-          localStorage.setItem('userFiles', JSON.stringify(files));
-
-          // Store the actual file data in a separate key
-          localStorage.setItem(`file_${newFile.id}`, preview);
-
-          onFileUpload(newFile);
-          toast.success("File uploaded successfully");
-        } catch (storageError) {
-          console.error('Storage error:', storageError);
-          toast.error("Failed to store file. Storage quota exceeded.");
-          // Clean up any partial data
-          const files = JSON.parse(localStorage.getItem('userFiles') || '[]');
-          const filteredFiles = files.filter((f: UserFile) => f.id !== newFile.id);
-          localStorage.setItem('userFiles', JSON.stringify(filteredFiles));
-        }
-      } catch (error) {
-        console.error('Error processing file:', error);
-        toast.error("Failed to process file");
-      } finally {
-        setIsUploading(false);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
+    try {
+      let fileData: string;
+      
+      if (file.type.startsWith('image/')) {
+        fileData = await compressImage(file);
+      } else {
+        const reader = new FileReader();
+        fileData = await new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
       }
-    };
 
-    reader.onerror = () => {
-      console.error('FileReader error:', reader.error);
-      toast.error("Failed to read file");
+      // Test storage capacity before saving
+      const testKey = `test_${Date.now()}`;
+      try {
+        localStorage.setItem(testKey, fileData);
+        localStorage.removeItem(testKey);
+      } catch (e) {
+        throw new Error('Storage capacity exceeded');
+      }
+
+      const newFile: UserFile = {
+        id: Date.now(),
+        userId: localStorage.getItem('userId'),
+        name: file.name,
+        type: file.type,
+        uploadedAt: new Date().toISOString(),
+        size: (file.size / 1024).toFixed(2) + ' KB',
+        category: category,
+      };
+
+      // Store file metadata
+      const files = JSON.parse(localStorage.getItem('userFiles') || '[]');
+      files.push(newFile);
+      localStorage.setItem('userFiles', JSON.stringify(files));
+
+      // Store the actual file data
+      localStorage.setItem(`file_${newFile.id}`, fileData);
+
+      onFileUpload(newFile);
+      toast.success("File uploaded successfully");
+    } catch (error) {
+      console.error('Upload error:', error);
+      if (error instanceof Error && error.message === 'Storage capacity exceeded') {
+        toast.error("Storage capacity exceeded. Try uploading a smaller file or clearing some space.");
+      } else {
+        toast.error("Failed to upload file. Please try again.");
+      }
+    } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-    };
-
-    reader.readAsDataURL(file);
+    }
   };
 
   return (
