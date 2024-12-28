@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import FileUpload from "./FileUpload";
 import ActionTypeIndicator from "@/components/shared/onboarding/ActionTypeIndicator";
 import { UserFile } from "@/types/userFile";
@@ -41,6 +42,22 @@ const Phase0Actions = ({
               <ActionTypeIndicator type="user" />
             </div>
           </div>
+
+          <div className="space-y-4">
+            <h4 className="font-medium">UK Contact Details</h4>
+            <div className="space-y-2">
+              <Input
+                placeholder="UK Contact Number"
+                value={formData.ukContactNumber || ''}
+                onChange={(e) => onUKContactChange('ukContactNumber', e.target.value)}
+              />
+              <Input
+                placeholder="UK Address"
+                value={formData.ukAddress || ''}
+                onChange={(e) => onUKContactChange('ukAddress', e.target.value)}
+              />
+            </div>
+          </div>
         </div>
       </Card>
 
@@ -75,11 +92,29 @@ const Phase0Actions = ({
             <ActionTypeIndicator type="upload" />
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-2">
             <FileUpload
               label="Other Required Documents"
               onFileUpload={(file) => onFileUpload('other', file)}
               isUploaded={formData.otherDocumentsUploaded}
+            />
+            <ActionTypeIndicator type="upload" />
+          </div>
+
+          <div className="flex items-center gap-2 mb-2">
+            <FileUpload
+              label="Travel Documents"
+              onFileUpload={(file) => onFileUpload('travelDocs', file)}
+              isUploaded={formData.travelDocumentsUploaded}
+            />
+            <ActionTypeIndicator type="upload" />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <FileUpload
+              label="Visa Copy"
+              onFileUpload={(file) => onFileUpload('visaCopy', file)}
+              isUploaded={formData.visaCopyUploaded}
             />
             <ActionTypeIndicator type="upload" />
           </div>
@@ -108,6 +143,13 @@ const Phase0Actions = ({
             <Checkbox disabled checked={formData.cosSent} />
             <div className="flex items-center gap-2">
               <Label>CoS Status</Label>
+              <ActionTypeIndicator type="admin" />
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox disabled checked={formData.rightToWorkSent} />
+            <div className="flex items-center gap-2">
+              <Label>Right to Work Status</Label>
               <ActionTypeIndicator type="admin" />
             </div>
           </div>
