@@ -1,129 +1,147 @@
-import { useState } from 'react';
-import { Label } from "@/components/ui/label";
+import { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Upload, Check } from "lucide-react";
 import { toast } from "sonner";
-import { useQueryClient } from '@tanstack/react-query';
+import { UserFile } from '@/types/userFile';
 
 interface FileUploadProps {
-  label: string;
-  onUpload: (file: File) => void;
-  isUploaded: boolean;
+  onFileUpload: (file: UserFile) => void;
+  category: string;
+  accept?: string;
 }
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
 
-export const FileUpload = ({ label, onUpload, isUploaded }: FileUploadProps) => {
-  const [file, setFile] = useState<File | null>(null);
-  const queryClient = useQueryClient();
+const FileUpload = ({ onFileUpload, category, accept }: FileUploadProps) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-      // Check file size
-      if (selectedFile.size > MAX_FILE_SIZE) {
-        toast.error(`File size must be less than 5MB. Current size: ${(selectedFile.size / (1024 * 1024)).toFixed(2)}MB`);
-        return;
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File is too large. Maximum size is 5MB.");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
+      return;
+    }
 
-      setFile(selectedFile);
-      
-      // Convert file to base64
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const base64Data = reader.result as string;
-          
-          // Create file metadata
-          const fileMetadata = {
-            id: Date.now(),
-            userId: localStorage.getItem('userId'),
-            name: selectedFile.name,
-            type: selectedFile.type,
-            uploadedAt: new Date().toISOString(),
-            size: `${(selectedFile.size / 1024).toFixed(2)} KB`,
-            category: label
-          };
+    setIsUploading(true);
+    const reader = new FileReader();
 
-          // Get existing files
-          const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
-          
-          // Find and remove any existing file with the same category and userId
-          const filteredFiles = existingFiles.filter((existingFile: any) => 
-            !(existingFile.category === label && 
-              String(existingFile.userId) === String(fileMetadata.userId))
-          );
+    reader.onload = async () => {
+      try {
+        const base64String = reader.result as string;
+        const fileSize = (file.size / 1024).toFixed(2) + ' KB';
+        
+        // Generate a smaller preview if it's an image
+        let preview = base64String;
+        if (file.type.startsWith('image/')) {
+          const img = new Image();
+          img.src = base64String;
+          await new Promise((resolve) => {
+            img.onload = resolve;
+          });
 
-          // If we found and removed an old file, also remove its data
-          const removedFile = existingFiles.find((existingFile: any) => 
-            existingFile.category === label && 
-            String(existingFile.userId) === String(fileMetadata.userId)
-          );
-          
-          if (removedFile) {
-            localStorage.removeItem(`file_${removedFile.id}`);
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 600;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
           }
 
-          // Store new file data
-          localStorage.setItem(`file_${fileMetadata.id}`, base64Data);
-
-          // Add new file metadata to the filtered list
-          localStorage.setItem('userFiles', JSON.stringify([...filteredFiles, fileMetadata]));
-          
-          onUpload(selectedFile);
-          toast.success(`${label} uploaded successfully`);
-
-          // Invalidate queries to update both admin and user views
-          queryClient.invalidateQueries({ queryKey: ['userFiles'] });
-          queryClient.invalidateQueries({ queryKey: ['user'] });
-        } catch (error) {
-          console.error('Error processing file:', error);
-          toast.error("Failed to process file");
+          canvas.width = width;
+          canvas.height = height;
+          ctx?.drawImage(img, 0, 0, width, height);
+          preview = canvas.toDataURL(file.type, 0.7);
         }
-      };
 
-      reader.onerror = () => {
-        toast.error("Error reading file");
-      };
+        const newFile: UserFile = {
+          id: Date.now(),
+          userId: localStorage.getItem('userId'),
+          name: file.name,
+          type: file.type,
+          uploadedAt: new Date().toISOString(),
+          size: fileSize,
+          category: category,
+        };
 
-      reader.readAsDataURL(selectedFile);
-    }
+        try {
+          // Store file metadata in localStorage
+          const files = JSON.parse(localStorage.getItem('userFiles') || '[]');
+          files.push(newFile);
+          localStorage.setItem('userFiles', JSON.stringify(files));
+
+          // Store the actual file data in a separate key
+          localStorage.setItem(`file_${newFile.id}`, preview);
+
+          onFileUpload(newFile);
+          toast.success("File uploaded successfully");
+        } catch (storageError) {
+          console.error('Storage error:', storageError);
+          toast.error("Failed to store file. Storage quota exceeded.");
+          // Clean up any partial data
+          const files = JSON.parse(localStorage.getItem('userFiles') || '[]');
+          const filteredFiles = files.filter((f: UserFile) => f.id !== newFile.id);
+          localStorage.setItem('userFiles', JSON.stringify(filteredFiles));
+        }
+      } catch (error) {
+        console.error('Error processing file:', error);
+        toast.error("Failed to process file");
+      } finally {
+        setIsUploading(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
+    };
+
+    reader.onerror = () => {
+      console.error('FileReader error:', reader.error);
+      toast.error("Failed to read file");
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    };
+
+    reader.readAsDataURL(file);
   };
 
   return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="flex items-center space-x-2">
-        <input
-          type="file"
-          onChange={handleFileChange}
-          className="hidden"
-          id={`file-${label}`}
-        />
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => document.getElementById(`file-${label}`)?.click()}
-        >
-          {isUploaded ? (
-            <>
-              <Check className="w-4 h-4 mr-2" />
-              Uploaded
-            </>
-          ) : (
-            <>
-              <Upload className="w-4 h-4 mr-2" />
-              Upload {label}
-            </>
-          )}
-        </Button>
-      </div>
-      {file && (
-        <p className="text-sm text-gray-500">
-          Selected: {file.name} ({(file.size / (1024 * 1024)).toFixed(2)}MB)
-        </p>
-      )}
+    <div className="space-y-4">
+      <input
+        ref={fileInputRef}
+        type="file"
+        onChange={handleFileChange}
+        accept={accept}
+        className="hidden"
+        id={`file-upload-${category}`}
+      />
+      <Button
+        type="button"
+        variant="outline"
+        disabled={isUploading}
+        onClick={() => fileInputRef.current?.click()}
+        className="w-full"
+      >
+        {isUploading ? "Uploading..." : "Upload File"}
+      </Button>
     </div>
   );
 };
+
+export default FileUpload;
