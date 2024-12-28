@@ -14,6 +14,8 @@ interface ReportFiltersProps {
   setFilterDate: (date: Date | undefined) => void;
   filterSender: string;
   setFilterSender: (value: string) => void;
+  filterId: string;
+  setFilterId: (value: string) => void;
 }
 
 export const ReportFilters = ({
@@ -23,11 +25,14 @@ export const ReportFilters = ({
   setFilterDate,
   filterSender,
   setFilterSender,
+  filterId,
+  setFilterId,
 }: ReportFiltersProps) => {
   const clearFilters = () => {
     setFilterType("all");
     setFilterDate(undefined);
     setFilterSender("");
+    setFilterId("");
   };
 
   return (
@@ -69,13 +74,21 @@ export const ReportFilters = ({
         </Popover>
 
         <Input
+          placeholder="Search by ID"
+          value={filterId}
+          onChange={(e) => setFilterId(e.target.value)}
+          className="w-full md:w-[200px]"
+          type="number"
+        />
+
+        <Input
           placeholder="Search by sender email"
           value={filterSender}
           onChange={(e) => setFilterSender(e.target.value)}
           className="w-full md:w-[300px]"
         />
 
-        {(filterType !== "all" || filterDate || filterSender) && (
+        {(filterType !== "all" || filterDate || filterSender || filterId) && (
           <Button
             variant="outline"
             onClick={clearFilters}
