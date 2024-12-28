@@ -67,21 +67,17 @@ const mockUser: User = {
 };
 
 const fetchUser = async (userId: string): Promise<User> => {
-  // Get the latest data from localStorage
   const users = JSON.parse(localStorage.getItem('users') || '[]');
   const user = users.find((u: User) => u.id === parseInt(userId));
   
   if (!user) {
-    // Return mock data if no user is found
     return mockUser;
   }
   
-  // Initialize onboarding with all false values if it doesn't exist
   if (!user.onboarding) {
     user.onboarding = mockUser.onboarding;
   }
   
-  // Merge the found user with mock data for missing fields
   return {
     ...mockUser,
     ...user,
@@ -115,7 +111,6 @@ const ViewUser = () => {
     refetchOnWindowFocus: true,
   });
 
-  // Fetch user reports
   const { data: reports } = useQuery({
     queryKey: ['reports', userId],
     queryFn: () => {
@@ -155,6 +150,8 @@ const ViewUser = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Candidate Details</h1>
       </div>
+      
+      <UserPersonalInfo user={user} />
       
       <StatusTabs activeTab={activeTab} onTabChange={setActiveTab} />
       
