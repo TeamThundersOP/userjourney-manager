@@ -20,7 +20,9 @@ const CreateUserForm = ({ onSuccess }: { onSuccess: () => void }) => {
       email: formData.username,
       status: "Pending",
       personalInfo: {
-        email: formData.username
+        givenName: "",
+        familyName: "",
+        fullName: ""
       }
     };
 
