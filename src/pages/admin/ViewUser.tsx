@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import UserPersonalInfo from '@/components/admin/UserPersonalInfo';
 import UserOnboarding from '@/components/admin/UserOnboarding';
 import UserFiles from '@/components/admin/UserFiles';
+import StatusTabs from '@/components/admin/user/StatusTabs';
+import ProgressStatus from '@/components/admin/user/ProgressStatus';
 import { User } from '@/types/user';
 
 const mockUser: User = {
@@ -102,14 +105,12 @@ const fetchUser = async (userId: string): Promise<User> => {
 
 const ViewUser = () => {
   const { userId } = useParams();
-  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState("status");
 
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['user', userId],
     queryFn: () => fetchUser(userId || ''),
-    // Refresh data every 2 seconds to catch updates
     refetchInterval: 2000,
-    // Enable real-time updates
     refetchOnWindowFocus: true,
   });
 
@@ -141,10 +142,22 @@ const ViewUser = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">User Profile</h1>
-      <UserPersonalInfo user={user} />
-      <UserOnboarding user={user} />
-      <UserFiles user={user} />
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Candidate Details</h1>
+      </div>
+      
+      <StatusTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      
+      <div className="mt-6">
+        {activeTab === "status" && <ProgressStatus user={user} />}
+        {activeTab === "personal" && <UserPersonalInfo user={user} />}
+        {activeTab === "report" && (
+          <div className="space-y-6">
+            <UserOnboarding user={user} />
+            <UserFiles user={user} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
