@@ -43,8 +43,13 @@ const Reports = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Reports</h1>
+    <div className="space-y-6 p-4 md:p-6">
+      <div className="flex flex-col space-y-2">
+        <h1 className="text-2xl md:text-3xl font-bold">Reports</h1>
+        <p className="text-muted-foreground">
+          View and manage user reports
+        </p>
+      </div>
       
       <ReportsTable
         reports={reports || []}
