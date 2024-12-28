@@ -42,6 +42,22 @@ const Reports = () => {
     setIsDialogOpen(true);
   };
 
+  const handleStatusChange = (newStatus: string) => {
+    if (selectedReport) {
+      // Update report status in localStorage
+      const reports = JSON.parse(localStorage.getItem('userReports') || '[]');
+      const updatedReports = reports.map((report: any) => 
+        report.id === selectedReport.id 
+          ? { ...report, status: newStatus }
+          : report
+      );
+      localStorage.setItem('userReports', JSON.stringify(updatedReports));
+      
+      // Update selected report
+      setSelectedReport({ ...selectedReport, status: newStatus });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -71,8 +87,9 @@ const Reports = () => {
 
       <ReportDetailsDialog
         report={selectedReport}
-        open={isDialogOpen}
+        isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
+        onStatusChange={handleStatusChange}
       />
     </div>
   );
