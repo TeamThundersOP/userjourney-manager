@@ -3,11 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import UserTableRow from "./users/UserTableRow";
 import SearchBar from "./users/SearchBar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const UsersList = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
-  const { data: users = [], isLoading } = useQuery({
+  const { data: users = [], isLoading, refetch } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       // Get users from localStorage
@@ -18,6 +21,27 @@ const UsersList = () => {
       return JSON.parse(storedUsers);
     },
   });
+
+  const handleViewUser = (id: number) => {
+    navigate(`/admin/users/${id}`);
+  };
+
+  const handleDeleteUser = async (id: number) => {
+    try {
+      const storedUsers = localStorage.getItem('users');
+      if (!storedUsers) return;
+
+      const users = JSON.parse(storedUsers);
+      const updatedUsers = users.filter((user: any) => user.id !== id);
+      
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+      await refetch();
+      
+      toast.success('User deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete user');
+    }
+  };
 
   const filteredUsers = users.filter((user: any) =>
     user.email?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -49,7 +73,12 @@ const UsersList = () => {
           </div>
         ) : (
           filteredUsers.map((user: any) => (
-            <UserTableRow key={user.id} user={user} />
+            <UserTableRow 
+              key={user.id} 
+              user={user} 
+              onView={handleViewUser}
+              onDelete={handleDeleteUser}
+            />
           ))
         )}
       </div>
