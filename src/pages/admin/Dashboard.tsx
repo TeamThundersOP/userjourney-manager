@@ -4,14 +4,18 @@ import { useQuery } from "@tanstack/react-query";
 import { Users, FileText, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import CreateUserDialog from "@/components/admin/CreateUserDialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'create' | 'view' | 'delete'>('create');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const { data: usersCount } = useQuery({
+  const { data: usersCount, refetch: refetchUsersCount } = useQuery({
     queryKey: ['usersCount'],
     queryFn: () => {
       const localStorageUsers = JSON.parse(localStorage.getItem('users') || '[]');
@@ -34,7 +38,28 @@ const Dashboard = () => {
     if (tab === 'create') {
       setIsCreateDialogOpen(true);
     }
-    // Handle other tab actions as needed
+  };
+
+  const handleCreateUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const newUser = {
+      id: Date.now(),
+      email,
+      password,
+      status: "Pending",
+      personalInfo: {},
+      files: []
+    };
+
+    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    localStorage.setItem('users', JSON.stringify([...existingUsers, newUser]));
+
+    toast.success("Candidate created successfully");
+    refetchUsersCount();
+    setEmail("");
+    setPassword("");
+    setIsCreateDialogOpen(false);
   };
 
   return (
@@ -113,10 +138,36 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      <CreateUserDialog 
-        open={isCreateDialogOpen} 
-        onOpenChange={setIsCreateDialogOpen}
-      />
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Candidate</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleCreateUser} className="space-y-4">
+            <div>
+              <Input
+                placeholder="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Input
+                placeholder="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Create Candidate
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
