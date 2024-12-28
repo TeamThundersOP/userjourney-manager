@@ -14,6 +14,7 @@ import { UserFile } from "@/types/userFile";
 import SearchBar from "./users/SearchBar";
 import UserTableRow from "./users/UserTableRow";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Eye, Trash2 } from "lucide-react";
 
 interface User {
   id: number;
