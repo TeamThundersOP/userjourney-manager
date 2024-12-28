@@ -6,6 +6,9 @@ import { User } from "@/types/user";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 interface Phase0DetailsProps {
   user: User;
@@ -14,11 +17,13 @@ interface Phase0DetailsProps {
 
 const Phase0Details = ({ user, onSaveFeedback }: Phase0DetailsProps) => {
   const [feedback, setFeedback] = useState(user.onboarding?.phase0?.feedback || "");
-  const phase0 = user.onboarding?.phase0;
+  const [phase0, setPhase0] = useState(user.onboarding?.phase0);
+  const phase0Initial = user.onboarding?.phase0;
 
   const steps = [
     { 
       title: "Personal Details",
+      key: "personalDetailsCompleted",
       completed: phase0?.personalDetailsCompleted,
       status: phase0?.personalDetailsCompleted ? "Completed" : "Pending"
     },
@@ -114,11 +119,65 @@ const Phase0Details = ({ user, onSaveFeedback }: Phase0DetailsProps) => {
     toast.success("Feedback saved successfully");
   };
 
+  const handleStatusChange = (key: string, value: boolean) => {
+    setPhase0(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const handleJobStatusChange = (value: 'pending' | 'accepted' | 'rejected') => {
+    setPhase0(prev => ({
+      ...prev,
+      jobStatus: value
+    }));
+  };
+
+  const handleVisaStatusChange = (value: 'pending' | 'approved' | 'rejected') => {
+    setPhase0(prev => ({
+      ...prev,
+      visaStatus: value
+    }));
+  };
+
+  const handleSaveChanges = () => {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map((u: User) => {
+      if (u.id === user.id) {
+        return {
+          ...u,
+          onboarding: {
+            ...u.onboarding,
+            phase0: phase0
+          }
+        };
+      }
+      return u;
+    });
+    
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    toast.success("Phase 0 status updated successfully");
+  };
+
+  const handleResetChanges = () => {
+    setPhase0(phase0Initial);
+    toast.success("Changes reset to original state");
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <Progress value={progress} className="h-2" />
         <p className="text-sm text-gray-500">{completedSteps} of {steps.length} steps completed</p>
+      </div>
+
+      <div className="flex justify-end space-x-4">
+        <Button variant="outline" onClick={handleResetChanges}>
+          Reset Changes
+        </Button>
+        <Button onClick={handleSaveChanges}>
+          Save Changes
+        </Button>
       </div>
 
       {/* Contact Information Cards */}
@@ -139,8 +198,8 @@ const Phase0Details = ({ user, onSaveFeedback }: Phase0DetailsProps) => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {steps.map((step, index) => (
-          <Card key={index} className="p-4">
+        {steps.map((step) => (
+          <Card key={step.key} className="p-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2">
                 {step.completed ? (
@@ -153,16 +212,64 @@ const Phase0Details = ({ user, onSaveFeedback }: Phase0DetailsProps) => {
                   <p className="text-sm text-gray-500 capitalize">Status: {step.status}</p>
                 </div>
               </div>
-              {step.uploadable && !step.completed && (
-                <Button variant="outline" size="sm" className="flex items-center gap-1">
-                  <Upload className="h-4 w-4" />
-                  Upload
-                </Button>
+              {step.key !== 'jobStatus' && step.key !== 'visaStatus' && (
+                <Checkbox
+                  checked={phase0?.[step.key as keyof typeof phase0] as boolean}
+                  onCheckedChange={(checked) => handleStatusChange(step.key, checked as boolean)}
+                />
               )}
             </div>
           </Card>
         ))}
       </div>
+
+      <Card className="p-6">
+        <div className="space-y-6">
+          <div>
+            <h3 className="font-semibold mb-4">Job Status</h3>
+            <RadioGroup
+              value={phase0?.jobStatus}
+              onValueChange={handleJobStatusChange}
+              className="flex flex-col space-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="pending" id="job-pending" />
+                <Label htmlFor="job-pending">Pending</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="accepted" id="job-accepted" />
+                <Label htmlFor="job-accepted">Accepted</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="rejected" id="job-rejected" />
+                <Label htmlFor="job-rejected">Rejected</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4">Visa Status</h3>
+            <RadioGroup
+              value={phase0?.visaStatus}
+              onValueChange={handleVisaStatusChange}
+              className="flex flex-col space-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="pending" id="visa-pending" />
+                <Label htmlFor="visa-pending">Pending</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="approved" id="visa-approved" />
+                <Label htmlFor="visa-approved">Approved</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="rejected" id="visa-rejected" />
+                <Label htmlFor="visa-rejected">Rejected</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+      </Card>
 
       <Card className="p-6">
         <div className="space-y-4">
