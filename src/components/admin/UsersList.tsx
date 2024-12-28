@@ -5,6 +5,7 @@ import SearchBar from "./users/SearchBar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Table, TableHeader, TableRow, TableHead, TableBody } from "@/components/ui/table";
 
 const UsersList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -61,26 +62,34 @@ const UsersList = () => {
     <div className="space-y-4">
       <SearchBar value={searchQuery} onChange={setSearchQuery} />
       <div className="rounded-md border">
-        <div className="bg-muted/50 p-4 grid grid-cols-4 gap-4 font-medium">
-          <div>ID</div>
-          <div>Name</div>
-          <div>Email</div>
-          <div className="text-right">Actions</div>
-        </div>
-        {filteredUsers.length === 0 ? (
-          <div className="p-4 text-center text-muted-foreground">
-            No users found
-          </div>
-        ) : (
-          filteredUsers.map((user: any) => (
-            <UserTableRow 
-              key={user.id} 
-              user={user} 
-              onView={handleViewUser}
-              onDelete={handleDeleteUser}
-            />
-          ))
-        )}
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredUsers.length === 0 ? (
+              <TableRow>
+                <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                  No users found
+                </td>
+              </TableRow>
+            ) : (
+              filteredUsers.map((user: any) => (
+                <UserTableRow 
+                  key={user.id} 
+                  user={user} 
+                  onView={handleViewUser}
+                  onDelete={handleDeleteUser}
+                />
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

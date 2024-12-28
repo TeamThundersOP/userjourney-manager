@@ -16,7 +16,7 @@ interface UserTableRowProps {
 
 const UserTableRow = ({ user, onView, onDelete }: UserTableRowProps) => {
   return (
-    <TableRow key={user.id}>
+    <TableRow>
       <TableCell className="font-medium">#{user.id}</TableCell>
       <TableCell>{user.personalInfo?.fullName || "N/A"}</TableCell>
       <TableCell>{user.email}</TableCell>
