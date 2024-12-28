@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { User } from "@/types/user";
-import { FileUpload } from "./FileUpload";
+import FileUpload from "./FileUpload";
 import PhaseFeedback from "./PhaseFeedback";
 import { useNavigate } from 'react-router-dom';
 

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { FileUpload } from "./FileUpload";
+import FileUpload from "./FileUpload";
 import { Progress } from "@/components/ui/progress";
 import { User } from "@/types/user";
 import PhaseFeedback from "./PhaseFeedback";
