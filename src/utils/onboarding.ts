@@ -1,16 +1,57 @@
 import { OnboardingPhase0, OnboardingPhase1, OnboardingPhase2 } from "@/types/user";
 
 export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase1 | OnboardingPhase2): number => {
-  // Fields to exclude from progress calculation
-  const excludedFields = ['feedback', 'jobStatus', 'visaStatus', 'ukContactNumber', 'ukAddress'];
+  if (!phase) return 0;
+
+  // Define fields to track for each phase
+  const phase0Fields = [
+    'personalDetailsCompleted',
+    'cvSubmitted',
+    'interviewCompleted',
+    'passportUploaded',
+    'pccUploaded',
+    'otherDocumentsUploaded',
+    'offerLetterSent',
+    'cosSent',
+    'rightToWorkSent',
+    'documentsUploaded',
+    'travelDetailsUpdated',
+    'travelDocumentsUploaded',
+    'visaCopyUploaded',
+    'ukContactUpdated'
+  ];
+
+  const phase1Fields = [
+    'hmrcChecklist',
+    'companyAgreements',
+    'pensionScheme',
+    'bankStatements',
+    'vaccinationProof'
+  ];
+
+  const phase2Fields = [
+    'rightToWork',
+    'shareCode',
+    'dbs',
+    'onboardingComplete'
+  ];
+
+  // Determine which phase we're calculating progress for
+  let fieldsToCheck: string[] = [];
   
-  const totalFields = Object.keys(phase).filter(key => !excludedFields.includes(key)).length;
-  const completedFields = Object.entries(phase).reduce((count, [key, value]) => {
-    // Skip excluded fields
-    if (excludedFields.includes(key)) return count;
-    // Count boolean fields that are true
-    return count + (value === true ? 1 : 0);
+  if ('personalDetailsCompleted' in phase) {
+    fieldsToCheck = phase0Fields;
+  } else if ('hmrcChecklist' in phase) {
+    fieldsToCheck = phase1Fields;
+  } else if ('rightToWork' in phase) {
+    fieldsToCheck = phase2Fields;
+  }
+
+  // Count completed fields
+  const completedFields = fieldsToCheck.reduce((count, field) => {
+    return count + (phase[field as keyof typeof phase] === true ? 1 : 0);
   }, 0);
-  
-  return Math.round((completedFields / totalFields) * 100);
+
+  // Calculate percentage
+  return Math.round((completedFields / fieldsToCheck.length) * 100);
 };
