@@ -24,6 +24,21 @@ const FileTable = ({ files, onDownload, onDelete }: FileTableProps) => {
     return categoryMap[category.toLowerCase()] || 'bg-gray-500';
   };
 
+  const formatCategoryName = (category: string): string => {
+    const specialCases: { [key: string]: string } = {
+      'cv': 'CV',
+      'pcc': 'PCC',
+    };
+
+    if (specialCases[category.toLowerCase()]) {
+      return specialCases[category.toLowerCase()];
+    }
+
+    return category.split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -43,9 +58,9 @@ const FileTable = ({ files, onDownload, onDelete }: FileTableProps) => {
             <TableCell>{file.type}</TableCell>
             <TableCell>
               <Badge 
-                className={`${getCategoryColor(file.category)} text-white capitalize`}
+                className={`${getCategoryColor(file.category)} text-white`}
               >
-                {file.category}
+                {formatCategoryName(file.category)}
               </Badge>
             </TableCell>
             <TableCell>{new Date(file.uploadedAt).toLocaleDateString()}</TableCell>
