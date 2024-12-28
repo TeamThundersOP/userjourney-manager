@@ -142,7 +142,7 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full">
       {label && <Label htmlFor={`file-upload-${category}`}>{label}</Label>}
       <input
         ref={fileInputRef}
@@ -157,7 +157,7 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
         variant={isUploaded ? "secondary" : "outline"}
         disabled={isUploading}
         onClick={() => fileInputRef.current?.click()}
-        className="w-full"
+        className="w-full h-[42px] min-w-[200px]"
       >
         {isUploading ? "Uploading..." : isUploaded ? "Uploaded ✓" : "Upload File"}
       </Button>
