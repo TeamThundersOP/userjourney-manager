@@ -10,11 +10,11 @@ interface CreateUserDialogProps {
 const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <div className="flex items-center space-x-2">
             <User className="h-6 w-6" />
-            <DialogTitle>Create New Candidate</DialogTitle>
+            <DialogTitle className="text-xl">Create New Candidate</DialogTitle>
           </div>
         </DialogHeader>
         <CreateUserForm onSuccess={() => onOpenChange(false)} />
