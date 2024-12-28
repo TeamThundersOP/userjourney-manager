@@ -87,6 +87,7 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
           variant="outline"
           size="icon"
           onClick={() => setIsEditDialogOpen(true)}
+          className="ml-2"
         >
           <PenSquare className="h-4 w-4" />
         </Button>
@@ -138,10 +139,12 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
             <Progress value={phase1Progress} className="mb-2" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {Object.entries(user.onboarding.phase1).map(([key, value]) => (
-                <div key={key} className="flex items-center">
-                  <div className={`w-2 h-2 rounded-full mr-2 ${value ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  <span className="text-sm capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                </div>
+                key !== 'feedback' && (
+                  <div key={key} className="flex items-center">
+                    <div className={`w-2 h-2 rounded-full mr-2 ${value ? 'bg-green-500' : 'bg-gray-300'}`} />
+                    <span className="text-sm capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                  </div>
+                )
               ))}
             </div>
           </div>
@@ -170,10 +173,12 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
             <Progress value={phase2Progress} className="mb-2" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {Object.entries(user.onboarding.phase2).map(([key, value]) => (
-                <div key={key} className="flex items-center">
-                  <div className={`w-2 h-2 rounded-full mr-2 ${value ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  <span className="text-sm capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                </div>
+                key !== 'feedback' && (
+                  <div key={key} className="flex items-center">
+                    <div className={`w-2 h-2 rounded-full mr-2 ${value ? 'bg-green-500' : 'bg-gray-300'}`} />
+                    <span className="text-sm capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                  </div>
+                )
               ))}
             </div>
           </div>
