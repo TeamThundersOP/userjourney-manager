@@ -104,13 +104,22 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
     window.location.reload();
   };
 
+  const progress = Object.values(formData).filter(Boolean).length / Object.values(formData).length * 100;
+
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Phase 0: Initial Setup</h2>
-        <Progress value={
-          Object.values(formData).filter(Boolean).length / Object.values(formData).length * 100
-        } />
+    <div className="space-y-8 animate-fade-in">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-semibold text-primary">Phase 0: Initial Setup</h2>
+          <div className="text-sm text-gray-500">
+            Progress: {Math.round(progress)}%
+          </div>
+        </div>
+        
+        <Progress 
+          value={progress} 
+          className="h-2 bg-gray-100"
+        />
         
         <PhaseFeedback 
           feedback={userData?.onboarding?.phase0?.feedback} 
@@ -126,17 +135,19 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
         onVisaStatusChange={handleVisaStatusChange}
       />
 
-      <div className="flex justify-end space-x-4">
+      <div className="flex justify-end space-x-4 sticky bottom-6 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-lg">
         <Button
           variant="outline"
           onClick={() => onSave(formData)}
           disabled={isLoading}
+          className="hover:bg-gray-50"
         >
           Save Progress
         </Button>
         <Button
           onClick={handleNext}
           disabled={!userData?.onboarding?.approvals?.phase0}
+          className="bg-primary hover:bg-primary/90"
         >
           Next Phase
         </Button>
