@@ -1,5 +1,6 @@
 import { OnboardingPhase0 } from "@/types/user";
 import Phase0StatusItem from "./Phase0StatusItem";
+import ActionTypeIndicator from "@/components/shared/onboarding/ActionTypeIndicator";
 
 interface Phase0StatusGridProps {
   phase0: OnboardingPhase0;
