@@ -2,6 +2,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserFile } from "@/types/userFile";
+import { Badge } from "@/components/ui/badge";
 
 interface FileTableProps {
   files: UserFile[];
@@ -10,6 +11,19 @@ interface FileTableProps {
 }
 
 const FileTable = ({ files, onDownload, onDelete }: FileTableProps) => {
+  const getCategoryColor = (category: string): string => {
+    const categoryMap: { [key: string]: string } = {
+      'cv': 'bg-blue-500',
+      'right to work': 'bg-green-500',
+      'travel documents': 'bg-yellow-500',
+      'passport': 'bg-purple-500',
+      'pcc': 'bg-pink-500',
+      'visa': 'bg-orange-500',
+      'other documents': 'bg-gray-500'
+    };
+    return categoryMap[category.toLowerCase()] || 'bg-gray-500';
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -27,7 +41,13 @@ const FileTable = ({ files, onDownload, onDelete }: FileTableProps) => {
           <TableRow key={file.id}>
             <TableCell className="font-medium">{file.name}</TableCell>
             <TableCell>{file.type}</TableCell>
-            <TableCell>{file.category}</TableCell>
+            <TableCell>
+              <Badge 
+                className={`${getCategoryColor(file.category)} text-white capitalize`}
+              >
+                {file.category}
+              </Badge>
+            </TableCell>
             <TableCell>{new Date(file.uploadedAt).toLocaleDateString()}</TableCell>
             <TableCell>{file.size}</TableCell>
             <TableCell>
