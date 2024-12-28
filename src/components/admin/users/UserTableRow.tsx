@@ -19,7 +19,7 @@ const UserTableRow = ({ user, onView, onDelete }: UserTableRowProps) => {
     <TableRow key={user.id}>
       <TableCell className="font-medium">#{user.id}</TableCell>
       <TableCell>{user.personalInfo?.fullName || "N/A"}</TableCell>
-      <TableCell>{user.email}</TableCell>
+      <TableCell className="max-w-[200px] truncate">{user.email}</TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end space-x-2">
           <Button

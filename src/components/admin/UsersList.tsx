@@ -13,6 +13,7 @@ import { useState } from "react";
 import { UserFile } from "@/types/userFile";
 import SearchBar from "./users/SearchBar";
 import UserTableRow from "./users/UserTableRow";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface User {
   id: number;
@@ -59,6 +60,7 @@ const UsersList = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const { data: users = [], isLoading, error } = useQuery({
     queryKey: ['users'],
@@ -134,28 +136,65 @@ const UsersList = () => {
   return (
     <div className="space-y-4">
       <SearchBar value={searchTerm} onChange={setSearchTerm} />
-      <div className="rounded-lg border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">User ID</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.map((user) => (
-              <UserTableRow
-                key={user.id}
-                user={user}
-                onView={handleView}
-                onDelete={handleDelete}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      {isMobile ? (
+        <div className="space-y-4">
+          {filteredUsers.map((user) => (
+            <div
+              key={user.id}
+              className="p-4 rounded-lg border bg-card shadow-sm space-y-2"
+            >
+              <div className="flex justify-between items-center">
+                <span className="font-medium">#{user.id}</span>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleView(user.id)}
+                    className="p-2 hover:bg-muted rounded-full"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(user.id)}
+                    className="p-2 hover:bg-muted rounded-full text-red-500"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">Name</div>
+                <div>{user.personalInfo?.fullName || "N/A"}</div>
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">Email</div>
+                <div>{user.email}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-lg border bg-card">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">User ID</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <UserTableRow
+                  key={user.id}
+                  user={user}
+                  onView={handleView}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 };
