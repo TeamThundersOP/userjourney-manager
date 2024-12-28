@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import FileUpload from "./FileUpload";
 import ActionTypeIndicator from "@/components/shared/onboarding/ActionTypeIndicator";
 import { UserFile } from "@/types/userFile";
@@ -12,13 +13,15 @@ interface Phase0ActionsProps {
   onFileUpload: (type: string, file: UserFile) => void;
   onPersonalDetailsChange: (checked: boolean) => void;
   onUKContactChange: (field: 'ukContactNumber' | 'ukAddress', value: string) => void;
+  onVisaStatusChange?: (status: 'pending' | 'approved' | 'rejected') => void;
 }
 
 const Phase0Actions = ({
   formData,
   onFileUpload,
   onPersonalDetailsChange,
-  onUKContactChange
+  onUKContactChange,
+  onVisaStatusChange
 }: Phase0ActionsProps) => {
   return (
     <div className="space-y-6">
@@ -41,6 +44,28 @@ const Phase0Actions = ({
               <Label>Fill Personal Details</Label>
               <ActionTypeIndicator type="user" />
             </div>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="font-medium">Visa Application Status</h4>
+            <RadioGroup
+              value={formData.visaStatus}
+              onValueChange={onVisaStatusChange}
+              className="flex flex-col space-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="pending" id="visa-pending" />
+                <Label htmlFor="visa-pending">Pending</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="approved" id="visa-approved" />
+                <Label htmlFor="visa-approved">Approved</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="rejected" id="visa-rejected" />
+                <Label htmlFor="visa-rejected">Rejected</Label>
+              </div>
+            </RadioGroup>
           </div>
 
           <div className="space-y-4">
@@ -103,7 +128,7 @@ const Phase0Actions = ({
 
           <div className="flex items-center gap-2 mb-2">
             <FileUpload
-              label="Travel Documents"
+              label="Travel Documents (Including Tickets)"
               onFileUpload={(file) => onFileUpload('travelDocs', file)}
               isUploaded={formData.travelDocumentsUploaded}
             />
