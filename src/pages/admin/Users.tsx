@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Search, Trash2, User } from "lucide-react";
+import { Search, Trash2, UserIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { User as UserType } from "@/types/user"; // Added this import
+import { User } from "@/types/user";
+import { Input } from "@/components/ui/input";
 
 const Users = () => {
   const [searchByID, setSearchByID] = useState(false);
@@ -14,7 +14,7 @@ const Users = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2">
-        <User className="h-6 w-6" />
+        <UserIcon className="h-6 w-6" />
         <h1 className="text-2xl font-semibold">View Candidates</h1>
       </div>
 
