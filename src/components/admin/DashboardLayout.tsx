@@ -2,10 +2,13 @@ import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from "@/components/ui/button";
 import { useNavigate, Outlet, Link } from 'react-router-dom';
 import { User } from 'lucide-react';
+import { useState } from 'react';
+import CreateUserDialog from './CreateUserDialog';
 
 const DashboardLayout = () => {
   const { logout } = useAdminAuth();
   const navigate = useNavigate();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -36,7 +39,7 @@ const DashboardLayout = () => {
           <Button
             variant="ghost"
             className="text-gray-600 hover:text-gray-900"
-            onClick={() => navigate('/admin/users/create')}
+            onClick={() => setIsCreateDialogOpen(true)}
           >
             Create Candidate
           </Button>
@@ -60,6 +63,11 @@ const DashboardLayout = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
       </main>
+
+      <CreateUserDialog 
+        open={isCreateDialogOpen} 
+        onOpenChange={setIsCreateDialogOpen} 
+      />
     </div>
   );
 };
