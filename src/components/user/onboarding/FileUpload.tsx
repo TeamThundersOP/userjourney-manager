@@ -2,16 +2,19 @@ import { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { UserFile } from '@/types/userFile';
+import { Label } from '@/components/ui/label';
 
 interface FileUploadProps {
   onFileUpload: (file: UserFile) => void;
-  category: string;
+  category?: string;
   accept?: string;
+  label?: string;
+  isUploaded?: boolean;
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
 
-const FileUpload = ({ onFileUpload, category, accept }: FileUploadProps) => {
+const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = false }: FileUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -123,6 +126,7 @@ const FileUpload = ({ onFileUpload, category, accept }: FileUploadProps) => {
 
   return (
     <div className="space-y-4">
+      {label && <Label htmlFor={`file-upload-${category}`}>{label}</Label>}
       <input
         ref={fileInputRef}
         type="file"
@@ -133,12 +137,12 @@ const FileUpload = ({ onFileUpload, category, accept }: FileUploadProps) => {
       />
       <Button
         type="button"
-        variant="outline"
+        variant={isUploaded ? "secondary" : "outline"}
         disabled={isUploading}
         onClick={() => fileInputRef.current?.click()}
         className="w-full"
       >
-        {isUploading ? "Uploading..." : "Upload File"}
+        {isUploading ? "Uploading..." : isUploaded ? "Uploaded ✓" : "Upload File"}
       </Button>
     </div>
   );
