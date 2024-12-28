@@ -18,7 +18,11 @@ const UserFiles = ({ user }: UserFilesProps) => {
   const getUserFiles = (): UserFile[] => {
     try {
       const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
-      return allFiles.filter((file) => String(file.userId) === String(user.id));
+      return allFiles.filter((file) => {
+        const fileUserId = String(file.userId);
+        const currentUserId = String(user.id);
+        return fileUserId === currentUserId && file.category; // Only return files with categories
+      });
     } catch (error) {
       console.error('Error parsing user files:', error);
       return [];
@@ -40,6 +44,16 @@ const UserFiles = ({ user }: UserFilesProps) => {
         const updatedUser = { ...u };
         if (!updatedUser.onboarding) return updatedUser;
 
+        // Get existing onboarding status
+        const existingOnboarding = JSON.parse(localStorage.getItem(`onboarding_${user.id}`) || 'null');
+        if (existingOnboarding) {
+          updatedUser.onboarding.phase0 = {
+            ...updatedUser.onboarding.phase0,
+            ...existingOnboarding
+          };
+          return updatedUser;
+        }
+
         // Reset all file-related statuses first
         updatedUser.onboarding.phase0 = {
           ...updatedUser.onboarding.phase0,
@@ -55,6 +69,8 @@ const UserFiles = ({ user }: UserFilesProps) => {
 
         // Update onboarding status based on actual files present
         userFiles.forEach(file => {
+          if (!file.category) return; // Skip files without category
+          
           switch (file.category.toLowerCase()) {
             case 'cv':
               updatedUser.onboarding.phase0.cvSubmitted = true;
@@ -85,6 +101,9 @@ const UserFiles = ({ user }: UserFilesProps) => {
           updatedUser.onboarding.phase0.passportUploaded &&
           updatedUser.onboarding.phase0.pccUploaded &&
           updatedUser.onboarding.phase0.otherDocumentsUploaded;
+
+        // Store the current onboarding status
+        localStorage.setItem(`onboarding_${user.id}`, JSON.stringify(updatedUser.onboarding.phase0));
 
         return updatedUser;
       }
