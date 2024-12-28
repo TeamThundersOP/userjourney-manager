@@ -9,6 +9,7 @@ import { User } from "@/types/user";
 import PhaseFeedback from "./PhaseFeedback";
 import UKContactDetails from "./UKContactDetails";
 import { toast } from "sonner";
+import { UserFile } from "@/types/userFile";
 
 interface Phase0OnboardingProps {
   userData: User | null;
@@ -47,7 +48,7 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
     }
   }, [userData]);
 
-  const handleFileUpload = (type: string, file: File) => {
+  const handleFileUpload = (type: string, _: UserFile) => {
     const fieldMap: { [key: string]: string } = {
       cv: 'cvSubmitted',
       passport: 'passportUploaded',
@@ -73,7 +74,6 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
   };
 
   const handleNext = () => {
-    // Update currentPhase to 1 in localStorage
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const updatedUsers = users.map((u: User) => {
       if (u.id === userData?.id) {
@@ -89,7 +89,6 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
     });
     localStorage.setItem('users', JSON.stringify(updatedUsers));
     toast.success("Moving to Phase 1");
-    // Force reload to update the UI
     window.location.reload();
   };
 
