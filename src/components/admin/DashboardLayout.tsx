@@ -1,73 +1,161 @@
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from "@/components/ui/button";
-import { useNavigate, Outlet, Link } from 'react-router-dom';
-import { User } from 'lucide-react';
-import { useState } from 'react';
-import CreateUserDialog from './CreateUserDialog';
+import { useNavigate, Outlet, useLocation } from 'react-router-dom';
+import { Home, Users, FileText, LogOut, Sun, Moon, Menu, X } from 'lucide-react';
+import { Toggle } from "@/components/ui/toggle";
+import { useState, useEffect } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const DashboardLayout = () => {
   const { logout } = useAdminAuth();
   const navigate = useNavigate();
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const location = useLocation();
+  const [isDark, setIsDark] = useState(false);
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    setIsDark(isDarkMode);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    } else {
+      setSidebarOpen(true);
+    }
+  }, [isMobile]);
+
+  const toggleTheme = () => {
+    const newIsDark = !isDark;
+    setIsDark(newIsDark);
+    document.documentElement.classList.toggle('dark');
+  };
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
+  };
+
+  const isActive = (path: string) => {
+    return location.pathname === `/admin/${path}`;
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link to="/admin/dashboard" className="text-2xl font-bold text-red-500">
-              Admin Dashboard
-            </Link>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-500">Welcome, admin</span>
-              <Button 
-                variant="ghost" 
-                onClick={logout}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Logout
-              </Button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
+      <button
+        onClick={toggleSidebar}
+        className="fixed top-4 left-4 z-50 md:hidden bg-white dark:bg-gray-800 p-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"
+      >
+        {isSidebarOpen ? (
+          <X className="h-6 w-6 text-primary" />
+        ) : (
+          <Menu className="h-6 w-6 text-primary" />
+        )}
+      </button>
+
+      {isSidebarOpen && isMobile && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <aside className={`fixed top-0 left-0 h-screen w-64 bg-white dark:bg-gray-800 shadow-lg border-r border-gray-100 dark:border-gray-700 transition-all duration-200 z-40 ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      } md:translate-x-0`}>
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/lovable-uploads/17a49967-e711-4d5a-b8fe-fb02e4469a2a.png" 
+                alt="Funelli Logo" 
+                className="h-8 w-auto"
+              />
+              <span className="text-xl font-bold font-araboto-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Funelli
+              </span>
             </div>
+            <Toggle 
+              pressed={isDark}
+              onPressedChange={toggleTheme}
+              aria-label="Toggle theme"
+              className="ml-2"
+            >
+              {isDark ? (
+                <Moon className="h-4 w-4 text-primary" />
+              ) : (
+                <Sun className="h-4 w-4 text-primary" />
+              )}
+            </Toggle>
           </div>
         </div>
-      </header>
-
-      {/* Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <nav className="flex space-x-4 bg-white rounded-lg p-2 shadow-sm">
+        <nav className="mt-6 space-y-2 px-3">
           <Button
-            variant="ghost"
-            className="text-gray-600 hover:text-gray-900"
-            onClick={() => setIsCreateDialogOpen(true)}
+            variant={isActive('dashboard') ? 'default' : 'ghost'}
+            className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
+              isActive('dashboard') 
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
+            }`}
+            onClick={() => {
+              navigate('/admin/dashboard');
+              isMobile && setSidebarOpen(false);
+            }}
           >
-            Create Candidate
+            <Home className="mr-2 h-4 w-4 text-primary" />
+            Home
           </Button>
           <Button
-            variant="ghost"
-            className="text-gray-600 hover:text-gray-900"
-            onClick={() => navigate('/admin/users')}
+            variant={isActive('users') ? 'default' : 'ghost'}
+            className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
+              isActive('users')
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
+            }`}
+            onClick={() => {
+              navigate('/admin/users');
+              isMobile && setSidebarOpen(false);
+            }}
           >
-            View Candidates
+            <Users className="mr-2 h-4 w-4 text-primary" />
+            Users
           </Button>
           <Button
-            variant="ghost"
-            className="text-gray-600 hover:text-gray-900"
+            variant={isActive('reports') ? 'default' : 'ghost'}
+            className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
+              isActive('reports')
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
+            }`}
+            onClick={() => {
+              navigate('/admin/reports');
+              isMobile && setSidebarOpen(false);
+            }}
           >
-            Delete Candidate
+            <FileText className="mr-2 h-4 w-4 text-primary" />
+            Reports
           </Button>
+          <div className="absolute bottom-8 left-0 w-full px-3">
+            <Button
+              variant="ghost"
+              className="w-full justify-start px-4 py-2 text-left text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 transition-all duration-200"
+              onClick={logout}
+            >
+              <LogOut className="mr-2 h-4 w-4 text-primary" />
+              Logout
+            </Button>
+          </div>
         </nav>
-      </div>
+      </aside>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Outlet />
+      <main className={`min-h-screen p-8 transition-all duration-200 ${
+        isSidebarOpen ? 'md:ml-64' : ''
+      }`}>
+        <div className="max-w-7xl mx-auto pt-12 md:pt-0">
+          <Outlet />
+        </div>
       </main>
-
-      <CreateUserDialog 
-        open={isCreateDialogOpen} 
-        onOpenChange={setIsCreateDialogOpen} 
-      />
     </div>
   );
 };
