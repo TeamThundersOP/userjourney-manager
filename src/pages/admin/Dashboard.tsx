@@ -2,9 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Users, FileText, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import CreateUserDialog from "@/components/admin/CreateUserDialog";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'create' | 'view' | 'delete'>('create');
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const { data: usersCount } = useQuery({
     queryKey: ['usersCount'],
@@ -24,11 +29,48 @@ const Dashboard = () => {
     refetchInterval: 5000,
   });
 
+  const handleTabClick = (tab: 'create' | 'view' | 'delete') => {
+    setActiveTab(tab);
+    if (tab === 'create') {
+      setIsCreateDialogOpen(true);
+    }
+    // Handle other tab actions as needed
+  };
+
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
-        <p className="text-gray-500">Here's an overview of your admin dashboard</p>
+        <h1 className="text-3xl font-bold tracking-tight text-primary">Admin Dashboard</h1>
+      </div>
+
+      <div className="flex space-x-4 border-b border-gray-200">
+        <Button
+          variant={activeTab === 'create' ? 'default' : 'ghost'}
+          className={`rounded-none border-b-2 ${
+            activeTab === 'create' ? 'border-primary' : 'border-transparent'
+          }`}
+          onClick={() => handleTabClick('create')}
+        >
+          Create Candidate
+        </Button>
+        <Button
+          variant={activeTab === 'view' ? 'default' : 'ghost'}
+          className={`rounded-none border-b-2 ${
+            activeTab === 'view' ? 'border-primary' : 'border-transparent'
+          }`}
+          onClick={() => handleTabClick('view')}
+        >
+          View Candidates
+        </Button>
+        <Button
+          variant={activeTab === 'delete' ? 'default' : 'ghost'}
+          className={`rounded-none border-b-2 ${
+            activeTab === 'delete' ? 'border-primary' : 'border-transparent'
+          }`}
+          onClick={() => handleTabClick('delete')}
+        >
+          Delete Candidate
+        </Button>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -70,6 +112,11 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      <CreateUserDialog 
+        open={isCreateDialogOpen} 
+        onOpenChange={setIsCreateDialogOpen}
+      />
     </div>
   );
 };
