@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ReportsTable } from "@/components/admin/reports/ReportsTable";
 import { ReportDetailsDialog } from "@/components/admin/reports/ReportDetailsDialog";
@@ -42,29 +42,15 @@ const Reports = () => {
     setIsDialogOpen(true);
   };
 
-  const handleStatusChange = (newStatus: string) => {
-    if (selectedReport) {
-      // Update report status in localStorage
-      const reports = JSON.parse(localStorage.getItem('userReports') || '[]');
-      const updatedReports = reports.map((report: any) => 
-        report.id === selectedReport.id 
-          ? { ...report, status: newStatus }
-          : report
-      );
-      localStorage.setItem('userReports', JSON.stringify(updatedReports));
-      
-      // Update selected report
-      setSelectedReport({ ...selectedReport, status: newStatus });
-    }
-  };
-
   return (
-    <div className="space-y-6 p-4 md:p-6">
-      <div className="flex flex-col space-y-2">
-        <h1 className="text-2xl md:text-3xl font-bold">Reports</h1>
-        <p className="text-muted-foreground">
-          View and manage user reports
-        </p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-araboto-bold text-primary">Reports</h1>
+          <p className="text-muted-foreground">
+            View and manage user reports
+          </p>
+        </div>
       </div>
       
       <ReportFilters
@@ -85,9 +71,8 @@ const Reports = () => {
 
       <ReportDetailsDialog
         report={selectedReport}
-        isOpen={isDialogOpen}
+        open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        onStatusChange={handleStatusChange}
       />
     </div>
   );
