@@ -12,6 +12,7 @@ import { useState } from "react";
 import Phase0Form from "./onboarding/Phase0Form";
 import Phase1Form from "./onboarding/Phase1Form";
 import Phase2Form from "./onboarding/Phase2Form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface EditOnboardingDialogProps {
   user: User;
@@ -26,6 +27,7 @@ const EditOnboardingDialog = ({
   onOpenChange,
   onSave,
 }: EditOnboardingDialogProps) => {
+  const [activePhase, setActivePhase] = useState("phase0");
   const [onboarding, setOnboarding] = useState({
     ...user.onboarding,
     currentPhase: user.onboarding?.currentPhase || 0,
@@ -92,43 +94,56 @@ const EditOnboardingDialog = ({
           <DialogTitle>Edit Onboarding Progress</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-8 py-4 px-6">
-              <Phase0Form
-                phase0={onboarding.phase0}
-                onUpdate={(updates) =>
-                  setOnboarding((prev) => ({
-                    ...prev,
-                    phase0: { ...prev.phase0, ...updates },
-                  }))
-                }
-              />
+          <Tabs value={activePhase} onValueChange={setActivePhase} className="flex-1">
+            <TabsList>
+              <TabsTrigger value="phase0">Phase 0</TabsTrigger>
+              <TabsTrigger value="phase1" disabled={!user.onboarding?.approvals.phase0}>
+                Phase 1
+              </TabsTrigger>
+              <TabsTrigger value="phase2" disabled={!user.onboarding?.approvals.phase1}>
+                Phase 2
+              </TabsTrigger>
+            </TabsList>
+            <div className="flex-1 overflow-y-auto">
+              <div className="space-y-8 py-4 px-6">
+                <TabsContent value="phase0">
+                  <Phase0Form
+                    phase0={onboarding.phase0}
+                    onUpdate={(updates) =>
+                      setOnboarding((prev) => ({
+                        ...prev,
+                        phase0: { ...prev.phase0, ...updates },
+                      }))
+                    }
+                  />
+                </TabsContent>
 
-              {user.onboarding?.approvals.phase0 && (
-                <Phase1Form
-                  phase1={onboarding.phase1}
-                  onUpdate={(updates) =>
-                    setOnboarding((prev) => ({
-                      ...prev,
-                      phase1: { ...prev.phase1, ...updates },
-                    }))
-                  }
-                />
-              )}
+                <TabsContent value="phase1">
+                  <Phase1Form
+                    phase1={onboarding.phase1}
+                    onUpdate={(updates) =>
+                      setOnboarding((prev) => ({
+                        ...prev,
+                        phase1: { ...prev.phase1, ...updates },
+                      }))
+                    }
+                  />
+                </TabsContent>
 
-              {user.onboarding?.approvals.phase1 && (
-                <Phase2Form
-                  phase2={onboarding.phase2}
-                  onUpdate={(updates) =>
-                    setOnboarding((prev) => ({
-                      ...prev,
-                      phase2: { ...prev.phase2, ...updates },
-                    }))
-                  }
-                />
-              )}
+                <TabsContent value="phase2">
+                  <Phase2Form
+                    phase2={onboarding.phase2}
+                    onUpdate={(updates) =>
+                      setOnboarding((prev) => ({
+                        ...prev,
+                        phase2: { ...prev.phase2, ...updates },
+                      }))
+                    }
+                  />
+                </TabsContent>
+              </div>
             </div>
-          </div>
+          </Tabs>
           <DialogFooter className="sticky bottom-0 bg-white py-4 px-6 border-t">
             <Button type="submit">Save changes</Button>
           </DialogFooter>

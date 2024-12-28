@@ -1,8 +1,8 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { OnboardingPhase0 } from "@/types/user";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface Phase0FormProps {
   phase0: OnboardingPhase0;
@@ -116,65 +116,53 @@ const Phase0Form = ({ phase0, onUpdate }: Phase0FormProps) => {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="visaStatus">Visa Status</Label>
-        <Select
-          value={phase0.visaStatus}
-          onValueChange={(value: 'pending' | 'approved' | 'rejected') =>
-            onUpdate({ visaStatus: value })
-          }
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select visa status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <div className="space-y-4">
+        <div>
+          <Label>Job Status</Label>
+          <RadioGroup
+            value={phase0.jobStatus}
+            onValueChange={(value: 'pending' | 'accepted' | 'rejected') =>
+              onUpdate({ jobStatus: value })
+            }
+            className="flex flex-col space-y-1 mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="pending" id="pending" />
+              <Label htmlFor="pending">Pending</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="accepted" id="accepted" />
+              <Label htmlFor="accepted">Accepted</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rejected" id="rejected" />
+              <Label htmlFor="rejected">Rejected</Label>
+            </div>
+          </RadioGroup>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="travelDetailsUpdated"
-            checked={phase0.travelDetailsUpdated}
-            onCheckedChange={(checked) =>
-              onUpdate({ travelDetailsUpdated: checked as boolean })
+        <div>
+          <Label>Visa Status</Label>
+          <RadioGroup
+            value={phase0.visaStatus}
+            onValueChange={(value: 'pending' | 'approved' | 'rejected') =>
+              onUpdate({ visaStatus: value })
             }
-          />
-          <Label htmlFor="travelDetailsUpdated">Travel Details Updated</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="travelDocumentsUploaded"
-            checked={phase0.travelDocumentsUploaded}
-            onCheckedChange={(checked) =>
-              onUpdate({ travelDocumentsUploaded: checked as boolean })
-            }
-          />
-          <Label htmlFor="travelDocumentsUploaded">Travel Documents Uploaded</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="visaCopyUploaded"
-            checked={phase0.visaCopyUploaded}
-            onCheckedChange={(checked) =>
-              onUpdate({ visaCopyUploaded: checked as boolean })
-            }
-          />
-          <Label htmlFor="visaCopyUploaded">Visa Copy Uploaded</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="ukContactUpdated"
-            checked={phase0.ukContactUpdated}
-            onCheckedChange={(checked) =>
-              onUpdate({ ukContactUpdated: checked as boolean })
-            }
-          />
-          <Label htmlFor="ukContactUpdated">UK Contact Updated</Label>
+            className="flex flex-col space-y-1 mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="pending" id="visa-pending" />
+              <Label htmlFor="visa-pending">Pending</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="approved" id="visa-approved" />
+              <Label htmlFor="visa-approved">Approved</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rejected" id="visa-rejected" />
+              <Label htmlFor="visa-rejected">Rejected</Label>
+            </div>
+          </RadioGroup>
         </div>
       </div>
 
