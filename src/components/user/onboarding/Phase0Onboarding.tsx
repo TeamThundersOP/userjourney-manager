@@ -6,6 +6,7 @@ import PhaseFeedback from "./PhaseFeedback";
 import { toast } from "sonner";
 import { UserFile } from "@/types/userFile";
 import Phase0Actions from "./Phase0Actions";
+import { Badge } from "@/components/ui/badge";
 
 interface Phase0OnboardingProps {
   userData: User | null;
@@ -106,6 +107,22 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
 
   const progress = Object.values(formData).filter(Boolean).length / Object.values(formData).length * 100;
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'accepted':
+      case 'approved':
+        return 'bg-green-500';
+      case 'rejected':
+        return 'bg-red-500';
+      default:
+        return 'bg-yellow-500';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="space-y-6">
@@ -120,6 +137,25 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
           value={progress} 
           className="h-2 bg-gray-100"
         />
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Job Status:</span>
+            <Badge 
+              className={`${getStatusColor(userData?.onboarding?.phase0?.jobStatus || 'pending')}`}
+            >
+              {getStatusText(userData?.onboarding?.phase0?.jobStatus || 'pending')}
+            </Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Visa Status:</span>
+            <Badge 
+              className={`${getStatusColor(userData?.onboarding?.phase0?.visaStatus || 'pending')}`}
+            >
+              {getStatusText(userData?.onboarding?.phase0?.visaStatus || 'pending')}
+            </Badge>
+          </div>
+        </div>
         
         <PhaseFeedback 
           feedback={userData?.onboarding?.phase0?.feedback} 
