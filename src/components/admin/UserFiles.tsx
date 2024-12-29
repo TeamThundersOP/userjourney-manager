@@ -83,6 +83,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
               updatedUser.onboarding.phase2.rightToWork = true;
               break;
             case 'travel documents':
+            case 'traveldocs':
               updatedUser.onboarding.phase0.travelDocumentsUploaded = true;
               break;
             case 'passport':
@@ -92,8 +93,10 @@ const UserFiles = ({ user }: UserFilesProps) => {
               updatedUser.onboarding.phase0.pccUploaded = true;
               break;
             case 'visa':
+            case 'visacopy':
               updatedUser.onboarding.phase0.visaCopyUploaded = true;
               break;
+            case 'other':
             case 'other documents':
               updatedUser.onboarding.phase0.otherDocumentsUploaded = true;
               break;
