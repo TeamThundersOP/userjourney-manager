@@ -15,8 +15,7 @@ export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase
     'cosSent',
     'travelDocumentsUploaded',
     'visaCopyUploaded',
-    'ukContactUpdated',
-    'travelDetailsUpdated'  // Added this field to match the type
+    'ukContactUpdated'
   ];
 
   const phase1Fields = [
@@ -32,7 +31,7 @@ export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase
     'shareCode',
     'dbs',
     'onboardingComplete',
-    'rightToWorkSent'  // Added this field to match the type
+    'rightToWorkSent'
   ];
 
   // Determine which phase we're calculating progress for
