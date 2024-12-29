@@ -58,13 +58,17 @@ const UserFiles = ({ user }: UserFilesProps) => {
         updatedUser.onboarding.phase0 = {
           ...updatedUser.onboarding.phase0,
           cvSubmitted: false,
-          rightToWorkSent: false,
           travelDocumentsUploaded: false,
           passportUploaded: false,
           pccUploaded: false,
           visaCopyUploaded: false,
           otherDocumentsUploaded: false,
           documentsUploaded: false
+        };
+
+        updatedUser.onboarding.phase2 = {
+          ...updatedUser.onboarding.phase2,
+          rightToWorkSent: false
         };
 
         // Update onboarding status based on actual files present
@@ -76,7 +80,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
               updatedUser.onboarding.phase0.cvSubmitted = true;
               break;
             case 'right to work':
-              updatedUser.onboarding.phase0.rightToWorkSent = true;
+              updatedUser.onboarding.phase2.rightToWorkSent = true;
               break;
             case 'travel documents':
               updatedUser.onboarding.phase0.travelDocumentsUploaded = true;

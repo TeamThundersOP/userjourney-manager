@@ -96,16 +96,6 @@ const Phase0Form = ({ phase0, onUpdate }: Phase0FormProps) => {
         </div>
         <div className="flex items-center space-x-2">
           <Checkbox
-            id="rightToWorkSent"
-            checked={phase0.rightToWorkSent}
-            onCheckedChange={(checked) =>
-              onUpdate({ rightToWorkSent: checked as boolean })
-            }
-          />
-          <Label htmlFor="rightToWorkSent">Right to Work Sent</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Checkbox
             id="documentsUploaded"
             checked={phase0.documentsUploaded}
             onCheckedChange={(checked) =>
