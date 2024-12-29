@@ -10,13 +10,14 @@ interface FileUploadProps {
   accept?: string;
   label?: string;
   isUploaded?: boolean;
+  userId?: number;
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
 const MAX_IMAGE_DIMENSION = 800; // Maximum width/height for images
 const IMAGE_QUALITY = 0.5; // Reduced image quality for better compression
 
-const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = false }: FileUploadProps) => {
+const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = false, userId }: FileUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -121,7 +122,7 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
 
       const newFile: UserFile = {
         id: Date.now(),
-        userId: localStorage.getItem('userId'),
+        userId: userId,
         name: file.name,
         type: file.type,
         uploadedAt: new Date().toISOString(),

@@ -14,6 +14,7 @@ interface Phase0ActionsProps {
   onPersonalDetailsChange: (checked: boolean) => void;
   onUKContactChange: (field: 'ukContactNumber' | 'ukAddress', value: string) => void;
   onVisaStatusChange?: (status: 'pending' | 'approved' | 'rejected') => void;
+  userId?: number;
 }
 
 const Phase0Actions = ({
@@ -21,7 +22,8 @@ const Phase0Actions = ({
   onFileUpload,
   onPersonalDetailsChange,
   onUKContactChange,
-  onVisaStatusChange
+  onVisaStatusChange,
+  userId
 }: Phase0ActionsProps) => {
   return (
     <div className="space-y-6">
@@ -104,6 +106,7 @@ const Phase0Actions = ({
               label="CV Upload"
               onFileUpload={(file) => onFileUpload('cv', file)}
               isUploaded={formData.cvSubmitted}
+              userId={userId}
             />
             <ActionTypeIndicator type="upload" />
           </div>
@@ -113,6 +116,7 @@ const Phase0Actions = ({
               label="Passport Copy"
               onFileUpload={(file) => onFileUpload('passport', file)}
               isUploaded={formData.passportUploaded}
+              userId={userId}
             />
             <ActionTypeIndicator type="upload" />
           </div>
@@ -122,6 +126,7 @@ const Phase0Actions = ({
               label="PCC (Police Clearance)"
               onFileUpload={(file) => onFileUpload('pcc', file)}
               isUploaded={formData.pccUploaded}
+              userId={userId}
             />
             <ActionTypeIndicator type="upload" />
           </div>
@@ -131,6 +136,7 @@ const Phase0Actions = ({
               label="Other Documents"
               onFileUpload={(file) => onFileUpload('other', file)}
               isUploaded={formData.otherDocumentsUploaded}
+              userId={userId}
             />
             <ActionTypeIndicator type="upload" />
           </div>
@@ -140,6 +146,7 @@ const Phase0Actions = ({
               label="Travel Documents"
               onFileUpload={(file) => onFileUpload('travelDocs', file)}
               isUploaded={formData.travelDocumentsUploaded}
+              userId={userId}
             />
             <ActionTypeIndicator type="upload" />
           </div>
@@ -149,6 +156,7 @@ const Phase0Actions = ({
               label="Visa Copy"
               onFileUpload={(file) => onFileUpload('visaCopy', file)}
               isUploaded={formData.visaCopyUploaded}
+              userId={userId}
             />
             <ActionTypeIndicator type="upload" />
           </div>
