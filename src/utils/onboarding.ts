@@ -13,7 +13,6 @@ export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase
     'otherDocumentsUploaded',
     'offerLetterSent',
     'cosSent',
-    'rightToWorkSent',
     'documentsUploaded',
     'travelDetailsUpdated',
     'travelDocumentsUploaded',
