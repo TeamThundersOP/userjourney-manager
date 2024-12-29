@@ -1,9 +1,8 @@
-import { OnboardingPhase0, OnboardingPhase1, OnboardingPhase2 } from "@/types/user";
+import { User } from "@/types/user";
 
-export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase1 | OnboardingPhase2): number => {
-  if (!phase) return 0;
+export const calculateProgress = (userData: User | null, phase: number) => {
+  if (!userData?.onboarding) return 0;
 
-  // Define fields to track for each phase
   const phase0Fields = [
     'personalDetailsCompleted',
     'cvSubmitted',
@@ -15,7 +14,9 @@ export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase
     'cosSent',
     'travelDocumentsUploaded',
     'visaCopyUploaded',
-    'ukContactUpdated'
+    'ukContactUpdated',
+    'rightToWorkSent',
+    'onboardingComplete'
   ];
 
   const phase1Fields = [
@@ -29,28 +30,22 @@ export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase
   const phase2Fields = [
     'rightToWork',
     'shareCode',
-    'dbs',
-    'onboardingComplete',
-    'rightToWorkSent'
+    'dbs'
   ];
 
   // Determine which phase we're calculating progress for
-  let fieldsToCheck: string[] = [];
-  
-  if ('personalDetailsCompleted' in phase) {
-    fieldsToCheck = phase0Fields;
-  } else if ('hmrcChecklist' in phase) {
-    fieldsToCheck = phase1Fields;
-  } else if ('rightToWork' in phase) {
-    fieldsToCheck = phase2Fields;
-  }
+  const fields = phase === 0 ? phase0Fields :
+                phase === 1 ? phase1Fields :
+                phase2Fields;
 
-  // Count completed fields, excluding non-boolean fields like feedback
-  const completedFields = fieldsToCheck.reduce((count, field) => {
-    const value = phase[field as keyof typeof phase];
-    return count + (typeof value === 'boolean' && value === true ? 1 : 0);
-  }, 0);
+  // Count completed items (true values)
+  const completedItems = fields.filter(field => {
+    const value = phase === 0 ? userData.onboarding?.phase0[field as keyof typeof userData.onboarding.phase0] :
+                  phase === 1 ? userData.onboarding?.phase1[field as keyof typeof userData.onboarding.phase1] :
+                  userData.onboarding?.phase2[field as keyof typeof userData.onboarding.phase2];
+    return value === true;
+  }).length;
 
   // Calculate percentage
-  return Math.round((completedFields / fieldsToCheck.length) * 100);
+  return (completedItems / fields.length) * 100;
 };
