@@ -34,6 +34,45 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
     return categoryMap[category.toLowerCase()] || category;
   };
 
+  const cleanStorage = () => {
+    try {
+      // Get all localStorage keys
+      const keys = Object.keys(localStorage);
+      
+      // Find old file data entries (older than 30 days)
+      const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+      
+      // Get userFiles metadata
+      const userFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
+      const activeFileIds = new Set(userFiles.map(file => `file_${file.id}`));
+      
+      // Remove orphaned file data
+      keys.forEach(key => {
+        if (key.startsWith('file_') && !activeFileIds.has(key)) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      // Remove old files from userFiles array
+      const updatedFiles = userFiles.filter(file => {
+        const uploadDate = new Date(file.uploadedAt).getTime();
+        return uploadDate > thirtyDaysAgo;
+      });
+
+      localStorage.setItem('userFiles', JSON.stringify(updatedFiles));
+      
+      // Clean up any orphaned onboarding statuses
+      keys.forEach(key => {
+        if (key.startsWith('onboarding_') && !userFiles.some(file => `onboarding_${file.userId}` === key)) {
+          localStorage.removeItem(key);
+        }
+      });
+
+    } catch (error) {
+      console.error('Error cleaning storage:', error);
+    }
+  };
+
   const compressImage = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -115,7 +154,16 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
         localStorage.setItem(testKey, fileData);
         localStorage.removeItem(testKey);
       } catch (e) {
-        throw new Error('Storage capacity exceeded');
+        // If storage is full, attempt to clean up
+        cleanStorage();
+        
+        // Try again after cleanup
+        try {
+          localStorage.setItem(testKey, fileData);
+          localStorage.removeItem(testKey);
+        } catch (e) {
+          throw new Error('Storage capacity exceeded even after cleanup');
+        }
       }
 
       const fileId = Date.now();
@@ -141,8 +189,8 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
       toast.success("File uploaded successfully");
     } catch (error) {
       console.error('Upload error:', error);
-      if (error instanceof Error && error.message === 'Storage capacity exceeded') {
-        toast.error("Storage capacity exceeded. Try uploading a smaller file or clearing some space.");
+      if (error instanceof Error && error.message.includes('Storage capacity exceeded')) {
+        toast.error("Storage capacity exceeded. Please try uploading a smaller file.");
       } else {
         toast.error("Failed to upload file. Please try again.");
       }
