@@ -15,7 +15,8 @@ export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase
     'cosSent',
     'travelDocumentsUploaded',
     'visaCopyUploaded',
-    'ukContactUpdated'
+    'ukContactUpdated',
+    'travelDetailsUpdated'  // Added this field to match the type
   ];
 
   const phase1Fields = [
@@ -30,7 +31,8 @@ export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase
     'rightToWork',
     'shareCode',
     'dbs',
-    'onboardingComplete'
+    'onboardingComplete',
+    'rightToWorkSent'  // Added this field to match the type
   ];
 
   // Determine which phase we're calculating progress for
@@ -44,10 +46,9 @@ export const calculatePhaseProgress = (phase: OnboardingPhase0 | OnboardingPhase
     fieldsToCheck = phase2Fields;
   }
 
-  // Count completed fields
+  // Count completed fields, excluding non-boolean fields like feedback
   const completedFields = fieldsToCheck.reduce((count, field) => {
     const value = phase[field as keyof typeof phase];
-    // Skip non-boolean fields and only count true boolean values
     return count + (typeof value === 'boolean' && value === true ? 1 : 0);
   }, 0);
 
