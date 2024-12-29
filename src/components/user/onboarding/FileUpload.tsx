@@ -3,9 +3,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { UserFile } from '@/types/userFile';
 import { Label } from '@/components/ui/label';
-import { uploadFile } from '@/utils/fileStorage';
-import { compressImage } from './FileCompressor';
-import { normalizeCategory } from './FileCategories';
 
 interface FileUploadProps {
   onFileUpload: (file: UserFile) => void;
@@ -17,17 +14,72 @@ interface FileUploadProps {
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
+const MAX_IMAGE_DIMENSION = 800; // Maximum width/height for images
+const IMAGE_QUALITY = 0.5; // Reduced image quality for better compression
 
-const FileUpload = ({ 
-  onFileUpload, 
-  category = '', 
-  accept, 
-  label, 
-  isUploaded = false, 
-  userId 
-}: FileUploadProps) => {
+const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = false, userId }: FileUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const normalizeCategory = (category: string): string => {
+    const categoryMap: { [key: string]: string } = {
+      'cv': 'cv',
+      'passport': 'passport',
+      'pcc': 'pcc',
+      'other': 'other documents',
+      'travelDocs': 'travel documents',
+      'visaCopy': 'visa',
+      'right to work': 'right to work'
+    };
+    return categoryMap[category.toLowerCase()] || category;
+  };
+
+  const compressImage = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > height) {
+            if (width > MAX_IMAGE_DIMENSION) {
+              height *= MAX_IMAGE_DIMENSION / width;
+              width = MAX_IMAGE_DIMENSION;
+            }
+          } else {
+            if (height > MAX_IMAGE_DIMENSION) {
+              width *= MAX_IMAGE_DIMENSION / height;
+              height = MAX_IMAGE_DIMENSION;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          const mimeType = 'image/webp';
+          resolve(canvas.toDataURL(mimeType, IMAGE_QUALITY));
+        };
+        
+        img.onerror = () => {
+          reject(new Error('Failed to load image'));
+        };
+      };
+      
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+    });
+  };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -44,23 +96,56 @@ const FileUpload = ({
     setIsUploading(true);
 
     try {
-      let processedFile = file;
+      let fileData: string;
       
       if (file.type.startsWith('image/')) {
-        processedFile = await compressImage(file);
+        fileData = await compressImage(file);
+      } else {
+        const reader = new FileReader();
+        fileData = await new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
       }
 
-      const uploadedFile = await uploadFile(
-        processedFile,
-        userId,
-        normalizeCategory(category)
-      );
+      // Test storage capacity before saving
+      const testKey = `test_${Date.now()}`;
+      try {
+        localStorage.setItem(testKey, fileData);
+        localStorage.removeItem(testKey);
+      } catch (e) {
+        throw new Error('Storage capacity exceeded');
+      }
 
-      onFileUpload(uploadedFile);
+      const fileId = Date.now();
+      const newFile: UserFile = {
+        id: fileId,
+        userId: userId ? String(userId) : null,
+        name: file.name,
+        type: file.type,
+        uploadedAt: new Date().toISOString(),
+        size: (file.size / 1024).toFixed(2) + ' KB',
+        category: normalizeCategory(category),
+      };
+
+      // Store file metadata
+      const files = JSON.parse(localStorage.getItem('userFiles') || '[]');
+      files.push(newFile);
+      localStorage.setItem('userFiles', JSON.stringify(files));
+
+      // Store the actual file data
+      localStorage.setItem(`file_${fileId}`, fileData);
+
+      onFileUpload(newFile);
       toast.success("File uploaded successfully");
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error("Failed to upload file. Please try again.");
+      if (error instanceof Error && error.message === 'Storage capacity exceeded') {
+        toast.error("Storage capacity exceeded. Try uploading a smaller file or clearing some space.");
+      } else {
+        toast.error("Failed to upload file. Please try again.");
+      }
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
