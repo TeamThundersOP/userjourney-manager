@@ -12,7 +12,6 @@ export const calculateProgress = (user: User, phase: number): number => {
     'otherDocumentsUploaded',
     'offerLetterSent',
     'cosSent',
-    'rightToWorkSent',
     'documentsUploaded',
     'travelDetailsUpdated',
     'travelDocumentsUploaded',

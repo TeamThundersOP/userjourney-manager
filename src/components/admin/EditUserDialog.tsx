@@ -112,8 +112,7 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave }: EditUserDialogProp
           rightToWork: false,
           shareCode: false,
           dbs: false,
-          onboardingComplete: false,
-          rightToWorkSent: false
+          onboardingComplete: false
         },
         approvals: {
           phase0: false,

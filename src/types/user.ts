@@ -56,7 +56,6 @@ export interface OnboardingPhase0 {
   otherDocumentsUploaded: boolean;
   offerLetterSent: boolean;
   cosSent: boolean;
-  rightToWorkSent: boolean;
   documentsUploaded: boolean;
   visaStatus: 'pending' | 'approved' | 'rejected';
   travelDetailsUpdated: boolean;
