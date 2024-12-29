@@ -56,6 +56,7 @@ export interface OnboardingPhase0 {
   otherDocumentsUploaded: boolean;
   offerLetterSent: boolean;
   cosSent: boolean;
+  rightToWorkSent: boolean;
   documentsUploaded: boolean;
   visaStatus: 'pending' | 'approved' | 'rejected';
   travelDetailsUpdated: boolean;
@@ -82,7 +83,6 @@ export interface OnboardingPhase2 {
   rightToWork: boolean;
   shareCode: boolean;
   dbs: boolean;
-  rightToWorkSent: boolean;
   onboardingComplete: boolean;
   feedback?: string;
 }
