@@ -14,9 +14,7 @@ export const calculateProgress = (userData: User | null, phase: number) => {
     'cosSent',
     'travelDocumentsUploaded',
     'visaCopyUploaded',
-    'ukContactUpdated',
-    'rightToWorkSent',
-    'onboardingComplete'
+    'ukContactUpdated'
   ];
 
   const phase1Fields = [
