@@ -82,7 +82,7 @@ export interface OnboardingPhase2 {
   rightToWork: boolean;
   shareCode: boolean;
   dbs: boolean;
-  onboardingComplete: boolean;
   rightToWorkSent: boolean;
+  onboardingComplete: boolean;
   feedback?: string;
 }
