@@ -18,8 +18,6 @@ const Phase0StatusGrid = ({ phase0, onStatusChange }: Phase0StatusGridProps) => 
     { key: 'otherDocumentsUploaded', label: 'Other Documents' },
     { key: 'offerLetterSent', label: 'Offer Letter' },
     { key: 'cosSent', label: 'COS' },
-    { key: 'documentsUploaded', label: 'Documents' },
-    { key: 'travelDetailsUpdated', label: 'Travel Details' },
     { key: 'travelDocumentsUploaded', label: 'Travel Documents' },
     { key: 'visaCopyUploaded', label: 'Visa Copy' },
     { key: 'ukContactUpdated', label: 'UK Contact' }
