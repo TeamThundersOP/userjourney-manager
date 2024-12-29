@@ -1,7 +1,7 @@
 import { User } from "@/types/user";
 
-export const calculateProgress = (userData: User | null, phase: number) => {
-  if (!userData?.onboarding) return 0;
+export const calculateProgress = (user: User, phase: number): number => {
+  if (!user.onboarding) return 0;
 
   const phase0Fields = [
     'personalDetailsCompleted',
@@ -28,22 +28,31 @@ export const calculateProgress = (userData: User | null, phase: number) => {
   const phase2Fields = [
     'rightToWork',
     'shareCode',
-    'dbs'
+    'dbs',
+    'rightToWorkSent',
+    'onboardingComplete'
   ];
 
-  // Determine which phase we're calculating progress for
-  const fields = phase === 0 ? phase0Fields :
-                phase === 1 ? phase1Fields :
-                phase2Fields;
+  let fields: string[];
+  let phaseData: any;
 
-  // Count completed items (true values)
-  const completedItems = fields.filter(field => {
-    const value = phase === 0 ? userData.onboarding?.phase0[field as keyof typeof userData.onboarding.phase0] :
-                  phase === 1 ? userData.onboarding?.phase1[field as keyof typeof userData.onboarding.phase1] :
-                  userData.onboarding?.phase2[field as keyof typeof userData.onboarding.phase2];
-    return value === true;
-  }).length;
+  switch (phase) {
+    case 0:
+      fields = phase0Fields;
+      phaseData = user.onboarding.phase0;
+      break;
+    case 1:
+      fields = phase1Fields;
+      phaseData = user.onboarding.phase1;
+      break;
+    case 2:
+      fields = phase2Fields;
+      phaseData = user.onboarding.phase2;
+      break;
+    default:
+      return 0;
+  }
 
-  // Calculate percentage
-  return (completedItems / fields.length) * 100;
+  const completedFields = fields.filter(field => phaseData[field] === true).length;
+  return (completedFields / fields.length) * 100;
 };
