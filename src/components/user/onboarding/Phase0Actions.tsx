@@ -180,13 +180,6 @@ const Phase0Actions = ({
               <ActionTypeIndicator type="admin" />
             </div>
           </div>
-          <div className="flex items-center space-x-2 p-3 rounded-lg">
-            <Checkbox disabled checked={formData.rightToWorkSent} />
-            <div className="flex items-center gap-2">
-              <Label>Right to Work Status</Label>
-              <ActionTypeIndicator type="admin" />
-            </div>
-          </div>
         </div>
       </Card>
     </div>
