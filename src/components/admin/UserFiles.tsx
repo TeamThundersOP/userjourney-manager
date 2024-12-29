@@ -75,7 +75,8 @@ const UserFiles = ({ user }: UserFilesProps) => {
         userFiles.forEach(file => {
           if (!file.category) return; // Skip files without category
           
-          switch (file.category.toLowerCase()) {
+          const category = file.category.toLowerCase();
+          switch (category) {
             case 'cv':
               updatedUser.onboarding.phase0.cvSubmitted = true;
               break;
@@ -83,7 +84,6 @@ const UserFiles = ({ user }: UserFilesProps) => {
               updatedUser.onboarding.phase2.rightToWork = true;
               break;
             case 'travel documents':
-            case 'traveldocs':
               updatedUser.onboarding.phase0.travelDocumentsUploaded = true;
               break;
             case 'passport':
@@ -93,10 +93,8 @@ const UserFiles = ({ user }: UserFilesProps) => {
               updatedUser.onboarding.phase0.pccUploaded = true;
               break;
             case 'visa':
-            case 'visacopy':
               updatedUser.onboarding.phase0.visaCopyUploaded = true;
               break;
-            case 'other':
             case 'other documents':
               updatedUser.onboarding.phase0.otherDocumentsUploaded = true;
               break;

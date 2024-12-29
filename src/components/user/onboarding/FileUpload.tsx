@@ -20,6 +20,19 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const normalizeCategory = (category: string): string => {
+    const categoryMap: { [key: string]: string } = {
+      'cv': 'cv',
+      'passport': 'passport',
+      'pcc': 'pcc',
+      'other': 'other documents',
+      'travelDocs': 'travel documents',
+      'visaCopy': 'visa',
+      'right to work': 'right to work'
+    };
+    return categoryMap[category.toLowerCase()] || category;
+  };
+
   const compressImage = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -113,7 +126,7 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
         type: file.type,
         uploadedAt: new Date().toISOString(),
         size: (file.size / 1024).toFixed(2) + ' KB',
-        category: category,
+        category: normalizeCategory(category),
       };
 
       // Store file metadata
