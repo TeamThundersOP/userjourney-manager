@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PenSquare, Check } from "lucide-react";
 import { User } from "@/types/user";
-import { calculatePhaseProgress } from "@/utils/onboarding";
+import { calculateProgress } from "@/utils/onboarding";
 import { useState } from "react";
 import EditOnboardingDialog from "./EditOnboardingDialog";
 import Phase0Details from "./onboarding/Phase0Details";
@@ -30,9 +30,9 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
     );
   }
 
-  const phase0Progress = calculatePhaseProgress(user.onboarding.phase0);
-  const phase1Progress = calculatePhaseProgress(user.onboarding.phase1);
-  const phase2Progress = calculatePhaseProgress(user.onboarding.phase2);
+  const phase0Progress = calculateProgress(user, 0);
+  const phase1Progress = calculateProgress(user, 1);
+  const phase2Progress = calculateProgress(user, 2);
 
   const handleApprovePhase = (phase: number) => {
     const updatedUser = {
