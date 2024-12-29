@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { UserFile } from "@/types/userFile";
 import FileTable from "./files/FileTable";
 import EmptyFiles from "./files/EmptyFiles";
+import { downloadFile, deleteFile, getUserFiles } from "@/utils/fileStorage";
 
 interface UserFilesProps {
   user: User;
@@ -15,24 +16,19 @@ const UserFiles = ({ user }: UserFilesProps) => {
   const queryClient = useQueryClient();
   const [files, setFiles] = useState<UserFile[]>([]);
 
-  const getUserFiles = (): UserFile[] => {
-    try {
-      const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
-      return allFiles.filter((file) => {
-        const fileUserId = String(file.userId);
-        const currentUserId = String(user.id);
-        return fileUserId === currentUserId;
-      });
-    } catch (error) {
-      console.error('Error parsing user files:', error);
-      return [];
-    }
-  };
-
   useEffect(() => {
-    const userFiles = getUserFiles();
-    setFiles(userFiles);
-    updateOnboardingStatus(userFiles);
+    const fetchUserFiles = async () => {
+      try {
+        const userFiles = await getUserFiles(user.id);
+        setFiles(userFiles);
+        updateOnboardingStatus(userFiles);
+      } catch (error) {
+        console.error('Error fetching user files:', error);
+        toast.error('Failed to fetch user files');
+      }
+    };
+
+    fetchUserFiles();
   }, [user.id]);
 
   const updateOnboardingStatus = (userFiles: UserFile[]) => {
@@ -121,15 +117,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
 
   const handleDownload = async (file: UserFile) => {
     try {
-      const fileData = localStorage.getItem(`file_${file.id}`);
-      
-      if (!fileData) {
-        toast.error("File data not found");
-        return;
-      }
-
-      const base64Response = await fetch(fileData);
-      const blob = await base64Response.blob();
+      const blob = await downloadFile(file.id);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -147,14 +135,10 @@ const UserFiles = ({ user }: UserFilesProps) => {
     }
   };
 
-  const handleDelete = (file: UserFile) => {
+  const handleDelete = async (file: UserFile) => {
     try {
-      localStorage.removeItem(`file_${file.id}`);
-      const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
-      const updatedFiles = allFiles.filter((f) => f.id !== file.id);
-      localStorage.setItem('userFiles', JSON.stringify(updatedFiles));
-      
-      const userFiles = getUserFiles();
+      await deleteFile(file.id);
+      const userFiles = await getUserFiles(user.id);
       setFiles(userFiles);
       updateOnboardingStatus(userFiles);
       
