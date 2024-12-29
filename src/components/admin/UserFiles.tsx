@@ -21,7 +21,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
       return allFiles.filter((file) => {
         const fileUserId = String(file.userId);
         const currentUserId = String(user.id);
-        return fileUserId === currentUserId && file.category; // Only return files with categories
+        return fileUserId === currentUserId;
       });
     } catch (error) {
       console.error('Error parsing user files:', error);
@@ -73,7 +73,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
 
         // Update onboarding status based on actual files present
         userFiles.forEach(file => {
-          if (!file.category) return; // Skip files without category
+          if (!file.category) return;
           
           const category = file.category.toLowerCase();
           switch (category) {

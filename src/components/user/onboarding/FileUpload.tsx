@@ -48,7 +48,6 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
           let width = img.width;
           let height = img.height;
           
-          // Calculate new dimensions while maintaining aspect ratio
           if (width > height) {
             if (width > MAX_IMAGE_DIMENSION) {
               height *= MAX_IMAGE_DIMENSION / width;
@@ -67,7 +66,6 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
           
-          // Convert to WebP for better compression if supported
           const mimeType = 'image/webp';
           resolve(canvas.toDataURL(mimeType, IMAGE_QUALITY));
         };
@@ -120,9 +118,10 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
         throw new Error('Storage capacity exceeded');
       }
 
+      const fileId = Date.now();
       const newFile: UserFile = {
-        id: Date.now(),
-        userId: userId || null,
+        id: fileId,
+        userId: userId ? String(userId) : null,
         name: file.name,
         type: file.type,
         uploadedAt: new Date().toISOString(),
@@ -136,7 +135,7 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
       localStorage.setItem('userFiles', JSON.stringify(files));
 
       // Store the actual file data
-      localStorage.setItem(`file_${newFile.id}`, fileData);
+      localStorage.setItem(`file_${fileId}`, fileData);
 
       onFileUpload(newFile);
       toast.success("File uploaded successfully");
