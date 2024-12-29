@@ -122,7 +122,7 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
 
       const newFile: UserFile = {
         id: Date.now(),
-        userId: userId,
+        userId: userId || null,
         name: file.name,
         type: file.type,
         uploadedAt: new Date().toISOString(),
