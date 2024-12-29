@@ -68,7 +68,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
 
         updatedUser.onboarding.phase2 = {
           ...updatedUser.onboarding.phase2,
-          rightToWorkSent: false
+          rightToWork: false
         };
 
         // Update onboarding status based on actual files present
@@ -80,7 +80,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
               updatedUser.onboarding.phase0.cvSubmitted = true;
               break;
             case 'right to work':
-              updatedUser.onboarding.phase2.rightToWorkSent = true;
+              updatedUser.onboarding.phase2.rightToWork = true;
               break;
             case 'travel documents':
               updatedUser.onboarding.phase0.travelDocumentsUploaded = true;
