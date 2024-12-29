@@ -68,6 +68,29 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
     localStorage.setItem('users', JSON.stringify(updatedUsers));
   };
 
+  const handleSaveFeedback = (feedback: string) => {
+    const updatedUser = {
+      ...user,
+      onboarding: {
+        ...user.onboarding!,
+        phase0: {
+          ...user.onboarding!.phase0,
+          feedback
+        }
+      }
+    };
+    setUser(updatedUser);
+    
+    // Update localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map((u: User) => 
+      u.id === updatedUser.id ? updatedUser : u
+    );
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    
+    toast.success('Feedback saved successfully');
+  };
+
   const canApprovePhase = (phase: number) => {
     if (phase === 0) {
       return phase0Progress === 100 && !user.onboarding?.approvals.phase0;
@@ -113,7 +136,10 @@ const UserOnboarding = ({ user: initialUser }: UserOnboardingProps) => {
             ) : null}
           </div>
           <Progress value={phase0Progress} className="mb-2" />
-          <Phase0Details user={user} />
+          <Phase0Details 
+            user={user} 
+            onSaveFeedback={handleSaveFeedback}
+          />
         </div>
 
         {user.onboarding?.approvals.phase0 && (
