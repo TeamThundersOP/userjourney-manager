@@ -36,7 +36,6 @@ const mockUser: User = {
       otherDocumentsUploaded: false,
       offerLetterSent: false,
       cosSent: false,
-      rightToWorkSent: false,
       documentsUploaded: false,
       visaStatus: 'pending',
       travelDetailsUpdated: false,
@@ -55,7 +54,8 @@ const mockUser: User = {
       rightToWork: false,
       shareCode: false,
       dbs: false,
-      onboardingComplete: false
+      onboardingComplete: false,
+      rightToWorkSent: false
     },
     approvals: {
       phase0: false,

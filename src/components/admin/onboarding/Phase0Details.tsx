@@ -1,108 +1,149 @@
-import { User } from "@/types/user";
 import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { User } from "@/types/user";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+import { toast } from "sonner";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import Phase0StatusGrid from "./Phase0StatusGrid";
 
 interface Phase0DetailsProps {
   user: User;
+  onSaveFeedback: (feedback: string) => void;
 }
 
-const Phase0Details = ({ user }: Phase0DetailsProps) => {
+const Phase0Details = ({ user, onSaveFeedback }: Phase0DetailsProps) => {
+  const [feedback, setFeedback] = useState(user.onboarding?.phase0?.feedback || "");
+  const [phase0, setPhase0] = useState(user.onboarding?.phase0);
+  const phase0Initial = user.onboarding?.phase0;
+
+  const handleStatusChange = (key: string, value: boolean) => {
+    setPhase0(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const handleJobStatusChange = (value: 'pending' | 'accepted' | 'rejected') => {
+    setPhase0(prev => ({
+      ...prev,
+      jobStatus: value
+    }));
+  };
+
+  const handleVisaStatusChange = (value: 'pending' | 'approved' | 'rejected') => {
+    setPhase0(prev => ({
+      ...prev,
+      visaStatus: value
+    }));
+  };
+
+  const handleSaveChanges = () => {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map((u: User) => {
+      if (u.id === user.id) {
+        return {
+          ...u,
+          onboarding: {
+            ...u.onboarding,
+            phase0: phase0
+          }
+        };
+      }
+      return u;
+    });
+    
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    toast.success("Phase 0 status updated successfully");
+  };
+
+  const completedSteps = Object.values(phase0 || {}).filter(value => value === true).length;
+  const totalSteps = Object.keys(phase0 || {}).filter(key => key !== 'feedback' && key !== 'jobStatus' && key !== 'visaStatus').length;
+  const progress = (completedSteps / totalSteps) * 100;
+
   return (
-    <div className="mt-4 space-y-4">
-      <h3 className="text-lg font-semibold">Phase 0 Details</h3>
-      
-      {/* Show US Contact Information */}
-      {(user.onboarding?.phase0?.usContactNumber || user.onboarding?.phase0?.usAddress) && (
-        <Card className="p-4 space-y-2">
-          <h4 className="font-medium">US Contact Information</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Contact Number</p>
-              <p className="font-medium">{user.onboarding?.phase0?.usContactNumber || "Not provided"}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Address</p>
-              <p className="font-medium">{user.onboarding?.phase0?.usAddress || "Not provided"}</p>
-            </div>
-          </div>
-        </Card>
-      )}
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <Progress value={progress} className="h-2" />
+        <p className="text-sm text-gray-500">{completedSteps} of {totalSteps} steps completed</p>
+      </div>
 
-      {/* Show UK Contact Information */}
-      {(user.onboarding?.phase0?.ukContactNumber || user.onboarding?.phase0?.ukAddress) && (
-        <Card className="p-4 space-y-2">
-          <h4 className="font-medium">UK Contact Information</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Contact Number</p>
-              <p className="font-medium">{user.onboarding?.phase0?.ukContactNumber || "Not provided"}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">UK Address</p>
-              <p className="font-medium">{user.onboarding?.phase0?.ukAddress || "Not provided"}</p>
-            </div>
-          </div>
-        </Card>
-      )}
+      <div className="flex justify-end space-x-4">
+        <Button variant="outline" onClick={handleSaveChanges}>
+          Save Changes
+        </Button>
+      </div>
 
-      <Card className="p-4">
-        <h4 className="font-medium mb-4">Submission Status</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Phase0StatusGrid phase0={phase0} onStatusChange={handleStatusChange} />
+
+      <Card className="p-6">
+        <div className="space-y-6">
           <div>
-            <p className="text-sm text-gray-500">Personal Details</p>
-            <p className="font-medium">{user.onboarding?.phase0?.personalDetailsCompleted ? "Completed" : "Pending"}</p>
+            <h3 className="font-semibold mb-4">Job Status</h3>
+            <RadioGroup
+              value={phase0?.jobStatus}
+              onValueChange={handleJobStatusChange}
+              className="flex flex-col space-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="pending" id="job-pending" />
+                <Label htmlFor="job-pending">Pending</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="accepted" id="job-accepted" />
+                <Label htmlFor="job-accepted">Accepted</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="rejected" id="job-rejected" />
+                <Label htmlFor="job-rejected">Rejected</Label>
+              </div>
+            </RadioGroup>
           </div>
+
           <div>
-            <p className="text-sm text-gray-500">CV Status</p>
-            <p className="font-medium">{user.onboarding?.phase0?.cvSubmitted ? "Submitted" : "Pending"}</p>
+            <h3 className="font-semibold mb-4">Visa Status</h3>
+            <RadioGroup
+              value={phase0?.visaStatus}
+              onValueChange={handleVisaStatusChange}
+              className="flex flex-col space-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="pending" id="visa-pending" />
+                <Label htmlFor="visa-pending">Pending</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="approved" id="visa-approved" />
+                <Label htmlFor="visa-approved">Approved</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="rejected" id="visa-rejected" />
+                <Label htmlFor="visa-rejected">Rejected</Label>
+              </div>
+            </RadioGroup>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Interview Status</p>
-            <p className="font-medium">{user.onboarding?.phase0?.interviewCompleted ? "Completed" : "Pending"}</p>
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">Admin Feedback</h3>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => onSaveFeedback(feedback)}
+            >
+              Save Feedback
+            </Button>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Passport</p>
-            <p className="font-medium">{user.onboarding?.phase0?.passportUploaded ? "Uploaded" : "Pending"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">PCC</p>
-            <p className="font-medium">{user.onboarding?.phase0?.pccUploaded ? "Uploaded" : "Pending"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Other Documents</p>
-            <p className="font-medium">{user.onboarding?.phase0?.otherDocumentsUploaded ? "Uploaded" : "Pending"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Offer Letter</p>
-            <p className="font-medium">{user.onboarding?.phase0?.offerLetterSent ? "Sent" : "Pending"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">COS</p>
-            <p className="font-medium">{user.onboarding?.phase0?.cosSent ? "Sent" : "Pending"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Right to Work</p>
-            <p className="font-medium">{user.onboarding?.phase0?.rightToWorkSent ? "Sent" : "Pending"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Documents</p>
-            <p className="font-medium">{user.onboarding?.phase0?.documentsUploaded ? "Uploaded" : "Pending"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Travel Details</p>
-            <p className="font-medium">{user.onboarding?.phase0?.travelDetailsUpdated ? "Updated" : "Pending"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Travel Documents</p>
-            <p className="font-medium">{user.onboarding?.phase0?.travelDocumentsUploaded ? "Uploaded" : "Pending"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Visa Copy</p>
-            <p className="font-medium">{user.onboarding?.phase0?.visaCopyUploaded ? "Uploaded" : "Pending"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Visa Status</p>
-            <p className="font-medium capitalize">{user.onboarding?.phase0?.visaStatus || "Pending"}</p>
-          </div>
+          <Textarea
+            placeholder="Enter feedback for Phase 0..."
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            className="min-h-[100px]"
+          />
         </div>
       </Card>
     </div>
