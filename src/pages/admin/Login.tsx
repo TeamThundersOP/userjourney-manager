@@ -14,8 +14,10 @@ const AdminLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // For local development, use a relative URL
       await login(username, password);
     } catch (error) {
+      console.error('Login error:', error);
       toast({
         title: "Error",
         description: "Invalid credentials. Please try again.",
