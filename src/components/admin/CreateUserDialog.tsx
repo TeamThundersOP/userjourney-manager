@@ -39,25 +39,13 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         return;
       }
 
-      const supabaseUrl = supabase.supabaseUrl;
-      
-      // Call the edge function to create user
-      const response = await fetch(
-        `${supabaseUrl}/functions/v1/create-user`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabase.supabaseKey}`
-          },
-          body: JSON.stringify({ email, password })
-        }
-      );
+      // Call the edge function using the proper method
+      const { data, error } = await supabase.functions.invoke('create-user', {
+        body: { email, password }
+      });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create user');
+      if (error) {
+        throw error;
       }
 
       toast({
