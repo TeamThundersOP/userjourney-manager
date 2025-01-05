@@ -1,18 +1,16 @@
-import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { User } from "@/types/user";
-import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { toast } from "sonner";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import Phase0StatusGrid from "./Phase0StatusGrid";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import PersonalInfoSection from "./sections/PersonalInfoSection";
 import PassportInfoSection from "./sections/PassportInfoSection";
 import ContactInfoSection from "./sections/ContactInfoSection";
 import UKContactSection from "./sections/UKContactSection";
+import StatusSection from "./sections/StatusSection";
+import FeedbackSection from "./sections/FeedbackSection";
 
 interface Phase0DetailsProps {
   user: User;
@@ -80,7 +78,7 @@ const Phase0Details = ({ user, onSaveFeedback }: Phase0DetailsProps) => {
         <p className="text-sm text-gray-500">{completedSteps} of {totalSteps} steps completed</p>
       </div>
 
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion type="single" collapsible defaultValue="personal-info" className="w-full">
         <AccordionItem value="personal-info">
           <AccordionTrigger>Personal Information</AccordionTrigger>
           <AccordionContent>
@@ -121,74 +119,17 @@ const Phase0Details = ({ user, onSaveFeedback }: Phase0DetailsProps) => {
 
       <Phase0StatusGrid phase0={phase0} onStatusChange={handleStatusChange} />
 
-      <Card className="p-6">
-        <div className="space-y-6">
-          <div>
-            <h3 className="font-semibold mb-4">Job Status</h3>
-            <RadioGroup
-              value={phase0?.jobStatus}
-              onValueChange={handleJobStatusChange}
-              className="flex flex-col space-y-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="pending" id="job-pending" />
-                <Label htmlFor="job-pending">Pending</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="accepted" id="job-accepted" />
-                <Label htmlFor="job-accepted">Accepted</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="rejected" id="job-rejected" />
-                <Label htmlFor="job-rejected">Rejected</Label>
-              </div>
-            </RadioGroup>
-          </div>
+      <StatusSection 
+        phase0={phase0}
+        onJobStatusChange={handleJobStatusChange}
+        onVisaStatusChange={handleVisaStatusChange}
+      />
 
-          <div>
-            <h3 className="font-semibold mb-4">Visa Status</h3>
-            <RadioGroup
-              value={phase0?.visaStatus}
-              onValueChange={handleVisaStatusChange}
-              className="flex flex-col space-y-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="pending" id="visa-pending" />
-                <Label htmlFor="visa-pending">Pending</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="approved" id="visa-approved" />
-                <Label htmlFor="visa-approved">Approved</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="rejected" id="visa-rejected" />
-                <Label htmlFor="visa-rejected">Rejected</Label>
-              </div>
-            </RadioGroup>
-          </div>
-        </div>
-      </Card>
-
-      <Card className="p-6">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold">Admin Feedback</h3>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => onSaveFeedback(feedback)}
-            >
-              Save Feedback
-            </Button>
-          </div>
-          <Textarea
-            placeholder="Enter feedback for Phase 0..."
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-            className="min-h-[100px]"
-          />
-        </div>
-      </Card>
+      <FeedbackSection 
+        feedback={feedback}
+        onFeedbackChange={setFeedback}
+        onSaveFeedback={() => onSaveFeedback(feedback)}
+      />
     </div>
   );
 };
