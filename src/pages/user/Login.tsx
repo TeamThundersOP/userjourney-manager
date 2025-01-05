@@ -19,14 +19,19 @@ const UserLogin = () => {
     setIsLoading(true);
 
     try {
+      console.log('Checking candidate status for email:', email);
+      
       // First check if the email exists in the candidates table
       const { data: candidate, error: candidateError } = await supabase
         .from('candidates')
         .select('*')
-        .eq('email', email)
+        .eq('email', email.toLowerCase().trim())
         .maybeSingle();
 
+      console.log('Candidate query result:', { candidate, candidateError });
+
       if (candidateError) {
+        console.error('Error checking candidate status:', candidateError);
         throw new Error('Error checking candidate status');
       }
 
@@ -47,6 +52,7 @@ const UserLogin = () => {
       });
 
       if (signInError) {
+        console.error('Sign in error:', signInError);
         toast({
           title: "Login Failed",
           description: "Invalid email or password. Please check your credentials and try again.",
