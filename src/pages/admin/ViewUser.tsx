@@ -110,10 +110,10 @@ const ViewUser = () => {
   const { data: reports } = useQuery({
     queryKey: ['reports', userId],
     queryFn: () => {
-      const allReports = JSON.parse(localStorage.getItem('userReports') || '[]');
+      const allReports = JSON.parse(localStorage.getItem('reports') || '[]');
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       
-      // Find the current user's email
+      // Find the current user
       const currentUser = users.find((u: any) => Number(u.id) === Number(userId));
       
       if (!currentUser) {
@@ -121,12 +121,12 @@ const ViewUser = () => {
         return [];
       }
       
-      // Filter reports based on the sender's email matching the current user's email
+      // Filter reports based on the userId matching the current user's id
       const userReports = allReports.filter((report: any) => 
-        report.sender === currentUser.email
+        String(report.userId) === String(userId)
       );
       
-      console.log('Current user email:', currentUser.email);
+      console.log('Current user ID:', userId);
       console.log('All reports:', allReports);
       console.log('Filtered user reports:', userReports);
       
