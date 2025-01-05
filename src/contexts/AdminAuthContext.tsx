@@ -22,7 +22,6 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
 
-  // For demo purposes, we'll use hardcoded credentials
   const ADMIN_EMAIL = 'vanapallisaisriram7@gmail.com';
   const DEMO_USERNAME = 'admin';
   const DEMO_PASSWORD = 'admin123';
@@ -30,30 +29,42 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   const login = async (username: string, password: string) => {
     if (username === DEMO_USERNAME && password === DEMO_PASSWORD) {
       try {
-        // First try to sign up the admin user if they don't exist
-        const { error: signUpError } = await supabase.auth.signUp({
-          email: ADMIN_EMAIL,
-          password: password,
-        });
-
-        // If sign up fails (user likely exists), proceed to sign in
-        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        // First sign in with Supabase
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
           email: ADMIN_EMAIL,
           password: password,
         });
 
         if (signInError) {
-          console.error('Supabase auth error:', signInError);
-          throw new Error('Authentication failed');
+          // If sign in fails, try to sign up
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email: ADMIN_EMAIL,
+            password: password,
+          });
+
+          if (signUpError) {
+            console.error('Supabase auth error:', signUpError);
+            throw new Error('Authentication failed');
+          }
+
+          // Use the sign up data if sign in failed
+          if (signUpData.user) {
+            signInData = signUpData;
+          }
         }
 
-        if (data.user) {
-          // Check if admin exists in candidates table
-          const { data: existingUser } = await supabase
+        if (signInData.user) {
+          // Check if admin exists in candidates table using maybeSingle()
+          const { data: existingUser, error: queryError } = await supabase
             .from('candidates')
             .select('*')
             .eq('username', username)
-            .single();
+            .maybeSingle();
+
+          if (queryError) {
+            console.error('Error querying user:', queryError);
+            throw new Error('Failed to query user');
+          }
 
           // If admin user doesn't exist in candidates, create it
           if (!existingUser) {
@@ -73,6 +84,8 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
           }
 
           setIsAuthenticated(true);
+          localStorage.setItem('adminAuth', 'true');
+          localStorage.setItem('userRole', 'admin');
           navigate('/admin/dashboard');
         }
       } catch (error) {
@@ -87,6 +100,8 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   const logout = async () => {
     await supabase.auth.signOut();
     setIsAuthenticated(false);
+    localStorage.removeItem('adminAuth');
+    localStorage.removeItem('userRole');
     navigate('/admin/login');
   };
 
@@ -94,6 +109,10 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
     // Check for existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthenticated(!!session);
+      if (session) {
+        localStorage.setItem('adminAuth', 'true');
+        localStorage.setItem('userRole', 'admin');
+      }
     });
 
     // Listen for auth state changes
@@ -101,6 +120,10 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
+      if (session) {
+        localStorage.setItem('adminAuth', 'true');
+        localStorage.setItem('userRole', 'admin');
+      }
     });
 
     return () => subscription.unsubscribe();
