@@ -36,14 +36,7 @@ const UserLogin = () => {
       if (!candidate) {
         toast({
           title: "Account Not Found",
-          description: (
-            <div className="flex flex-col gap-2">
-              <span>No account found with this email.</span>
-              <Link to="/user/signup" className="text-primary hover:underline">
-                Click here to sign up
-              </Link>
-            </div>
-          ),
+          description: "No account found with this email. Please check your credentials.",
           variant: "destructive",
         });
         return;
