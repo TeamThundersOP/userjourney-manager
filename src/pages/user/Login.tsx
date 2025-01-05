@@ -20,7 +20,7 @@ const UserLogin = () => {
 
     try {
       const normalizedEmail = email.toLowerCase().trim();
-      console.log('Checking candidate status for email:', normalizedEmail);
+      console.log('Attempting login process for:', normalizedEmail);
       
       // First check if the email exists in the candidates table
       const { data: candidate, error: candidateError } = await supabase
@@ -29,14 +29,20 @@ const UserLogin = () => {
         .eq('email', normalizedEmail)
         .maybeSingle();
 
-      console.log('Candidate query result:', { candidate, candidateError });
+      console.log('Candidate check result:', { candidate, candidateError });
 
       if (candidateError) {
         console.error('Error checking candidate status:', candidateError);
-        throw new Error('Error checking candidate status');
+        toast({
+          title: "Error",
+          description: "An error occurred while checking your registration status. Please try again.",
+          variant: "destructive",
+        });
+        return;
       }
 
       if (!candidate) {
+        console.log('No candidate found for email:', normalizedEmail);
         toast({
           title: "Access Restricted",
           description: "This email is not registered in our system. Please contact the administrator for access.",
@@ -45,33 +51,37 @@ const UserLogin = () => {
         return;
       }
 
+      console.log('Candidate found, proceeding with authentication');
+
       // If candidate exists, proceed with authentication
-      const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
         password,
       });
 
-      console.log('Sign in result:', { user, signInError });
+      console.log('Authentication result:', { data, error: signInError });
 
       if (signInError) {
-        console.error('Sign in error:', signInError);
+        console.error('Authentication error:', signInError);
         toast({
           title: "Login Failed",
-          description: "Invalid email or password. Please check your credentials and try again.",
+          description: signInError.message || "Invalid email or password. Please check your credentials and try again.",
           variant: "destructive",
         });
         return;
       }
 
-      if (user) {
+      if (data.user) {
+        console.log('Login successful, setting up session');
         // Set local storage items
         localStorage.setItem('userAuth', 'true');
-        localStorage.setItem('userId', user.id);
+        localStorage.setItem('userId', data.user.id);
         
         // Check if this is the first login
-        const isFirstLogin = !user.last_sign_in_at;
+        const isFirstLogin = !data.user.last_sign_in_at;
         
         if (isFirstLogin) {
+          console.log('First time login detected');
           localStorage.setItem('hasResetPassword', 'false');
           toast({
             title: "Welcome!",
@@ -81,6 +91,7 @@ const UserLogin = () => {
           return;
         }
         
+        console.log('Regular login, redirecting to dashboard');
         toast({
           title: "Success",
           description: "Logged in successfully",
@@ -89,10 +100,10 @@ const UserLogin = () => {
         navigate('/user/dashboard');
       }
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('Unexpected error during login:', error);
       toast({
         title: "Error",
-        description: "An error occurred during login. Please try again.",
+        description: "An unexpected error occurred during login. Please try again.",
         variant: "destructive",
       });
     } finally {
