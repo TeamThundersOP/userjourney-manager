@@ -114,22 +114,10 @@ const ViewUser = () => {
       console.log('All reports:', allReports);
       console.log('Current userId:', userId);
       
-      // Get users to map their emails
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      
-      const filteredReports = allReports
-        .map((report: any) => {
-          // Find the user who created the report
-          const reportUser = users.find((u: any) => u.email === report.sender);
-          if (reportUser) {
-            return {
-              ...report,
-              userId: reportUser.id // Add userId based on the matched user
-            };
-          }
-          return report;
-        })
-        .filter((report: any) => Number(report.userId) === Number(userId));
+      // Filter reports directly by userId
+      const filteredReports = allReports.filter((report: any) => 
+        Number(report.userId) === Number(userId)
+      );
       
       console.log('Filtered reports:', filteredReports);
       return filteredReports;

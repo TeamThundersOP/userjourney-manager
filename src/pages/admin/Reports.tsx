@@ -25,8 +25,6 @@ const Reports = () => {
         .map((report: any) => {
           // Find the user who created the report by comparing IDs as numbers
           const user = users.find((u: any) => Number(u.id) === Number(report.userId));
-          console.log('Report:', { reportId: report.id, userId: report.userId, foundUser: user?.email });
-          
           return {
             ...report,
             status: report.status || 'Pending',
