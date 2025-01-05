@@ -66,6 +66,7 @@ const ResetPassword = () => {
       });
 
       if (updateAuthError) {
+        // Handle the same password error specifically
         if (updateAuthError.message.includes('same_password')) {
           toast({
             title: "Error",
@@ -85,15 +86,15 @@ const ResetPassword = () => {
         .from('candidates')
         .update({ has_reset_password: true })
         .eq('id', existingCandidate.id)
-        .select('has_reset_password')
-        .single();
+        .select()
+        .maybeSingle();
 
       if (updateCandidateError) {
         console.error('Error updating candidate:', updateCandidateError);
         throw updateCandidateError;
       }
 
-      if (!updateResult?.has_reset_password) {
+      if (!updateResult) {
         console.error('Failed to verify password reset update');
         throw new Error('Failed to verify password reset update');
       }
