@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 interface CreateUserDialogProps {
@@ -27,6 +27,22 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
       
       if (!session) {
         throw new Error("No active session found. Please login as admin.");
+      }
+
+      // Check if email already exists
+      const { data: existingUsers } = await supabase
+        .from('candidates')
+        .select('email')
+        .eq('name', email);
+
+      if (existingUsers && existingUsers.length > 0) {
+        toast({
+          title: "Error",
+          description: "A user with this email already exists.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
       }
 
       // First create the user in Supabase Auth
