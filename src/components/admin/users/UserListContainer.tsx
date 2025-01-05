@@ -12,7 +12,15 @@ const fetchUsers = async (): Promise<User[]> => {
     .select('*');
     
   if (error) throw error;
-  return data || [];
+  
+  // Transform the data to match the User interface
+  return (data || []).map(candidate => ({
+    ...candidate,
+    email: candidate.email || '', // Provide default value
+    status: candidate.status || 'Pending', // Provide default value
+    personalInfo: undefined,
+    onboarding: undefined
+  })) as User[];
 };
 
 const UserListContainer = () => {
