@@ -53,13 +53,13 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
 
       if (authError) throw authError;
 
-      // Then save to Supabase database with username set as 'admin'
+      // Then save to Supabase database using email as both name and username
       const { error: dbError } = await supabase
         .from('candidates')
         .insert([
           {
             name: email,
-            username: 'admin',
+            username: email, // Using email as username instead of hardcoding 'admin'
           }
         ])
         .select();
