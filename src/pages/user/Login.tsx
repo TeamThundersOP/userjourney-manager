@@ -72,8 +72,25 @@ const UserLogin = () => {
       if (data.user) {
         console.log('Login successful, checking password reset status');
         
+        // Fetch the latest candidate data to check password reset status
+        const { data: updatedCandidate, error: fetchError } = await supabase
+          .from('candidates')
+          .select('has_reset_password')
+          .eq('email', normalizedEmail)
+          .maybeSingle();
+
+        if (fetchError) {
+          console.error('Error fetching updated candidate status:', fetchError);
+          toast({
+            title: "Error",
+            description: "An error occurred while checking your account status.",
+            variant: "destructive",
+          });
+          return;
+        }
+
         // Check if the user has reset their password
-        if (!candidate.has_reset_password) {
+        if (!updatedCandidate?.has_reset_password) {
           console.log('First time login detected, redirecting to password reset');
           toast({
             title: "Welcome!",
