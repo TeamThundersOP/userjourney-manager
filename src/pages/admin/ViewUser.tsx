@@ -9,7 +9,9 @@ import { ReportsTable } from '@/components/admin/reports/ReportsTable';
 import { User } from '@/types/user';
 
 const mockUser: User = {
-  id: 1,
+  id: "1", // Changed from number to string
+  name: "John Doe",
+  username: "johndoe",
   email: "user1@example.com",
   status: "Active",
   personalInfo: {
@@ -66,7 +68,7 @@ const mockUser: User = {
 
 const fetchUser = async (userId: string): Promise<User> => {
   const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const user = users.find((u: User) => u.id === parseInt(userId));
+  const user = users.find((u: User) => String(u.id) === userId);
   
   if (!user) {
     return mockUser;
