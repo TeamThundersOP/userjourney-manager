@@ -2,15 +2,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Users, FileText, ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const { data: usersCount } = useQuery({
+  const { data: usersCount = 0 } = useQuery({
     queryKey: ['usersCount'],
-    queryFn: () => {
-      const localStorageUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      return localStorageUsers.length;
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('candidates')
+        .select('*', { count: 'exact', head: true })
+        .neq('username', 'vanapallisaisriram7@gmail.com') // Filter out admin account
+        .neq('username', 'admin'); // Also filter out any user with username 'admin'
+
+      if (error) throw error;
+      return count || 0;
     },
     refetchInterval: 5000,
   });
@@ -47,7 +54,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-500 mb-2">Total registered users in the system</p>
-            <p className="text-3xl font-bold text-primary">{usersCount || 0}</p>
+            <p className="text-3xl font-bold text-primary">{usersCount}</p>
           </CardContent>
         </Card>
 
