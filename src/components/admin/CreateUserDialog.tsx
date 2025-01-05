@@ -39,14 +39,16 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         return;
       }
 
+      const supabaseUrl = supabase.supabaseUrl;
+      
       // Call the edge function to create user
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`,
+        `${supabaseUrl}/functions/v1/create-user`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+            'Authorization': `Bearer ${supabase.supabaseKey}`
           },
           body: JSON.stringify({ email, password })
         }
