@@ -29,10 +29,10 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         throw new Error("No active session found. Please login as admin.");
       }
 
-      // Check if email already exists
+      // Check if email already exists by checking the name field
       const { data: existingUsers } = await supabase
         .from('candidates')
-        .select('email')
+        .select('name')
         .eq('name', email);
 
       if (existingUsers && existingUsers.length > 0) {
@@ -59,7 +59,7 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         .insert([
           {
             name: email,
-            username: email, // Using email as username instead of hardcoding 'admin'
+            username: email,
           }
         ])
         .select();
