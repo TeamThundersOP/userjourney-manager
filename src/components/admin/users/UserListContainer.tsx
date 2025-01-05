@@ -9,7 +9,8 @@ import { User } from "@/types/user";
 const fetchUsers = async (): Promise<User[]> => {
   const { data, error } = await supabase
     .from('candidates')
-    .select('*');
+    .select('*')
+    .neq('username', 'admin'); // Filter out admin user
     
   if (error) throw error;
   
