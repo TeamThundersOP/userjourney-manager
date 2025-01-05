@@ -32,7 +32,8 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
     if (username === DEMO_USERNAME && password === DEMO_PASSWORD) {
       try {
         // First try to sign in with Supabase
-        const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+        let user;
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
           email: ADMIN_EMAIL,
           password: password,
         });
@@ -49,10 +50,12 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
             throw new Error('Authentication failed');
           }
 
-          authData = signUpData;
+          user = signUpData.user;
+        } else {
+          user = signInData.user;
         }
 
-        if (authData.user) {
+        if (user) {
           // Check if admin exists in candidates table
           const { data: existingUser, error: queryError } = await supabase
             .from('candidates')
