@@ -81,25 +81,20 @@ const ResetPassword = () => {
       console.log('Password updated successfully in Auth, updating candidate record');
 
       // Update the candidates table to mark password as reset
-      const { error: updateCandidateError } = await supabase
+      const { data: updateResult, error: updateCandidateError } = await supabase
         .from('candidates')
         .update({ has_reset_password: true })
-        .eq('id', existingCandidate.id);
+        .eq('id', existingCandidate.id)
+        .select('has_reset_password')
+        .single();
 
       if (updateCandidateError) {
         console.error('Error updating candidate:', updateCandidateError);
         throw updateCandidateError;
       }
 
-      // Verify the update was successful
-      const { data: verifyUpdate, error: verifyError } = await supabase
-        .from('candidates')
-        .select('has_reset_password')
-        .eq('id', existingCandidate.id)
-        .single();
-
-      if (verifyError || !verifyUpdate?.has_reset_password) {
-        console.error('Error verifying update:', verifyError);
+      if (!updateResult?.has_reset_password) {
+        console.error('Failed to verify password reset update');
         throw new Error('Failed to verify password reset update');
       }
 
