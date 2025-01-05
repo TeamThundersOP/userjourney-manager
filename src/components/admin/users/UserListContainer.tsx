@@ -16,8 +16,8 @@ const fetchUsers = async (): Promise<User[]> => {
   // Transform the data to match the User interface
   return (data || []).map(candidate => ({
     ...candidate,
-    email: candidate.email || '', // Provide default value
-    status: candidate.status || 'Pending', // Provide default value
+    email: '', // Since email doesn't exist in candidates table, set empty string
+    status: 'Pending', // Set a default status
     personalInfo: undefined,
     onboarding: undefined
   })) as User[];
