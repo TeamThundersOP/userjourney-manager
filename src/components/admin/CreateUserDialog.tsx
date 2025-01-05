@@ -23,6 +23,13 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
     setIsLoading(true);
     
     try {
+      // First check if we have an active session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("No active session found. Please login as admin.");
+      }
+
       // Create new user object
       const newUser = {
         id: Date.now(),
@@ -39,7 +46,7 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
       const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
       localStorage.setItem('users', JSON.stringify([...existingUsers, newUser]));
 
-      // Save to Supabase database
+      // Save to Supabase database with explicit auth headers
       const { error } = await supabase
         .from('candidates')
         .insert([
@@ -47,7 +54,8 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
             name: email, // Using email as name initially
             username: email,
           }
-        ]);
+        ])
+        .select();
 
       if (error) throw error;
 
@@ -61,11 +69,11 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
       setEmail("");
       setPassword("");
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating user:', error);
       toast({
         title: "Error",
-        description: "Failed to create user. Please try again.",
+        description: error.message || "Failed to create user. Please try again.",
         variant: "destructive",
       });
     } finally {
