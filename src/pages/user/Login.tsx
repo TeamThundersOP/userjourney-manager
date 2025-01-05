@@ -16,12 +16,16 @@ const UserLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      console.log('Checking candidate with email:', email);
+      
       // First check if user exists in candidates table
       const { data: candidate, error: candidateError } = await supabase
         .from('candidates')
         .select('*')
-        .eq('name', email)
+        .eq('email', email)  // Changed from 'name' to 'email'
         .maybeSingle();
+
+      console.log('Candidate query result:', { candidate, candidateError });
 
       if (candidateError) {
         console.error('Error checking candidate:', candidateError);
@@ -34,6 +38,7 @@ const UserLogin = () => {
       }
 
       if (!candidate) {
+        console.log('No candidate found with email:', email);
         toast({
           title: "Access Denied",
           description: "No account found with this email. Please check your credentials.",
