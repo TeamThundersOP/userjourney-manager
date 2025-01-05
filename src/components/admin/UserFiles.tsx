@@ -128,16 +128,22 @@ const UserFiles = ({ user }: UserFilesProps) => {
         return;
       }
 
+      // Create a blob from the base64 data
       const base64Response = await fetch(fileData);
       const blob = await base64Response.blob();
+      
+      // Create a download link
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = file.name;
       
+      // Trigger download
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      
+      // Clean up
       window.URL.revokeObjectURL(url);
       
       toast.success(`Downloading ${file.name}`);
@@ -149,15 +155,20 @@ const UserFiles = ({ user }: UserFilesProps) => {
 
   const handleDelete = (file: UserFile) => {
     try {
+      // Remove file data
       localStorage.removeItem(`file_${file.id}`);
+      
+      // Update files list
       const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
       const updatedFiles = allFiles.filter((f) => f.id !== file.id);
       localStorage.setItem('userFiles', JSON.stringify(updatedFiles));
       
+      // Update local state and onboarding status
       const userFiles = getUserFiles();
       setFiles(userFiles);
       updateOnboardingStatus(userFiles);
       
+      // Invalidate queries to refresh UI
       queryClient.invalidateQueries({ queryKey: ['userFiles'] });
       toast.success(`${file.name} deleted successfully`);
     } catch (error) {
