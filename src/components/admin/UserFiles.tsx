@@ -18,9 +18,14 @@ const UserFiles = ({ user }: UserFilesProps) => {
   const getUserFiles = (): UserFile[] => {
     try {
       const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
+      console.log('All files:', allFiles);
+      console.log('Current user ID:', user.id);
+      
       return allFiles.filter((file) => {
+        // Convert both IDs to strings for comparison
         const fileUserId = String(file.userId);
         const currentUserId = String(user.id);
+        console.log('Comparing file userId:', fileUserId, 'with current userId:', currentUserId);
         return fileUserId === currentUserId;
       });
     } catch (error) {
@@ -30,7 +35,9 @@ const UserFiles = ({ user }: UserFilesProps) => {
   };
 
   useEffect(() => {
+    console.log('UserFiles component mounted/updated for user:', user.id);
     const userFiles = getUserFiles();
+    console.log('Filtered user files:', userFiles);
     setFiles(userFiles);
     updateOnboardingStatus(userFiles);
   }, [user.id]);
