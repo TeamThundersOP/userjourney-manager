@@ -10,23 +10,28 @@ import { User } from '@/types/user';
 
 const fetchUser = async (userId: string): Promise<User> => {
   try {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    console.log('Fetching user with ID:', userId);
-    console.log('Available users:', users);
+    // First, let's check what's in localStorage
+    const usersJson = localStorage.getItem('users');
+    console.log('Raw users from localStorage:', usersJson);
     
-    if (!users.length) {
+    if (!usersJson) {
+      console.error('No users found in localStorage');
       throw new Error('No users found in storage');
     }
 
-    const stringUserId = String(userId);
-    const user = users.find((u: User) => String(u.id) === stringUserId);
+    const users = JSON.parse(usersJson);
+    console.log('Parsed users:', users);
+    console.log('Looking for user with ID:', userId);
+    console.log('User IDs in storage:', users.map((u: User) => ({ id: u.id, type: typeof u.id })));
+
+    // Ensure we're working with string IDs
+    const user = users.find((u: User) => String(u.id) === userId);
     console.log('Found user:', user);
-    
+
     if (!user) {
-      console.error('User not found with ID:', stringUserId);
       throw new Error('User not found');
     }
-    
+
     // Initialize onboarding structure if it doesn't exist
     if (!user.onboarding) {
       user.onboarding = {
@@ -68,7 +73,7 @@ const fetchUser = async (userId: string): Promise<User> => {
         }
       };
     }
-    
+
     return user;
   } catch (error) {
     console.error('Error in fetchUser:', error);
