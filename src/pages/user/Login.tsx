@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useUserAuth } from '@/contexts/UserAuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,63 +10,55 @@ import { supabase } from "@/integrations/supabase/client";
 const UserLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useUserAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // First authenticate with Supabase
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (authError) {
-        if (authError.message.includes('Invalid login credentials')) {
+      if (signInError) {
+        console.error('Sign in error:', signInError);
+        toast({
+          title: "Login Failed",
+          description: "Invalid email or password. Please check your credentials and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (user) {
+        // Check if user exists in candidates table
+        const { data: candidate, error: candidateError } = await supabase
+          .from('candidates')
+          .select('*')
+          .eq('name', email)
+          .single();
+
+        if (candidateError || !candidate) {
+          await supabase.auth.signOut();
           toast({
-            title: "Login Failed",
-            description: "Invalid email or password. Please check your credentials and try again.",
+            title: "Access Denied",
+            description: "You don't have access to this application.",
             variant: "destructive",
           });
           return;
         }
 
+        // Set local storage items for compatibility with existing code
+        localStorage.setItem('userAuth', 'true');
+        localStorage.setItem('userId', user.id);
+        
         toast({
-          title: "Error",
-          description: authError.message,
-          variant: "destructive",
+          title: "Success",
+          description: "Logged in successfully",
         });
-        return;
-      }
-
-      // If authentication successful, check if user exists in candidates table
-      const { data: candidate, error: candidateError } = await supabase
-        .from('candidates')
-        .select('*')
-        .eq('name', email)
-        .maybeSingle();
-
-      if (candidateError) {
-        console.error('Database error:', candidateError);
-        toast({
-          title: "Error",
-          description: "An error occurred while checking user credentials.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (candidate) {
-        await login(email, password);
-      } else {
-        // Sign out from Supabase if user not found in candidates table
-        await supabase.auth.signOut();
-        toast({
-          title: "Access Denied",
-          description: "You don't have access to this application.",
-          variant: "destructive",
-        });
+        
+        navigate('/user/dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);
