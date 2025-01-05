@@ -23,6 +23,16 @@ const UserLogin = () => {
       });
 
       if (authError) {
+        // Check if the error is due to unconfirmed email
+        if (authError.message.includes('Email not confirmed')) {
+          toast({
+            title: "Email Not Confirmed",
+            description: "Please confirm your email address before logging in. Contact support if you need assistance.",
+            variant: "destructive",
+          });
+          return;
+        }
+
         toast({
           title: "Authentication Error",
           description: "Invalid credentials. Please check your email and password.",
