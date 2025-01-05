@@ -24,43 +24,44 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
     
     try {
       // First check if email already exists in candidates table
-      const { data: existingUsers } = await supabase
+      const { data: existingUsers, error: queryError } = await supabase
         .from('candidates')
-        .select('name')
-        .eq('name', email);
+        .select('email')
+        .eq('email', email)
+        .maybeSingle();
 
-      if (existingUsers && existingUsers.length > 0) {
+      if (queryError) {
+        console.error('Error checking existing user:', queryError);
+        toast({
+          title: "Error",
+          description: "Failed to check if user exists. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (existingUsers) {
         toast({
           title: "Error",
           description: "A user with this email already exists.",
           variant: "destructive",
         });
-        setIsLoading(false);
         return;
       }
 
-      // Call the edge function
+      // Call the edge function to create the user
       const response = await supabase.functions.invoke('create-user', {
         body: { email, password }
       });
 
-      // Check if the response contains an error
       if (response.error) {
         const errorData = JSON.parse(response.error.message);
-        if (errorData.code === 'user_exists') {
-          toast({
-            title: "Error",
-            description: "This email is already registered. Please use a different email.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: errorData.error || "Failed to create user. Please try again.",
-            variant: "destructive",
-          });
-        }
-        throw new Error(errorData.error);
+        toast({
+          title: "Error",
+          description: errorData.message || "Failed to create user. Please try again.",
+          variant: "destructive",
+        });
+        return;
       }
 
       toast({
@@ -74,7 +75,11 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error creating user:', error);
-      // Error toast is already shown above, no need to show it again
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
