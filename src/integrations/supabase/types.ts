@@ -15,6 +15,7 @@ export type Database = {
           created_at: string | null
           cv_submitted: boolean | null
           email: string | null
+          has_reset_password: boolean | null
           id: string
           interview_status: string | null
           name: string
@@ -28,6 +29,7 @@ export type Database = {
           created_at?: string | null
           cv_submitted?: boolean | null
           email?: string | null
+          has_reset_password?: boolean | null
           id?: string
           interview_status?: string | null
           name: string
@@ -41,6 +43,7 @@ export type Database = {
           created_at?: string | null
           cv_submitted?: boolean | null
           email?: string | null
+          has_reset_password?: boolean | null
           id?: string
           interview_status?: string | null
           name?: string

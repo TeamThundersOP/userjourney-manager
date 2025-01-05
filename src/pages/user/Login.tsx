@@ -72,17 +72,11 @@ const UserLogin = () => {
       }
 
       if (data.user) {
-        console.log('Login successful, setting up session');
-        // Set local storage items
-        localStorage.setItem('userAuth', 'true');
-        localStorage.setItem('userId', data.user.id);
+        console.log('Login successful, checking password reset status');
         
-        // Check if this is the first login
-        const isFirstLogin = !data.user.last_sign_in_at;
-        
-        if (isFirstLogin) {
-          console.log('First time login detected');
-          localStorage.setItem('hasResetPassword', 'false');
+        // Check if the user has reset their password
+        if (!candidate.has_reset_password) {
+          console.log('First time login detected, redirecting to password reset');
           toast({
             title: "Welcome!",
             description: "Please reset your password for security.",
