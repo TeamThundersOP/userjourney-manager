@@ -29,12 +29,38 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
 
   const login = async (username: string, password: string) => {
     if (username === DEMO_USERNAME && password === DEMO_PASSWORD) {
+      // First check if the admin user exists
+      const { data: existingUser } = await supabase
+        .from('candidates')
+        .select('*')
+        .eq('username', username)
+        .single();
+
+      // If admin user doesn't exist, create it
+      if (!existingUser) {
+        const { error: insertError } = await supabase
+          .from('candidates')
+          .insert([
+            {
+              username: DEMO_USERNAME,
+              name: 'Admin User',
+            }
+          ]);
+
+        if (insertError) {
+          console.error('Error creating admin user:', insertError);
+          throw new Error('Failed to create admin user');
+        }
+      }
+
+      // Now sign in with Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email: ADMIN_EMAIL,
-        password: DEMO_PASSWORD,
+        password: password,
       });
 
       if (error) {
+        console.error('Supabase auth error:', error);
         throw new Error('Authentication failed');
       }
 
