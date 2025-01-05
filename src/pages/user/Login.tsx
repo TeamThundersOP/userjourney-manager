@@ -21,12 +21,22 @@ const UserLogin = () => {
         .from('candidates')
         .select('*')
         .eq('name', email)
-        .single();
+        .maybeSingle();
 
-      if (candidateError || !candidate) {
+      if (candidateError) {
+        console.error('Error checking candidate:', candidateError);
+        toast({
+          title: "Error",
+          description: "An error occurred while checking your access. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!candidate) {
         toast({
           title: "Access Denied",
-          description: "You don't have access to this application.",
+          description: "No account found with this email. Please check your credentials.",
           variant: "destructive",
         });
         return;
