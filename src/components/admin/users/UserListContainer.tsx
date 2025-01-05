@@ -10,7 +10,8 @@ const fetchUsers = async (): Promise<User[]> => {
   const { data, error } = await supabase
     .from('candidates')
     .select('*')
-    .neq('username', 'vanapallisaisriram7@gmail.com'); // Filter out self account
+    .neq('username', 'vanapallisaisriram7@gmail.com') // Filter out admin account
+    .neq('username', 'admin'); // Also filter out any user with username 'admin'
     
   if (error) throw error;
   
