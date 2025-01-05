@@ -23,15 +23,14 @@ const Reports = () => {
       
       return reports
         .map((report: any) => {
-          // Find the user who created the report
-          const user = users.find((u: any) => u.id === report.userId);
-          console.log('Report userId:', report.userId);
-          console.log('Found user:', user);
+          // Find the user who created the report by comparing IDs as numbers
+          const user = users.find((u: any) => Number(u.id) === Number(report.userId));
+          console.log('Report:', { reportId: report.id, userId: report.userId, foundUser: user?.email });
           
           return {
             ...report,
             status: report.status || 'Pending',
-            sender: user?.email || 'Unknown User', // Use optional chaining
+            sender: user?.email || 'Unknown User',
           };
         })
         .filter((report: any) => {
