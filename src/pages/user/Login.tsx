@@ -27,7 +27,7 @@ const UserLogin = () => {
         .from('candidates')
         .select('*')
         .eq('email', normalizedEmail)
-        .single();
+        .maybeSingle();
 
       console.log('Candidate check result:', { candidate, candidateError });
 
