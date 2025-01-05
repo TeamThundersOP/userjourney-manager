@@ -14,16 +14,6 @@ const DashboardLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const isMobile = useIsMobile();
 
-  // Check if user has filled personal info
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const currentUser = users.find((u: any) => u.id.toString() === userId);
-  const hasFilledPersonalInfo = currentUser?.hasFilledPersonalInfo;
-
-  // If user hasn't filled personal info and isn't on the personal-info page, redirect them
-  if (!hasFilledPersonalInfo && location.pathname !== '/user/personal-info') {
-    return <Navigate to="/user/personal-info" />;
-  }
-
   useEffect(() => {
     const isDarkMode = document.documentElement.classList.contains('dark');
     setIsDark(isDarkMode);
@@ -36,6 +26,16 @@ const DashboardLayout = () => {
       setSidebarOpen(true);
     }
   }, [isMobile]);
+
+  // Check if user has filled personal info
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const currentUser = users.find((u: any) => u.id.toString() === userId);
+  const hasFilledPersonalInfo = currentUser?.hasFilledPersonalInfo;
+
+  // If user hasn't filled personal info and isn't on the personal-info page, redirect them
+  if (!hasFilledPersonalInfo && location.pathname !== '/user/personal-info') {
+    return <Navigate to="/user/personal-info" />;
+  }
 
   const isActive = (path: string) => {
     return location.pathname === `/user/${path}`;
