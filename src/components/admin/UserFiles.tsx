@@ -13,11 +13,24 @@ interface UserFilesProps {
 
 const UserFiles = ({ user }: UserFilesProps) => {
   const [files, setFiles] = useState<UserFile[]>([]);
-  const { handleDownload, handleDelete } = FileActions({ onFileChange: (updatedFiles) => {
-    const userFiles = updatedFiles.filter(file => String(file.userId) === String(user.id));
-    setFiles(userFiles);
-    updateOnboardingStatus(user, userFiles);
-  }});
+  
+  const { handleDownload, handleDelete } = FileActions({ 
+    onFileChange: (updatedFiles) => {
+      console.log('File change detected, all files:', updatedFiles);
+      console.log('Current user ID:', user.id);
+      
+      const userFiles = updatedFiles.filter(file => {
+        const fileUserId = String(file.userId);
+        const currentUserId = String(user.id);
+        console.log('Comparing file userId:', fileUserId, 'with current userId:', currentUserId);
+        return fileUserId === currentUserId;
+      });
+      
+      console.log('Filtered user files:', userFiles);
+      setFiles(userFiles);
+      updateOnboardingStatus(user, userFiles);
+    }
+  });
 
   useEffect(() => {
     console.log('UserFiles component mounted/updated for user:', user.id);
