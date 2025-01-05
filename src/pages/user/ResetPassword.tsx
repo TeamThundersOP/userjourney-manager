@@ -38,6 +38,28 @@ const ResetPassword = () => {
 
       console.log('Attempting to update password for user:', user.email);
 
+      // First check if the candidate exists
+      const { data: existingCandidate, error: checkError } = await supabase
+        .from('candidates')
+        .select()
+        .eq('email', user.email)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('Error checking candidate:', checkError);
+        throw new Error('Error verifying candidate status');
+      }
+
+      if (!existingCandidate) {
+        toast({
+          title: "Error",
+          description: "Your account is not registered as a candidate. Please contact support.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Update password in Supabase Auth
       const { error: updateAuthError } = await supabase.auth.updateUser({
         password: newPassword
@@ -51,6 +73,7 @@ const ResetPassword = () => {
             description: "New password must be different from your current password",
             variant: "destructive",
           });
+          setIsLoading(false);
           return;
         }
         throw updateAuthError;
@@ -58,37 +81,16 @@ const ResetPassword = () => {
 
       console.log('Password updated successfully in Auth, updating candidate record');
 
-      // First check if the candidate exists
-      const { data: existingCandidate, error: checkError } = await supabase
-        .from('candidates')
-        .select()
-        .eq('email', user.email)
-        .maybeSingle();
-
-      if (checkError) {
-        console.error('Error checking candidate:', checkError);
-        throw checkError;
-      }
-
-      if (!existingCandidate) {
-        console.error('No candidate found with email:', user.email);
-        throw new Error('Candidate not found');
-      }
-
       // Update the candidates table to mark password as reset
-      const { data: candidateData, error: updateCandidateError } = await supabase
+      const { error: updateCandidateError } = await supabase
         .from('candidates')
         .update({ has_reset_password: true })
-        .eq('email', user.email)
-        .select()
-        .maybeSingle();
+        .eq('email', user.email);
 
       if (updateCandidateError) {
         console.error('Error updating candidate:', updateCandidateError);
         throw updateCandidateError;
       }
-
-      console.log('Candidate record updated successfully:', candidateData);
 
       // Update local state
       setHasResetPassword(true);
