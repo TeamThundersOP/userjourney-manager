@@ -32,8 +32,8 @@ const UserLogin = () => {
 
       if (!candidate) {
         toast({
-          title: "Access Denied",
-          description: "Your account is not authorized. Please contact support.",
+          title: "Access Restricted",
+          description: "This email is not registered in our system. Please contact the administrator for access.",
           variant: "destructive",
         });
         setIsLoading(false);
