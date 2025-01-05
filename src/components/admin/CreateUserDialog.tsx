@@ -23,13 +23,7 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
     setIsLoading(true);
     
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error("No active session found. Please login as admin.");
-      }
-
-      // Check if email already exists by checking the name field
+      // First check if email already exists in candidates table
       const { data: existingUsers } = await supabase
         .from('candidates')
         .select('name')
@@ -45,38 +39,43 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         return;
       }
 
-      // Create user with admin API and set email_confirmed to true
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      // Create user with regular signup
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
-        email_confirm: true, // This automatically confirms the email
+        options: {
+          data: {
+            role: 'user' // Add role metadata
+          }
+        }
       });
 
       if (authError) throw authError;
 
-      // Then save to Supabase database using email as both name and username
-      const { error: dbError } = await supabase
-        .from('candidates')
-        .insert([
-          {
-            name: email,
-            username: email,
-          }
-        ])
-        .select();
+      if (authData.user) {
+        // Save to candidates table
+        const { error: dbError } = await supabase
+          .from('candidates')
+          .insert([
+            {
+              name: email,
+              username: email,
+            }
+          ])
+          .select();
 
-      if (dbError) throw dbError;
+        if (dbError) throw dbError;
 
-      toast({
-        title: "Success",
-        description: "User created successfully",
-      });
+        toast({
+          title: "Success",
+          description: "User created successfully. They will need to verify their email before logging in.",
+        });
 
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-
-      setEmail("");
-      setPassword("");
-      onOpenChange(false);
+        queryClient.invalidateQueries({ queryKey: ['users'] });
+        setEmail("");
+        setPassword("");
+        onOpenChange(false);
+      }
     } catch (error: any) {
       console.error('Error creating user:', error);
       toast({
@@ -95,7 +94,7 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         <DialogHeader>
           <DialogTitle>Create New User</DialogTitle>
           <DialogDescription>
-            Enter the details for the new user below.
+            Enter the details for the new user below. The user will need to verify their email before logging in.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
