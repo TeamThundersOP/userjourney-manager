@@ -4,7 +4,7 @@ import { useUserAuth } from '@/contexts/UserAuthContext';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 
 const ResetPassword = () => {
@@ -33,14 +33,29 @@ const ResetPassword = () => {
       });
 
       if (updateAuthError) {
+        // Handle the specific case where the new password is the same as the old one
+        if (updateAuthError.message.includes('same_password')) {
+          toast({
+            title: "Error",
+            description: "New password must be different from your current password",
+            variant: "destructive",
+          });
+          return;
+        }
         throw updateAuthError;
+      }
+
+      // Get the current user's email
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) {
+        throw new Error('User email not found');
       }
 
       // Update the candidates table to mark password as reset
       const { error: updateCandidateError } = await supabase
         .from('candidates')
         .update({ has_reset_password: true })
-        .eq('email', (await supabase.auth.getUser()).data.user?.email);
+        .eq('email', user.email);
 
       if (updateCandidateError) {
         throw updateCandidateError;
@@ -57,11 +72,11 @@ const ResetPassword = () => {
 
       // Redirect to dashboard
       navigate('/user/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error resetting password:', error);
       toast({
         title: "Error",
-        description: "Failed to reset password. Please try again.",
+        description: error.message || "Failed to reset password. Please try again.",
         variant: "destructive",
       });
     }
