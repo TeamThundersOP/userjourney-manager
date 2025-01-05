@@ -30,22 +30,6 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         throw new Error("No active session found. Please login as admin.");
       }
 
-      // Create new user object
-      const newUser = {
-        id: Date.now(),
-        email,
-        password,
-        status: "Pending",
-        personalInfo: {
-          email: email,
-        },
-        files: [] // Initialize empty files array
-      };
-
-      // Save to localStorage
-      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      localStorage.setItem('users', JSON.stringify([...existingUsers, newUser]));
-
       // Save to Supabase database with explicit auth headers
       const { error } = await supabase
         .from('candidates')
