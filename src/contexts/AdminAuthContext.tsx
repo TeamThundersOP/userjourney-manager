@@ -29,44 +29,55 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
 
   const login = async (username: string, password: string) => {
     if (username === DEMO_USERNAME && password === DEMO_PASSWORD) {
-      // First check if the admin user exists
-      const { data: existingUser } = await supabase
-        .from('candidates')
-        .select('*')
-        .eq('username', username)
-        .single();
+      try {
+        // First try to sign up the admin user if they don't exist
+        const { error: signUpError } = await supabase.auth.signUp({
+          email: ADMIN_EMAIL,
+          password: password,
+        });
 
-      // If admin user doesn't exist, create it
-      if (!existingUser) {
-        const { error: insertError } = await supabase
-          .from('candidates')
-          .insert([
-            {
-              username: DEMO_USERNAME,
-              name: 'Admin User',
-            }
-          ]);
+        // If sign up fails (user likely exists), proceed to sign in
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email: ADMIN_EMAIL,
+          password: password,
+        });
 
-        if (insertError) {
-          console.error('Error creating admin user:', insertError);
-          throw new Error('Failed to create admin user');
+        if (signInError) {
+          console.error('Supabase auth error:', signInError);
+          throw new Error('Authentication failed');
         }
-      }
 
-      // Now sign in with Supabase
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: ADMIN_EMAIL,
-        password: password,
-      });
+        if (data.user) {
+          // Check if admin exists in candidates table
+          const { data: existingUser } = await supabase
+            .from('candidates')
+            .select('*')
+            .eq('username', username)
+            .single();
 
-      if (error) {
-        console.error('Supabase auth error:', error);
+          // If admin user doesn't exist in candidates, create it
+          if (!existingUser) {
+            const { error: insertError } = await supabase
+              .from('candidates')
+              .insert([
+                {
+                  username: DEMO_USERNAME,
+                  name: 'Admin User',
+                }
+              ]);
+
+            if (insertError) {
+              console.error('Error creating admin user:', insertError);
+              throw new Error('Failed to create admin user');
+            }
+          }
+
+          setIsAuthenticated(true);
+          navigate('/admin/dashboard');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
         throw new Error('Authentication failed');
-      }
-
-      if (data.user) {
-        setIsAuthenticated(true);
-        navigate('/admin/dashboard');
       }
     } else {
       throw new Error('Invalid credentials');
