@@ -110,13 +110,7 @@ const UserLogin = () => {
                 placeholder="Enter your password"
               />
             </div>
-            <div className="flex items-center justify-between">
-              <Link 
-                to="/user/signup" 
-                className="text-sm text-primary hover:text-primary/90 hover:underline"
-              >
-                Don't have an account? Sign up
-              </Link>
+            <div className="flex items-center justify-end">
               <Link 
                 to="/user/reset-password" 
                 className="text-sm text-primary hover:text-primary/90 hover:underline"
