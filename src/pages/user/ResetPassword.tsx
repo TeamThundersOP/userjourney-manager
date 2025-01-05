@@ -10,12 +10,14 @@ import { supabase } from '@/integrations/supabase/client';
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { userId, setHasResetPassword } = useUserAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (newPassword !== confirmPassword) {
       toast({
@@ -23,6 +25,7 @@ const ResetPassword = () => {
         description: "Passwords do not match",
         variant: "destructive",
       });
+      setIsLoading(false);
       return;
     }
 
@@ -58,12 +61,12 @@ const ResetPassword = () => {
         .eq('email', user.email);
 
       if (updateCandidateError) {
+        console.error('Error updating candidate:', updateCandidateError);
         throw updateCandidateError;
       }
 
       // Update local state
       setHasResetPassword(true);
-      localStorage.setItem('hasResetPassword', 'true');
 
       toast({
         title: "Success",
@@ -79,6 +82,8 @@ const ResetPassword = () => {
         description: error.message || "Failed to reset password. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -100,6 +105,7 @@ const ResetPassword = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -112,10 +118,11 @@ const ResetPassword = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
-            <Button type="submit" className="w-full">
-              Reset Password
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Resetting Password..." : "Reset Password"}
             </Button>
           </form>
         </CardContent>
