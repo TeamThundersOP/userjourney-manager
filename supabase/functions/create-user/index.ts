@@ -6,7 +6,6 @@ const corsHeaders = {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -23,10 +22,8 @@ Deno.serve(async (req) => {
       }
     )
 
-    // Get the request body
     const { email, password } = await req.json()
-
-    console.log('Checking if user exists:', email)
+    console.log('Creating new user:', email)
 
     // First check if user exists in auth.users
     const { data: existingAuthUser } = await supabaseClient.auth.admin.listUsers()
@@ -46,9 +43,7 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log('Creating new user:', email)
-
-    // Create the user
+    // Create the auth user first
     const { data: userData, error: createError } = await supabaseClient.auth.admin.createUser({
       email,
       password,
@@ -66,76 +61,96 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Generate a unique username by adding a random suffix if needed
-    const baseUsername = email.split('@')[0]
-    let username = baseUsername
-    let attempts = 0
-    const maxAttempts = 5
+    // Generate a unique username
+    const generateUniqueUsername = async () => {
+      const baseUsername = email.split('@')[0].toLowerCase()
+      let finalUsername = baseUsername
+      let counter = 1
 
-    while (attempts < maxAttempts) {
-      const { data: existingUser, error: checkError } = await supabaseClient
+      while (counter <= 100) { // Limit attempts to prevent infinite loop
+        try {
+          const { data: existingUser, error: checkError } = await supabaseClient
+            .from('candidates')
+            .select('username')
+            .eq('username', finalUsername)
+            .maybeSingle()
+
+          if (checkError) {
+            console.error('Error checking username:', checkError)
+            throw checkError
+          }
+
+          if (!existingUser) {
+            return finalUsername
+          }
+
+          finalUsername = `${baseUsername}${counter}`
+          counter++
+        } catch (error) {
+          console.error('Error in username generation:', error)
+          throw error
+        }
+      }
+      throw new Error('Could not generate unique username')
+    }
+
+    try {
+      const username = await generateUniqueUsername()
+      console.log('Generated unique username:', username)
+
+      const { error: insertError } = await supabaseClient
         .from('candidates')
-        .select('username')
-        .eq('username', username)
-        .maybeSingle()
+        .insert([
+          {
+            id: userData.user.id,
+            name: email,
+            username: username,
+            email: email,
+          }
+        ])
 
-      if (!existingUser) {
-        // Username is available
-        break
+      if (insertError) {
+        console.error('Error inserting into candidates:', insertError)
+        // Clean up: delete the auth user if candidate creation fails
+        await supabaseClient.auth.admin.deleteUser(userData.user.id)
+        throw insertError
       }
 
-      // If username exists, append random string
-      username = `${baseUsername}_${Math.random().toString(36).substring(2, 7)}`
-      attempts++
-    }
-
-    if (attempts >= maxAttempts) {
-      // If we couldn't generate a unique username after max attempts
-      await supabaseClient.auth.admin.deleteUser(userData.user.id)
       return new Response(
-        JSON.stringify({ error: 'Failed to generate unique username' }),
+        JSON.stringify({ 
+          message: 'User created successfully', 
+          user: userData.user,
+          username: username 
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      )
+    } catch (error) {
+      console.error('Error in user creation process:', error)
+      // Clean up: delete the auth user if anything fails
+      if (userData?.user?.id) {
+        await supabaseClient.auth.admin.deleteUser(userData.user.id)
+      }
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to create user record',
+          details: error.message 
+        }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400,
         }
       )
     }
-
-    // Insert the user into the candidates table with the unique username
-    const { error: insertError } = await supabaseClient
-      .from('candidates')
-      .insert([
-        {
-          name: email,
-          username: username,
-          email: email,
-        },
-      ])
-
-    if (insertError) {
-      console.error('Error inserting into candidates:', insertError)
-      // If insertion fails, delete the created auth user
-      await supabaseClient.auth.admin.deleteUser(userData.user.id)
-      return new Response(
-        JSON.stringify({ error: 'Failed to create candidate record' }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400,
-        }
-      )
-    }
-
-    return new Response(
-      JSON.stringify({ message: 'User created successfully', user: userData.user }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    )
   } catch (error) {
     console.error('Server error:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message 
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
