@@ -108,26 +108,36 @@ const ViewUser = () => {
   });
 
   const { data: reports } = useQuery({
-    queryKey: ['reports', userId],
+    queryKey: ['userReports', userId],
     queryFn: () => {
-      const allReports = JSON.parse(localStorage.getItem('reports') || '[]');
+      const allReports = JSON.parse(localStorage.getItem('userReports') || '[]');
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       
       // Find the current user
-      const currentUser = users.find((u: any) => Number(u.id) === Number(userId));
+      const currentUser = users.find((u: any) => String(u.id) === String(userId));
       
       if (!currentUser) {
         console.log('Current user not found');
         return [];
       }
       
-      // Filter reports based on the userId matching the current user's id
-      const userReports = allReports.filter((report: any) => 
+      // Map reports with user information
+      const mappedReports = allReports.map((report: any) => {
+        const reportUser = users.find((u: any) => String(u.id) === String(report.userId));
+        return {
+          ...report,
+          sender: reportUser?.email || 'Unknown User',
+        };
+      });
+      
+      // Filter reports for the current user
+      const userReports = mappedReports.filter((report: any) => 
         String(report.userId) === String(userId)
       );
       
-      console.log('Current user ID:', userId);
+      console.log('Current user:', currentUser);
       console.log('All reports:', allReports);
+      console.log('Mapped reports:', mappedReports);
       console.log('Filtered user reports:', userReports);
       
       return userReports;
