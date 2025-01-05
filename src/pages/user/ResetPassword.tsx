@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from '@/integrations/supabase/client';
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState('');
@@ -25,40 +26,44 @@ const ResetPassword = () => {
       return;
     }
 
-    // Get users from localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find((u: any) => u.id.toString() === userId);
+    try {
+      // Update password in Supabase Auth
+      const { error: updateAuthError } = await supabase.auth.updateUser({
+        password: newPassword
+      });
 
-    if (user && user.password === newPassword) {
+      if (updateAuthError) {
+        throw updateAuthError;
+      }
+
+      // Update the candidates table to mark password as reset
+      const { error: updateCandidateError } = await supabase
+        .from('candidates')
+        .update({ has_reset_password: true })
+        .eq('email', (await supabase.auth.getUser()).data.user?.email);
+
+      if (updateCandidateError) {
+        throw updateCandidateError;
+      }
+
+      // Update local state
+      setHasResetPassword(true);
+      localStorage.setItem('hasResetPassword', 'true');
+
+      toast({
+        title: "Success",
+        description: "Password has been reset successfully",
+      });
+
+      // Redirect to dashboard
+      navigate('/user/dashboard');
+    } catch (error) {
+      console.error('Error resetting password:', error);
       toast({
         title: "Error",
-        description: "New password cannot be the same as the old password",
+        description: "Failed to reset password. Please try again.",
         variant: "destructive",
       });
-      return;
-    }
-
-    // Update user's password
-    const updatedUsers = users.map((u: any) => 
-      u.id.toString() === userId 
-        ? { ...u, password: newPassword, hasResetPassword: true } 
-        : u
-    );
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-    localStorage.setItem('hasResetPassword', 'true');
-    setHasResetPassword(true);
-
-    toast({
-      title: "Success",
-      description: "Password has been reset successfully",
-    });
-
-    // Navigate to personal info if not filled, otherwise to dashboard
-    const userAfterUpdate = updatedUsers.find((u: any) => u.id.toString() === userId);
-    if (!userAfterUpdate.hasFilledPersonalInfo) {
-      navigate('/user/personal-info');
-    } else {
-      navigate('/user/dashboard');
     }
   };
 
