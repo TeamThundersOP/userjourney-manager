@@ -61,37 +61,24 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Generate a unique username
+    // Generate a unique username with timestamp to ensure uniqueness
     const generateUniqueUsername = async () => {
       const baseUsername = email.split('@')[0].toLowerCase()
-      let finalUsername = baseUsername
-      let counter = 1
+      const timestamp = Date.now().toString().slice(-4)
+      const username = `${baseUsername}${timestamp}`
+      
+      // Check if username exists
+      const { data: existingUser } = await supabaseClient
+        .from('candidates')
+        .select('username')
+        .eq('username', username)
+        .maybeSingle()
 
-      while (counter <= 100) { // Limit attempts to prevent infinite loop
-        try {
-          const { data: existingUser, error: checkError } = await supabaseClient
-            .from('candidates')
-            .select('username')
-            .eq('username', finalUsername)
-            .maybeSingle()
-
-          if (checkError) {
-            console.error('Error checking username:', checkError)
-            throw checkError
-          }
-
-          if (!existingUser) {
-            return finalUsername
-          }
-
-          finalUsername = `${baseUsername}${counter}`
-          counter++
-        } catch (error) {
-          console.error('Error in username generation:', error)
-          throw error
-        }
+      if (existingUser) {
+        throw new Error('Username generation failed')
       }
-      throw new Error('Could not generate unique username')
+
+      return username
     }
 
     try {
@@ -103,7 +90,7 @@ Deno.serve(async (req) => {
         .insert([
           {
             id: userData.user.id,
-            name: email,
+            name: email.split('@')[0], // Use part before @ as name
             username: username,
             email: email,
           }
