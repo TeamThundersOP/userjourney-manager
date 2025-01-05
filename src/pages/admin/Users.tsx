@@ -10,10 +10,10 @@ const Users = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-araboto-bold text-primary">Users</h1>
+        <h1 className="text-3xl font-araboto-bold text-primary">View Candidates</h1>
         <Button onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Create User
+          Create Candidate
         </Button>
       </div>
 
