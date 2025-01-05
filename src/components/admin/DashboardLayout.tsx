@@ -1,16 +1,17 @@
-import { Outlet } from 'react-router-dom';
-import Navbar from './Navbar';
+import { Outlet } from "react-router-dom";
+import Navbar from "./Navbar";
+import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 
 const DashboardLayout = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
-      <Navbar />
-      <main className="relative pt-32 pb-8 min-h-screen p-4 md:p-8">
-        <div className="max-w-7xl mx-auto mt-8">
+    <AdminAuthProvider>
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 pt-20 pb-8">
           <Outlet />
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </AdminAuthProvider>
   );
 };
 
