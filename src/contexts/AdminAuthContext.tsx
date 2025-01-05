@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AdminAuthContextType {
   isAuthenticated: boolean;
@@ -21,6 +22,7 @@ export const useAdminAuth = () => {
 export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const ADMIN_EMAIL = 'vanapallisaisriram7@gmail.com';
   const DEMO_USERNAME = 'admin';
@@ -30,26 +32,28 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
     if (username === DEMO_USERNAME && password === DEMO_PASSWORD) {
       try {
         // First try to sign in with Supabase
-        let authData = await supabase.auth.signInWithPassword({
+        const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
           email: ADMIN_EMAIL,
           password: password,
         });
 
-        // If sign in fails, try to sign up
-        if (authData.error) {
-          authData = await supabase.auth.signUp({
+        if (signInError) {
+          // If sign in fails, try to sign up
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email: ADMIN_EMAIL,
             password: password,
           });
 
-          if (authData.error) {
-            console.error('Supabase auth error:', authData.error);
+          if (signUpError) {
+            console.error('Supabase auth error:', signUpError);
             throw new Error('Authentication failed');
           }
+
+          authData = signUpData;
         }
 
-        if (authData.data.user) {
-          // Check if admin exists in candidates table using maybeSingle()
+        if (authData.user) {
+          // Check if admin exists in candidates table
           const { data: existingUser, error: queryError } = await supabase
             .from('candidates')
             .select('*')
@@ -69,12 +73,16 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
                 {
                   username: DEMO_USERNAME,
                   name: 'Admin User',
+                  email: ADMIN_EMAIL,
                 }
               ]);
 
             if (insertError) {
               console.error('Error creating admin user:', insertError);
-              throw new Error('Failed to create admin user');
+              // If it's a duplicate key error, we can proceed since the user exists
+              if (insertError.code !== '23505') {
+                throw new Error('Failed to create admin user');
+              }
             }
           }
 
@@ -82,12 +90,27 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
           localStorage.setItem('adminAuth', 'true');
           localStorage.setItem('userRole', 'admin');
           navigate('/admin/dashboard');
+          
+          toast({
+            title: "Success",
+            description: "Logged in successfully",
+          });
         }
       } catch (error) {
         console.error('Login error:', error);
-        throw new Error('Authentication failed');
+        toast({
+          title: "Error",
+          description: error.message || "Authentication failed",
+          variant: "destructive",
+        });
+        throw error;
       }
     } else {
+      toast({
+        title: "Error",
+        description: "Invalid credentials",
+        variant: "destructive",
+      });
       throw new Error('Invalid credentials');
     }
   };
@@ -98,6 +121,11 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
     localStorage.removeItem('adminAuth');
     localStorage.removeItem('userRole');
     navigate('/admin/login');
+    
+    toast({
+      title: "Success",
+      description: "Logged out successfully",
+    });
   };
 
   useEffect(() => {
