@@ -66,7 +66,6 @@ const ResetPassword = () => {
       });
 
       if (updateAuthError) {
-        // Handle the specific case where the new password is the same as the old one
         if (updateAuthError.message.includes('same_password')) {
           toast({
             title: "Error",
@@ -84,13 +83,32 @@ const ResetPassword = () => {
       // Update the candidates table to mark password as reset
       const { error: updateCandidateError } = await supabase
         .from('candidates')
-        .update({ has_reset_password: true })
+        .update({ 
+          has_reset_password: true,
+          // Ensure we're updating the correct record by using both email and ID
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existingCandidate.id)
         .eq('email', user.email);
 
       if (updateCandidateError) {
         console.error('Error updating candidate:', updateCandidateError);
         throw updateCandidateError;
       }
+
+      // Verify the update
+      const { data: verifyUpdate, error: verifyError } = await supabase
+        .from('candidates')
+        .select('has_reset_password')
+        .eq('id', existingCandidate.id)
+        .single();
+
+      if (verifyError || !verifyUpdate) {
+        console.error('Error verifying update:', verifyError);
+        throw new Error('Failed to verify password reset update');
+      }
+
+      console.log('Candidate record updated successfully:', verifyUpdate);
 
       // Update local state
       setHasResetPassword(true);
