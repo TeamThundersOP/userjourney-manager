@@ -19,21 +19,22 @@ const ResetPassword = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (newPassword !== confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
-
     try {
+      if (newPassword !== confirmPassword) {
+        toast({
+          title: "Error",
+          description: "Passwords do not match",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Get the current user's email first
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.email) {
-        throw new Error('User email not found');
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user?.email) {
+        console.error('Error getting user:', userError);
+        throw new Error('Unable to verify user session');
       }
 
       console.log('Attempting to update password for user:', user.email);
@@ -56,7 +57,6 @@ const ResetPassword = () => {
           description: "Your account is not registered as a candidate. Please contact support.",
           variant: "destructive",
         });
-        setIsLoading(false);
         return;
       }
 
@@ -73,7 +73,6 @@ const ResetPassword = () => {
             description: "New password must be different from your current password",
             variant: "destructive",
           });
-          setIsLoading(false);
           return;
         }
         throw updateAuthError;
@@ -94,9 +93,10 @@ const ResetPassword = () => {
         throw updateCandidateError;
       }
 
+      // Verify the update was successful
       if (!updateResult) {
         console.error('Failed to verify password reset update');
-        throw new Error('Failed to verify password reset update');
+        throw new Error('Failed to update password reset status');
       }
 
       console.log('Password reset status updated successfully');
@@ -111,6 +111,7 @@ const ResetPassword = () => {
 
       // Redirect to dashboard
       navigate('/user/dashboard');
+
     } catch (error: any) {
       console.error('Error resetting password:', error);
       toast({
