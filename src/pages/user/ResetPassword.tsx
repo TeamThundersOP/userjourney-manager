@@ -58,7 +58,8 @@ const ResetPassword = () => {
       const { error: updateCandidateError } = await supabase
         .from('candidates')
         .update({ has_reset_password: true })
-        .eq('email', user.email);
+        .eq('email', user.email)
+        .select();  // Add select() to ensure the update was successful
 
       if (updateCandidateError) {
         console.error('Error updating candidate:', updateCandidateError);
