@@ -45,10 +45,11 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         return;
       }
 
-      // First create the user in Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // Create user with admin API and set email_confirmed to true
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email,
         password,
+        email_confirm: true, // This automatically confirms the email
       });
 
       if (authError) throw authError;
