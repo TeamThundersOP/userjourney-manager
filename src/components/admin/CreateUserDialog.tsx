@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CreateUserDialogProps {
   open: boolean;
@@ -13,40 +14,63 @@ interface CreateUserDialogProps {
 const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    // Create new user object without onboarding data
-    const newUser = {
-      id: Date.now(),
-      email,
-      password,
-      status: "Pending",
-      personalInfo: {
-        email: email,
-      },
-      files: [] // Initialize empty files array
-    };
+    try {
+      // Create new user object
+      const newUser = {
+        id: Date.now(),
+        email,
+        password,
+        status: "Pending",
+        personalInfo: {
+          email: email,
+        },
+        files: [] // Initialize empty files array
+      };
 
-    // Get existing users from localStorage
-    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Add new user to the list
-    localStorage.setItem('users', JSON.stringify([...existingUsers, newUser]));
+      // Save to localStorage
+      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+      localStorage.setItem('users', JSON.stringify([...existingUsers, newUser]));
 
-    toast({
-      title: "Success",
-      description: "User created successfully",
-    });
+      // Save to Supabase database
+      const { error } = await supabase
+        .from('candidates')
+        .insert([
+          {
+            name: email, // Using email as name initially
+            username: email,
+          }
+        ]);
 
-    queryClient.invalidateQueries({ queryKey: ['users'] });
+      if (error) throw error;
 
-    setEmail("");
-    setPassword("");
-    onOpenChange(false);
+      toast({
+        title: "Success",
+        description: "User created successfully",
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+
+      setEmail("");
+      setPassword("");
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error creating user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create user. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -63,6 +87,7 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           <div>
@@ -72,10 +97,11 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full">
-            Create User
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Creating..." : "Create User"}
           </Button>
         </form>
       </DialogContent>
