@@ -11,7 +11,7 @@ const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { userId, setHasResetPassword } = useUserAuth();
+  const { setHasResetPassword } = useUserAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -36,7 +36,7 @@ const ResetPassword = () => {
         throw new Error('User email not found');
       }
 
-      console.log('Updating password for user:', user.email);
+      console.log('Attempting to update password for user:', user.email);
 
       // Update password in Supabase Auth
       const { error: updateAuthError } = await supabase.auth.updateUser({
@@ -56,21 +56,22 @@ const ResetPassword = () => {
         throw updateAuthError;
       }
 
-      console.log('Password updated successfully, updating candidate record');
+      console.log('Password updated successfully in Auth, updating candidate record');
 
       // Update the candidates table to mark password as reset
-      const { data: updateData, error: updateCandidateError } = await supabase
+      const { data: candidateData, error: updateCandidateError } = await supabase
         .from('candidates')
         .update({ has_reset_password: true })
         .eq('email', user.email)
-        .select();
+        .select()
+        .single();
 
       if (updateCandidateError) {
         console.error('Error updating candidate:', updateCandidateError);
         throw updateCandidateError;
       }
 
-      console.log('Candidate record updated:', updateData);
+      console.log('Candidate record updated successfully:', candidateData);
 
       // Update local state
       setHasResetPassword(true);
@@ -95,8 +96,8 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center gradient-bg p-4">
+      <Card className="w-full max-w-md glass-card">
         <CardHeader>
           <CardTitle className="text-2xl text-center">Reset Password</CardTitle>
         </CardHeader>
@@ -112,6 +113,7 @@ const ResetPassword = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
+                className="w-full"
                 disabled={isLoading}
               />
             </div>
@@ -125,10 +127,15 @@ const ResetPassword = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                className="w-full"
                 disabled={isLoading}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={isLoading}
+            >
               {isLoading ? "Resetting Password..." : "Reset Password"}
             </Button>
           </form>
