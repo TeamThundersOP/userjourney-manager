@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import Phase0StatusGrid from "./Phase0StatusGrid";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface Phase0DetailsProps {
   user: User;
@@ -59,6 +60,11 @@ const Phase0Details = ({ user, onSaveFeedback }: Phase0DetailsProps) => {
     toast.success("Phase 0 status updated successfully");
   };
 
+  const handleResetChanges = () => {
+    setPhase0(phase0Initial);
+    toast.success("Changes reset to original state");
+  };
+
   const completedSteps = Object.values(phase0 || {}).filter(value => value === true).length;
   const totalSteps = Object.keys(phase0 || {}).filter(key => key !== 'feedback' && key !== 'jobStatus' && key !== 'visaStatus').length;
   const progress = (completedSteps / totalSteps) * 100;
@@ -70,8 +76,89 @@ const Phase0Details = ({ user, onSaveFeedback }: Phase0DetailsProps) => {
         <p className="text-sm text-gray-500">{completedSteps} of {totalSteps} steps completed</p>
       </div>
 
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="personal-info">
+          <AccordionTrigger>Personal Information</AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-2 gap-4 p-4">
+              <div>
+                <Label className="font-semibold">Full Name</Label>
+                <p className="text-gray-600">{user.personalInfo?.givenName} {user.personalInfo?.familyName}</p>
+              </div>
+              <div>
+                <Label className="font-semibold">Nationality</Label>
+                <p className="text-gray-600">{user.personalInfo?.nationality}</p>
+              </div>
+              <div>
+                <Label className="font-semibold">Date of Birth</Label>
+                <p className="text-gray-600">{user.personalInfo?.dateOfBirth}</p>
+              </div>
+              <div>
+                <Label className="font-semibold">Gender</Label>
+                <p className="text-gray-600">{user.personalInfo?.gender}</p>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="passport-info">
+          <AccordionTrigger>Passport Information</AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-2 gap-4 p-4">
+              <div>
+                <Label className="font-semibold">Passport Number</Label>
+                <p className="text-gray-600">{user.personalInfo?.passportNumber}</p>
+              </div>
+              <div>
+                <Label className="font-semibold">Place of Issue</Label>
+                <p className="text-gray-600">{user.personalInfo?.passportPlaceOfIssue}</p>
+              </div>
+              <div>
+                <Label className="font-semibold">Issue Date</Label>
+                <p className="text-gray-600">{user.personalInfo?.passportIssueDate}</p>
+              </div>
+              <div>
+                <Label className="font-semibold">Expiry Date</Label>
+                <p className="text-gray-600">{user.personalInfo?.passportExpiryDate}</p>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="contact-info">
+          <AccordionTrigger>Contact Information</AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-2 gap-4 p-4">
+              <div>
+                <Label className="font-semibold">Address</Label>
+                <p className="text-gray-600">{user.personalInfo?.address}</p>
+              </div>
+              <div>
+                <Label className="font-semibold">City</Label>
+                <p className="text-gray-600">{user.personalInfo?.city}</p>
+              </div>
+              <div>
+                <Label className="font-semibold">Postal Code</Label>
+                <p className="text-gray-600">{user.personalInfo?.postalCode}</p>
+              </div>
+              <div>
+                <Label className="font-semibold">Country</Label>
+                <p className="text-gray-600">{user.personalInfo?.country}</p>
+              </div>
+              <div>
+                <Label className="font-semibold">Phone</Label>
+                <p className="text-gray-600">{user.personalInfo?.phone}</p>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
       <div className="flex justify-end space-x-4">
-        <Button variant="outline" onClick={handleSaveChanges}>
+        <Button variant="outline" onClick={handleResetChanges}>
+          Reset Changes
+        </Button>
+        <Button onClick={handleSaveChanges}>
           Save Changes
         </Button>
       </div>
