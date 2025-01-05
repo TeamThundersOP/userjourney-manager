@@ -3,7 +3,7 @@ import { useUserAuth } from '@/contexts/UserAuthContext';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 
@@ -35,8 +35,15 @@ const UserLogin = () => {
 
       if (!candidate) {
         toast({
-          title: "User Not Found",
-          description: "No account found with this email. Please check your credentials or sign up.",
+          title: "Account Not Found",
+          description: (
+            <div className="flex flex-col gap-2">
+              <span>No account found with this email.</span>
+              <Link to="/user/signup" className="text-primary hover:underline">
+                Click here to sign up
+              </Link>
+            </div>
+          ),
           variant: "destructive",
         });
         return;
@@ -103,7 +110,13 @@ const UserLogin = () => {
                 placeholder="Enter your password"
               />
             </div>
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-between">
+              <Link 
+                to="/user/signup" 
+                className="text-sm text-primary hover:text-primary/90 hover:underline"
+              >
+                Don't have an account? Sign up
+              </Link>
               <Link 
                 to="/user/reset-password" 
                 className="text-sm text-primary hover:text-primary/90 hover:underline"
