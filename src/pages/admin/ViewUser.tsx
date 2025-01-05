@@ -111,9 +111,14 @@ const ViewUser = () => {
     queryKey: ['reports', userId],
     queryFn: () => {
       const allReports = JSON.parse(localStorage.getItem('userReports') || '[]');
-      return allReports.filter((report: any) => 
-        String(report.userId) === String(userId)
+      console.log('All reports:', allReports);
+      console.log('Current userId:', userId);
+      
+      const filteredReports = allReports.filter((report: any) => 
+        Number(report.userId) === Number(userId)
       );
+      console.log('Filtered reports:', filteredReports);
+      return filteredReports;
     },
     enabled: !!userId,
   });
