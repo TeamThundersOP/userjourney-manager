@@ -29,8 +29,16 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         throw new Error("No active session found. Please login as admin.");
       }
 
-      // Save to Supabase database
-      const { error } = await supabase
+      // First create the user in Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (authError) throw authError;
+
+      // Then save to Supabase database
+      const { error: dbError } = await supabase
         .from('candidates')
         .insert([
           {
@@ -40,7 +48,7 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         ])
         .select();
 
-      if (error) throw error;
+      if (dbError) throw dbError;
 
       toast({
         title: "Success",
