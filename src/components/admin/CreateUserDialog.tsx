@@ -39,13 +39,28 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         return;
       }
 
-      // Call the edge function using the proper method
-      const { data, error } = await supabase.functions.invoke('create-user', {
+      // Call the edge function
+      const response = await supabase.functions.invoke('create-user', {
         body: { email, password }
       });
 
-      if (error) {
-        throw error;
+      // Check if the response contains an error
+      if (response.error) {
+        const errorData = JSON.parse(response.error.message);
+        if (errorData.code === 'user_exists') {
+          toast({
+            title: "Error",
+            description: "This email is already registered. Please use a different email.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: errorData.error || "Failed to create user. Please try again.",
+            variant: "destructive",
+          });
+        }
+        throw new Error(errorData.error);
       }
 
       toast({
@@ -59,11 +74,7 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error creating user:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create user. Please try again.",
-        variant: "destructive",
-      });
+      // Error toast is already shown above, no need to show it again
     } finally {
       setIsLoading(false);
     }
