@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -23,19 +23,18 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
     setIsLoading(true);
     
     try {
-      // First check if we have an active session
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
         throw new Error("No active session found. Please login as admin.");
       }
 
-      // Save to Supabase database with explicit auth headers
+      // Save to Supabase database
       const { error } = await supabase
         .from('candidates')
         .insert([
           {
-            name: email, // Using email as name initially
+            name: email,
             username: email,
           }
         ])
@@ -70,6 +69,9 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New User</DialogTitle>
+          <DialogDescription>
+            Enter the details for the new user below.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
