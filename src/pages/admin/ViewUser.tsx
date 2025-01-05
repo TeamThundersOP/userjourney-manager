@@ -108,15 +108,14 @@ const ViewUser = () => {
   });
 
   const { data: reports } = useQuery({
-    queryKey: ['reports', userId, user?.email],
+    queryKey: ['reports', userId],
     queryFn: () => {
       const allReports = JSON.parse(localStorage.getItem('userReports') || '[]');
       return allReports.filter((report: any) => 
-        String(report.userId) === userId || 
-        (user?.email && report.sender === user.email)
+        String(report.userId) === String(userId)
       );
     },
-    enabled: !!user?.email, // Only run query when user email is available
+    enabled: !!userId,
   });
 
   if (isLoading) {
