@@ -39,43 +39,34 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         return;
       }
 
-      // Create user with regular signup
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            role: 'user' // Add role metadata
-          }
+      // Call the edge function to create user
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({ email, password })
         }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create user');
+      }
+
+      toast({
+        title: "Success",
+        description: "User created successfully and can log in immediately.",
       });
 
-      if (authError) throw authError;
-
-      if (authData.user) {
-        // Save to candidates table
-        const { error: dbError } = await supabase
-          .from('candidates')
-          .insert([
-            {
-              name: email,
-              username: email,
-            }
-          ])
-          .select();
-
-        if (dbError) throw dbError;
-
-        toast({
-          title: "Success",
-          description: "User created successfully. They will need to verify their email before logging in.",
-        });
-
-        queryClient.invalidateQueries({ queryKey: ['users'] });
-        setEmail("");
-        setPassword("");
-        onOpenChange(false);
-      }
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setEmail("");
+      setPassword("");
+      onOpenChange(false);
     } catch (error: any) {
       console.error('Error creating user:', error);
       toast({
@@ -94,7 +85,7 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
         <DialogHeader>
           <DialogTitle>Create New User</DialogTitle>
           <DialogDescription>
-            Enter the details for the new user below. The user will need to verify their email before logging in.
+            Enter the details for the new user below. The account will be automatically confirmed.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
