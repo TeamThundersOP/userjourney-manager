@@ -10,7 +10,10 @@ import { User } from '@/types/user';
 
 const fetchUser = async (userId: string): Promise<User> => {
   const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const user = users.find((u: User) => u.id === parseInt(userId));
+  console.log('Fetching user with ID:', userId);
+  console.log('Available users:', users);
+  
+  const user = users.find((u: User) => String(u.id) === String(userId));
   
   if (!user) {
     throw new Error('User not found');
