@@ -19,13 +19,14 @@ const UserLogin = () => {
     setIsLoading(true);
 
     try {
-      console.log('Checking candidate status for email:', email);
+      const normalizedEmail = email.toLowerCase().trim();
+      console.log('Checking candidate status for email:', normalizedEmail);
       
       // First check if the email exists in the candidates table
       const { data: candidate, error: candidateError } = await supabase
         .from('candidates')
         .select('*')
-        .eq('email', email.toLowerCase().trim())
+        .eq('email', normalizedEmail)
         .maybeSingle();
 
       console.log('Candidate query result:', { candidate, candidateError });
@@ -41,15 +42,16 @@ const UserLogin = () => {
           description: "This email is not registered in our system. Please contact the administrator for access.",
           variant: "destructive",
         });
-        setIsLoading(false);
         return;
       }
 
       // If candidate exists, proceed with authentication
       const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
+        email: normalizedEmail,
         password,
       });
+
+      console.log('Sign in result:', { user, signInError });
 
       if (signInError) {
         console.error('Sign in error:', signInError);
