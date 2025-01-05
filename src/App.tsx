@@ -51,52 +51,50 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <UserAuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            
-            {/* Admin routes - wrapped in AdminAuthProvider */}
-            <Route element={<AdminAuthProvider>
-              <Routes>
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route
-                  path="/admin/*"
-                  element={
-                    <ProtectedAdminRoute>
-                      <DashboardLayout />
-                    </ProtectedAdminRoute>
-                  }
-                >
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="users" element={<Users />} />
-                  <Route path="users/:userId" element={<ViewUser />} />
-                  <Route path="reports" element={<Reports />} />
-                  <Route index element={<Navigate to="dashboard" replace />} />
-                </Route>
-              </Routes>
-            </AdminAuthProvider>} />
+        <AdminAuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              
+              {/* Admin routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route
+                path="/admin/*"
+                element={
+                  <ProtectedAdminRoute>
+                    <DashboardLayout />
+                  </ProtectedAdminRoute>
+                }
+              >
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="users" element={<Users />} />
+                <Route path="users/:userId" element={<ViewUser />} />
+                <Route path="reports" element={<Reports />} />
+                <Route index element={<Navigate to="dashboard" replace />} />
+              </Route>
 
-            {/* User routes */}
-            <Route path="/user/login" element={<UserLogin />} />
-            <Route path="/user/reset-password" element={<ResetPassword />} />
-            <Route
-              path="/user/*"
-              element={
-                <ProtectedUserRoute>
-                  <UserDashboardLayout />
-                </ProtectedUserRoute>
-              }
-            >
-              <Route path="dashboard" element={<UserDashboard />} />
-              <Route path="reports" element={<UserReports />} />
-              <Route path="profile" element={<UserProfile />} />
-              <Route path="personal-info" element={<PersonalInfo />} />
-              <Route index element={<Navigate to="dashboard" replace />} />
-            </Route>
-          </Routes>
-        </TooltipProvider>
+              {/* User routes */}
+              <Route path="/user/login" element={<UserLogin />} />
+              <Route path="/user/reset-password" element={<ResetPassword />} />
+              <Route
+                path="/user/*"
+                element={
+                  <ProtectedUserRoute>
+                    <UserDashboardLayout />
+                  </ProtectedUserRoute>
+                }
+              >
+                <Route path="dashboard" element={<UserDashboard />} />
+                <Route path="reports" element={<UserReports />} />
+                <Route path="profile" element={<UserProfile />} />
+                <Route path="personal-info" element={<PersonalInfo />} />
+                <Route index element={<Navigate to="dashboard" replace />} />
+              </Route>
+            </Routes>
+          </TooltipProvider>
+        </AdminAuthProvider>
       </UserAuthProvider>
     </BrowserRouter>
   </QueryClientProvider>
