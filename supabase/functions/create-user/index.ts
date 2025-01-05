@@ -77,10 +77,10 @@ Deno.serve(async (req) => {
         .from('candidates')
         .select('username')
         .eq('username', username)
-        .single()
+        .maybeSingle()
 
-      if (checkError && checkError.code === 'PGRST116') {
-        // Username is available (no matching record found)
+      if (!existingUser) {
+        // Username is available
         break
       }
 
