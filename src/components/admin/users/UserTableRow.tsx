@@ -1,25 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Trash2, Eye } from "lucide-react";
+import { User } from "@/types/user";
 
 interface UserTableRowProps {
-  user: {
-    id: number;
-    email: string;
-    personalInfo?: {
-      fullName?: string;
-    };
-  };
-  onView: (id: number) => void;
-  onDelete: (id: number) => void;
+  user: User;
+  onView: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 const UserTableRow = ({ user, onView, onDelete }: UserTableRowProps) => {
   return (
-    <TableRow key={user.id}>
+    <TableRow>
       <TableCell className="font-medium">#{user.id}</TableCell>
-      <TableCell>{user.personalInfo?.fullName || "N/A"}</TableCell>
-      <TableCell className="max-w-[200px] truncate">{user.email}</TableCell>
+      <TableCell>{user.name || "N/A"}</TableCell>
+      <TableCell className="max-w-[200px] truncate">{user.username}</TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end space-x-2">
           <Button

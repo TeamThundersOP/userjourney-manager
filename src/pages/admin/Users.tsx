@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import CreateUserDialog from "@/components/admin/CreateUserDialog";
-import UsersList from "@/components/admin/UsersList";
+import UserListContainer from "@/components/admin/users/UserListContainer";
 
 const Users = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -17,7 +17,7 @@ const Users = () => {
         </Button>
       </div>
 
-      <UsersList />
+      <UserListContainer />
       
       <CreateUserDialog 
         open={isCreateDialogOpen} 
