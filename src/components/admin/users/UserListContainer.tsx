@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import SearchBar from "./SearchBar";
 import UserListView from "./UserListView";
@@ -28,7 +28,7 @@ const UserListContainer = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 
-  const { data: users = [], isLoading, error } = useQuery({
+  const { data: users = [], isLoading, error, refetch } = useQuery({
     queryKey: ['users'],
     queryFn: fetchUsers,
   });
@@ -71,6 +71,9 @@ const UserListContainer = () => {
         title: "Success",
         description: "User deleted successfully",
       });
+      
+      // Refetch the users list after successful deletion
+      refetch();
     } catch (error: any) {
       toast({
         title: "Error",
