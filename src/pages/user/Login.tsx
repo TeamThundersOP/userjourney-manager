@@ -51,7 +51,7 @@ const UserLogin = () => {
         return;
       }
 
-      // If this is the first time logging in, we need to create an auth user
+      // If this is the first time logging in and password hasn't been reset
       if (!candidate.has_reset_password) {
         // Try to create a new auth user
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -101,16 +101,15 @@ const UserLogin = () => {
             description: "Please reset your password for security.",
           });
           navigate('/user/reset-password');
-          return;
+        } else {
+          // If password has been reset, go directly to dashboard
+          console.log('Regular login, redirecting to dashboard');
+          toast({
+            title: "Success",
+            description: "Logged in successfully",
+          });
+          navigate('/user/dashboard');
         }
-        
-        console.log('Regular login, redirecting to dashboard');
-        toast({
-          title: "Success",
-          description: "Logged in successfully",
-        });
-        
-        navigate('/user/dashboard');
       }
     } catch (error: any) {
       console.error('Unexpected error during login:', error);
