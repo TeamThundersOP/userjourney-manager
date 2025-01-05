@@ -39,7 +39,7 @@ const ResetPassword = () => {
 
       console.log('Attempting to update password for user:', user.email);
 
-      // First check if the candidate exists
+      // First check if the candidate exists using email
       const { data: existingCandidate, error: checkError } = await supabase
         .from('candidates')
         .select('id, email')
@@ -57,6 +57,7 @@ const ResetPassword = () => {
           description: "Your account is not registered as a candidate. Please contact support.",
           variant: "destructive",
         });
+        setIsLoading(false);
         return;
       }
 
@@ -73,6 +74,7 @@ const ResetPassword = () => {
             description: "New password must be different from your current password",
             variant: "destructive",
           });
+          setIsLoading(false);
           return;
         }
         throw updateAuthError;
@@ -84,7 +86,7 @@ const ResetPassword = () => {
       const { data: updateResult, error: updateCandidateError } = await supabase
         .from('candidates')
         .update({ has_reset_password: true })
-        .eq('id', existingCandidate.id)
+        .eq('email', user.email) // Use email instead of ID
         .select()
         .maybeSingle();
 
