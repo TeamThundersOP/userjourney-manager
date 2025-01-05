@@ -16,6 +16,23 @@ const UserLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // First check if user exists in candidates table
+      const { data: candidate, error: candidateError } = await supabase
+        .from('candidates')
+        .select('*')
+        .eq('name', email)
+        .single();
+
+      if (candidateError || !candidate) {
+        toast({
+          title: "Access Denied",
+          description: "You don't have access to this application.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Then attempt to sign in
       const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -32,23 +49,6 @@ const UserLogin = () => {
       }
 
       if (user) {
-        // Check if user exists in candidates table
-        const { data: candidate, error: candidateError } = await supabase
-          .from('candidates')
-          .select('*')
-          .eq('name', email)
-          .single();
-
-        if (candidateError || !candidate) {
-          await supabase.auth.signOut();
-          toast({
-            title: "Access Denied",
-            description: "You don't have access to this application.",
-            variant: "destructive",
-          });
-          return;
-        }
-
         // Set local storage items for compatibility with existing code
         localStorage.setItem('userAuth', 'true');
         localStorage.setItem('userId', user.id);
