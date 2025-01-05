@@ -124,8 +124,8 @@ const DashboardLayout = () => {
 
       <main className={`min-h-screen p-4 md:p-8 transition-all duration-200 ${
         isSidebarOpen ? 'md:ml-64' : ''
-      } ${isMobile ? 'mt-16' : ''}`}>
-        <div className="max-w-7xl mx-auto">
+      } ${isMobile ? 'mt-24' : ''}`}>
+        <div className="max-w-7xl mx-auto mt-8">
           <Outlet />
         </div>
       </main>
