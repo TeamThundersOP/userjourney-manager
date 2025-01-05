@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import Phase0StatusGrid from "./Phase0StatusGrid";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface Phase0DetailsProps {
   user: User;
@@ -85,6 +86,28 @@ const Phase0Details = ({ user, onSaveFeedback }: Phase0DetailsProps) => {
       </div>
 
       <Phase0StatusGrid phase0={phase0} onStatusChange={handleStatusChange} />
+
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="uk-contact">
+          <AccordionTrigger>UK Contact Details</AccordionTrigger>
+          <AccordionContent>
+            <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+              <div>
+                <Label className="font-medium">UK Contact Number</Label>
+                <p className="text-sm text-gray-600">
+                  {phase0?.ukContactNumber || 'Not provided'}
+                </p>
+              </div>
+              <div>
+                <Label className="font-medium">UK Address</Label>
+                <p className="text-sm text-gray-600 whitespace-pre-line">
+                  {phase0?.ukAddress || 'Not provided'}
+                </p>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
       <Card className="p-6">
         <div className="space-y-6">
