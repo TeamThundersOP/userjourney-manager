@@ -13,13 +13,16 @@ const fetchUsers = async (): Promise<User[]> => {
     .neq('username', 'vanapallisaisriram7@gmail.com') // Filter out admin account
     .neq('username', 'admin'); // Also filter out any user with username 'admin'
     
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
   
   // Transform the data to match the User interface
   return (data || []).map(candidate => ({
     ...candidate,
-    email: '', // Since email doesn't exist in candidates table, set empty string
-    status: 'Pending', // Set a default status
+    email: candidate.email || '', // Use the email from candidates table
+    status: candidate.interview_status || 'Pending', // Use interview_status or default to 'Pending'
     personalInfo: undefined,
     onboarding: undefined
   })) as User[];
