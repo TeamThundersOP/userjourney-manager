@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
 
 const UserLogin = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +16,25 @@ const UserLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // First check if the user exists in the candidates table
+      const { data: candidate, error: candidateError } = await supabase
+        .from('candidates')
+        .select('*')
+        .eq('name', email)
+        .single();
+
+      if (candidateError || !candidate) {
+        toast({
+          title: "Error",
+          description: "User not found. Please check your credentials.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // If user exists, proceed with login
       await login(email, password);
+      
     } catch (error) {
       toast({
         title: "Error",
