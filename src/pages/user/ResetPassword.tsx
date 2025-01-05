@@ -30,6 +30,14 @@ const ResetPassword = () => {
     }
 
     try {
+      // Get the current user's email first
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) {
+        throw new Error('User email not found');
+      }
+
+      console.log('Updating password for user:', user.email);
+
       // Update password in Supabase Auth
       const { error: updateAuthError } = await supabase.auth.updateUser({
         password: newPassword
@@ -48,23 +56,21 @@ const ResetPassword = () => {
         throw updateAuthError;
       }
 
-      // Get the current user's email
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.email) {
-        throw new Error('User email not found');
-      }
+      console.log('Password updated successfully, updating candidate record');
 
       // Update the candidates table to mark password as reset
-      const { error: updateCandidateError } = await supabase
+      const { data: updateData, error: updateCandidateError } = await supabase
         .from('candidates')
         .update({ has_reset_password: true })
         .eq('email', user.email)
-        .select();  // Add select() to ensure the update was successful
+        .select();
 
       if (updateCandidateError) {
         console.error('Error updating candidate:', updateCandidateError);
         throw updateCandidateError;
       }
+
+      console.log('Candidate record updated:', updateData);
 
       // Update local state
       setHasResetPassword(true);
