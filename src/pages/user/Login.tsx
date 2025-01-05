@@ -16,17 +16,27 @@ const UserLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // First check if the user exists in the candidates table
+      // Check if the user exists in the candidates table
       const { data: candidate, error: candidateError } = await supabase
         .from('candidates')
         .select('*')
         .eq('name', email)
-        .single();
+        .maybeSingle();
 
-      if (candidateError || !candidate) {
+      if (candidateError) {
+        console.error('Database error:', candidateError);
         toast({
           title: "Error",
-          description: "User not found. Please check your credentials.",
+          description: "An error occurred while checking user credentials.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!candidate) {
+        toast({
+          title: "User Not Found",
+          description: "No account found with this email. Please check your credentials or sign up.",
           variant: "destructive",
         });
         return;
@@ -36,6 +46,7 @@ const UserLogin = () => {
       await login(email, password);
       
     } catch (error) {
+      console.error('Login error:', error);
       toast({
         title: "Error",
         description: "Invalid credentials. Please try again.",
