@@ -9,59 +9,71 @@ import { ReportsTable } from '@/components/admin/reports/ReportsTable';
 import { User } from '@/types/user';
 
 const fetchUser = async (userId: string): Promise<User> => {
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  console.log('Fetching user with ID:', userId);
-  console.log('Available users:', users);
-  
-  const user = users.find((u: User) => String(u.id) === String(userId));
-  
-  if (!user) {
-    throw new Error('User not found');
+  try {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    console.log('Fetching user with ID:', userId);
+    console.log('Available users:', users);
+    
+    if (!users.length) {
+      throw new Error('No users found in storage');
+    }
+
+    const stringUserId = String(userId);
+    const user = users.find((u: User) => String(u.id) === stringUserId);
+    console.log('Found user:', user);
+    
+    if (!user) {
+      console.error('User not found with ID:', stringUserId);
+      throw new Error('User not found');
+    }
+    
+    // Initialize onboarding structure if it doesn't exist
+    if (!user.onboarding) {
+      user.onboarding = {
+        currentPhase: 0,
+        phase0: {
+          personalDetailsCompleted: false,
+          cvSubmitted: false,
+          interviewCompleted: false,
+          jobStatus: 'pending',
+          passportUploaded: false,
+          pccUploaded: false,
+          otherDocumentsUploaded: false,
+          offerLetterSent: false,
+          cosSent: false,
+          documentsUploaded: false,
+          visaStatus: 'pending',
+          travelDetailsUpdated: false,
+          travelDocumentsUploaded: false,
+          visaCopyUploaded: false,
+          ukContactUpdated: false
+        },
+        phase1: {
+          hmrcChecklist: false,
+          companyAgreements: false,
+          pensionScheme: false,
+          bankStatements: false,
+          vaccinationProof: false
+        },
+        phase2: {
+          rightToWork: false,
+          shareCode: false,
+          dbs: false,
+          onboardingComplete: false
+        },
+        approvals: {
+          phase0: false,
+          phase1: false,
+          phase2: false
+        }
+      };
+    }
+    
+    return user;
+  } catch (error) {
+    console.error('Error in fetchUser:', error);
+    throw error;
   }
-  
-  // Initialize onboarding structure if it doesn't exist
-  if (!user.onboarding) {
-    user.onboarding = {
-      currentPhase: 0,
-      phase0: {
-        personalDetailsCompleted: false,
-        cvSubmitted: false,
-        interviewCompleted: false,
-        jobStatus: 'pending',
-        passportUploaded: false,
-        pccUploaded: false,
-        otherDocumentsUploaded: false,
-        offerLetterSent: false,
-        cosSent: false,
-        documentsUploaded: false,
-        visaStatus: 'pending',
-        travelDetailsUpdated: false,
-        travelDocumentsUploaded: false,
-        visaCopyUploaded: false,
-        ukContactUpdated: false
-      },
-      phase1: {
-        hmrcChecklist: false,
-        companyAgreements: false,
-        pensionScheme: false,
-        bankStatements: false,
-        vaccinationProof: false
-      },
-      phase2: {
-        rightToWork: false,
-        shareCode: false,
-        dbs: false,
-        onboardingComplete: false
-      },
-      approvals: {
-        phase0: false,
-        phase1: false,
-        phase2: false
-      }
-    };
-  }
-  
-  return user;
 };
 
 const ViewUser = () => {
@@ -71,6 +83,8 @@ const ViewUser = () => {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['user', userId],
     queryFn: () => fetchUser(userId || ''),
+    retry: 1,
+    enabled: !!userId,
   });
 
   const { data: reports } = useQuery({
@@ -120,10 +134,16 @@ const ViewUser = () => {
   }
 
   if (error) {
+    console.error('Error in ViewUser component:', error);
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-lg text-red-500">
           Error loading user details. Please try again later.
+          {process.env.NODE_ENV === 'development' && (
+            <div className="text-sm mt-2">
+              Error: {error instanceof Error ? error.message : 'Unknown error'}
+            </div>
+          )}
         </div>
       </div>
     );
