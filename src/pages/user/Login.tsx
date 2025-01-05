@@ -51,21 +51,40 @@ const UserLogin = () => {
         return;
       }
 
-      console.log('Candidate found, proceeding with authentication');
+      // If this is the first time logging in, we need to create an auth user
+      if (!candidate.has_reset_password) {
+        // Try to create a new auth user
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: normalizedEmail,
+          password: password,
+        });
 
-      // If candidate exists, proceed with authentication
+        if (signUpError && signUpError.message !== 'User already registered') {
+          console.error('Error creating auth user:', signUpError);
+          toast({
+            title: "Error",
+            description: "Failed to create your account. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      console.log('Proceeding with authentication');
+
+      // Now attempt to sign in
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
         password,
       });
 
-      console.log('Authentication result:', { data, error: signInError });
+      console.log('Authentication result:', { data, signInError });
 
       if (signInError) {
         console.error('Authentication error:', signInError);
         toast({
           title: "Login Failed",
-          description: signInError.message || "Invalid email or password. Please check your credentials and try again.",
+          description: "Invalid email or password. Please check your credentials and try again.",
           variant: "destructive",
         });
         return;
