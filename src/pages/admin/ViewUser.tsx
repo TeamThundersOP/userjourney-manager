@@ -110,17 +110,31 @@ const ViewUser = () => {
   const { data: reports } = useQuery({
     queryKey: ['reports', userId],
     queryFn: () => {
+      // Get all reports from localStorage
       const allReports = JSON.parse(localStorage.getItem('userReports') || '[]');
-      console.log('All reports:', allReports);
-      console.log('Current userId:', userId);
       
-      // Filter reports directly by userId
-      const filteredReports = allReports.filter((report: any) => 
-        Number(report.userId) === Number(userId)
+      // Get all users to map emails to IDs
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      
+      // Map through reports to add userId based on sender email
+      const reportsWithUserIds = allReports.map((report: any) => {
+        const user = users.find((u: any) => u.email === report.sender);
+        return {
+          ...report,
+          userId: user ? user.id : null
+        };
+      });
+      
+      // Filter reports for the current user
+      const userReports = reportsWithUserIds.filter((report: any) => 
+        report.userId && Number(report.userId) === Number(userId)
       );
       
-      console.log('Filtered reports:', filteredReports);
-      return filteredReports;
+      console.log('All reports:', allReports);
+      console.log('Reports with userIds:', reportsWithUserIds);
+      console.log('Filtered user reports:', userReports);
+      
+      return userReports;
     },
     enabled: !!userId,
   });
@@ -166,7 +180,9 @@ const ViewUser = () => {
           <div className="space-y-6">
             <ReportsTable
               reports={reports || []}
-              onViewReport={() => {}}
+              onViewReport={(report) => {
+                console.log('Viewing report:', report);
+              }}
             />
           </div>
         )}
