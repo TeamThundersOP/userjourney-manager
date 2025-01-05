@@ -37,8 +37,8 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
           password: password,
         });
 
-        // If sign in fails, try to sign up
         if (signInError) {
+          // If sign in fails, try to sign up
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email: ADMIN_EMAIL,
             password: password,
@@ -57,7 +57,7 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
           const { data: existingUser, error: queryError } = await supabase
             .from('candidates')
             .select('*')
-            .eq('username', username)
+            .eq('email', ADMIN_EMAIL)
             .maybeSingle();
 
           if (queryError) {
@@ -78,8 +78,13 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
               ]);
 
             if (insertError) {
-              console.error('Error creating admin user:', insertError);
-              throw new Error('Failed to create admin user');
+              // If it's a duplicate key error, we can proceed since the user exists
+              if (insertError.code === '23505') {
+                console.log('Admin user already exists in candidates table');
+              } else {
+                console.error('Error creating admin user:', insertError);
+                throw new Error('Failed to create admin user');
+              }
             }
           }
 
