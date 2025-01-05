@@ -51,27 +51,6 @@ const UserLogin = () => {
         return;
       }
 
-      // If this is the first time logging in and password hasn't been reset
-      if (!candidate.has_reset_password) {
-        // Try to create a new auth user
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email: normalizedEmail,
-          password: password,
-        });
-
-        if (signUpError && signUpError.message !== 'User already registered') {
-          console.error('Error creating auth user:', signUpError);
-          toast({
-            title: "Error",
-            description: "Failed to create your account. Please try again.",
-            variant: "destructive",
-          });
-          return;
-        }
-      }
-
-      console.log('Proceeding with authentication');
-
       // Now attempt to sign in
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
