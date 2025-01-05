@@ -58,13 +58,30 @@ const ResetPassword = () => {
 
       console.log('Password updated successfully in Auth, updating candidate record');
 
+      // First check if the candidate exists
+      const { data: existingCandidate, error: checkError } = await supabase
+        .from('candidates')
+        .select()
+        .eq('email', user.email)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('Error checking candidate:', checkError);
+        throw checkError;
+      }
+
+      if (!existingCandidate) {
+        console.error('No candidate found with email:', user.email);
+        throw new Error('Candidate not found');
+      }
+
       // Update the candidates table to mark password as reset
       const { data: candidateData, error: updateCandidateError } = await supabase
         .from('candidates')
         .update({ has_reset_password: true })
         .eq('email', user.email)
         .select()
-        .single();
+        .maybeSingle();
 
       if (updateCandidateError) {
         console.error('Error updating candidate:', updateCandidateError);
