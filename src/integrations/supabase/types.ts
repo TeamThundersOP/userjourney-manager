@@ -14,6 +14,7 @@ export type Database = {
           cos_sent: boolean | null
           created_at: string | null
           cv_submitted: boolean | null
+          email: string | null
           id: string
           interview_status: string | null
           name: string
@@ -26,6 +27,7 @@ export type Database = {
           cos_sent?: boolean | null
           created_at?: string | null
           cv_submitted?: boolean | null
+          email?: string | null
           id?: string
           interview_status?: string | null
           name: string
@@ -38,6 +40,7 @@ export type Database = {
           cos_sent?: boolean | null
           created_at?: string | null
           cv_submitted?: boolean | null
+          email?: string | null
           id?: string
           interview_status?: string | null
           name?: string

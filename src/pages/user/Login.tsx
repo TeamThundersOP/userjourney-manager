@@ -16,38 +16,7 @@ const UserLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      console.log('Checking candidate with email:', email);
-      
-      // First check if user exists in candidates table
-      const { data: candidate, error: candidateError } = await supabase
-        .from('candidates')
-        .select('*')
-        .eq('email', email)  // Changed from 'name' to 'email'
-        .maybeSingle();
-
-      console.log('Candidate query result:', { candidate, candidateError });
-
-      if (candidateError) {
-        console.error('Error checking candidate:', candidateError);
-        toast({
-          title: "Error",
-          description: "An error occurred while checking your access. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!candidate) {
-        console.log('No candidate found with email:', email);
-        toast({
-          title: "Access Denied",
-          description: "No account found with this email. Please check your credentials.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Then attempt to sign in
+      // First attempt to sign in with Supabase Auth
       const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -64,7 +33,36 @@ const UserLogin = () => {
       }
 
       if (user) {
-        // Set local storage items for compatibility with existing code
+        // After successful auth, check if user exists in candidates table
+        const { data: candidate, error: candidateError } = await supabase
+          .from('candidates')
+          .select('*')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (candidateError) {
+          console.error('Error checking candidate:', candidateError);
+          toast({
+            title: "Error",
+            description: "An error occurred while checking your access. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (!candidate) {
+          console.log('No candidate found with email:', email);
+          // Sign out the user since they don't have a candidate record
+          await supabase.auth.signOut();
+          toast({
+            title: "Access Denied",
+            description: "Your account is not authorized. Please contact support.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Set local storage items
         localStorage.setItem('userAuth', 'true');
         localStorage.setItem('userId', user.id);
         
