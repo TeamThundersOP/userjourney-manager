@@ -16,7 +16,22 @@ const UserLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // First, check if the user exists in the candidates table
+      // First authenticate with Supabase
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        toast({
+          title: "Authentication Error",
+          description: "Invalid credentials. Please check your email and password.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // If authentication successful, check if user exists in candidates table
       const { data: candidate, error: candidateError } = await supabase
         .from('candidates')
         .select('*')
@@ -33,13 +48,14 @@ const UserLogin = () => {
         return;
       }
 
-      // If candidate exists, proceed with login
       if (candidate) {
         await login(email, password);
       } else {
+        // Sign out from Supabase if user not found in candidates table
+        await supabase.auth.signOut();
         toast({
-          title: "Invalid Credentials",
-          description: "Please check your email and password.",
+          title: "Access Denied",
+          description: "You don't have access to this application.",
           variant: "destructive",
         });
       }
@@ -47,7 +63,7 @@ const UserLogin = () => {
       console.error('Login error:', error);
       toast({
         title: "Error",
-        description: "Invalid credentials. Please try again.",
+        description: "An error occurred during login.",
         variant: "destructive",
       });
     }
