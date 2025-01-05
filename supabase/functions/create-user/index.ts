@@ -66,13 +66,49 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Insert the user into the candidates table
+    // Generate a unique username by adding a random suffix if needed
+    const baseUsername = email.split('@')[0]
+    let username = baseUsername
+    let attempts = 0
+    const maxAttempts = 5
+
+    while (attempts < maxAttempts) {
+      const { data: existingUser, error: checkError } = await supabaseClient
+        .from('candidates')
+        .select('username')
+        .eq('username', username)
+        .single()
+
+      if (checkError && checkError.code === 'PGRST116') {
+        // Username is available (no matching record found)
+        break
+      }
+
+      // If username exists, append random string
+      username = `${baseUsername}_${Math.random().toString(36).substring(2, 7)}`
+      attempts++
+    }
+
+    if (attempts >= maxAttempts) {
+      // If we couldn't generate a unique username after max attempts
+      await supabaseClient.auth.admin.deleteUser(userData.user.id)
+      return new Response(
+        JSON.stringify({ error: 'Failed to generate unique username' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      )
+    }
+
+    // Insert the user into the candidates table with the unique username
     const { error: insertError } = await supabaseClient
       .from('candidates')
       .insert([
         {
           name: email,
-          username: email,
+          username: username,
+          email: email,
         },
       ])
 
