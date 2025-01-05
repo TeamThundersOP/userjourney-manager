@@ -25,9 +25,15 @@ const UserLogin = () => {
       if (authError) {
         // Check if the error is due to unconfirmed email
         if (authError.message.includes('Email not confirmed')) {
+          // Send another confirmation email
+          await supabase.auth.resend({
+            type: 'signup',
+            email,
+          });
+          
           toast({
             title: "Email Not Confirmed",
-            description: "Please confirm your email address before logging in. Contact support if you need assistance.",
+            description: "We've sent another confirmation email. Please check your inbox and confirm your email before logging in.",
             variant: "destructive",
           });
           return;
