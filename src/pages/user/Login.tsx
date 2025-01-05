@@ -66,10 +66,13 @@ const UserLogin = () => {
         localStorage.setItem('userAuth', 'true');
         localStorage.setItem('userId', user.id);
         
-        // Check if this is the first login
+        // Check if this is the first login by checking last_sign_in_at
         const { data: authUser } = await supabase.auth.getUser();
-        if (authUser?.user && !authUser.user.last_sign_in_at) {
+        const isFirstLogin = !user.last_sign_in_at;
+        
+        if (isFirstLogin) {
           // This is the first login
+          localStorage.setItem('hasResetPassword', 'false');
           toast({
             title: "Welcome!",
             description: "Please reset your password for security.",
