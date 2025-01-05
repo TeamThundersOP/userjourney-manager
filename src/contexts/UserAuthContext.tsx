@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from "@/hooks/use-toast";
 
 interface UserAuthContextType {
   isAuthenticated: boolean;
@@ -31,7 +30,6 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
   const [hasResetPassword, setHasResetPassword] = useState(false);
   const [hasFilledPersonalInfo, setHasFilledPersonalInfo] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     const storedAuth = localStorage.getItem('userAuth');
@@ -48,66 +46,34 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      const usersJson = localStorage.getItem('users');
-      if (!usersJson) {
-        throw new Error('No users found');
-      }
+    // For demo purposes, we'll use the users from localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find((u: any) => u.email === email);
 
-      const users = JSON.parse(usersJson);
-      const user = users.find((u: any) => u.email === email);
+    if (!user || user.password !== password) {
+      throw new Error('Invalid credentials');
+    }
 
-      if (!user) {
-        throw new Error('User not found');
-      }
+    setIsAuthenticated(true);
+    setUserId(user.id.toString());
+    setIsFirstLogin(!user.hasLoggedInBefore);
 
-      if (user.password !== password) {
-        throw new Error('Invalid password');
-      }
+    localStorage.setItem('userAuth', 'true');
+    localStorage.setItem('userId', user.id.toString());
 
-      // Convert user.id to string to ensure consistent type
-      const userIdString = String(user.id);
-      
-      setIsAuthenticated(true);
-      setUserId(userIdString);
-      setIsFirstLogin(!user.hasLoggedInBefore);
-      setHasResetPassword(!!user.hasResetPassword);
-      setHasFilledPersonalInfo(!!user.hasFilledPersonalInfo);
-
-      // Update localStorage
-      localStorage.setItem('userAuth', 'true');
-      localStorage.setItem('userId', userIdString);
-      localStorage.setItem('hasResetPassword', String(!!user.hasResetPassword));
-      localStorage.setItem('hasFilledPersonalInfo', String(!!user.hasFilledPersonalInfo));
-
-      // Update user's first login status in localStorage
-      if (!user.hasLoggedInBefore) {
-        const updatedUsers = users.map((u: any) => 
-          u.id === user.id ? { ...u, hasLoggedInBefore: true } : u
-        );
-        localStorage.setItem('users', JSON.stringify(updatedUsers));
-        navigate('/user/reset-password');
-      } else if (!user.hasResetPassword) {
-        navigate('/user/reset-password');
-      } else if (!user.hasFilledPersonalInfo) {
-        navigate('/user/personal-info');
-      } else {
-        navigate('/user/dashboard');
-      }
-
-      toast({
-        title: "Success",
-        description: "Successfully logged in",
-      });
-
-    } catch (error) {
-      console.error('Login error:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Invalid credentials",
-        variant: "destructive",
-      });
-      throw error;
+    // Update user's first login status
+    if (!user.hasLoggedInBefore) {
+      const updatedUsers = users.map((u: any) => 
+        u.id === user.id ? { ...u, hasLoggedInBefore: true } : u
+      );
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+      navigate('/user/reset-password');
+    } else if (!user.hasResetPassword) {
+      navigate('/user/reset-password');
+    } else if (!user.hasFilledPersonalInfo) {
+      navigate('/user/personal-info');
+    } else {
+      navigate('/user/dashboard');
     }
   };
 
@@ -118,8 +84,6 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
     setHasFilledPersonalInfo(false);
     localStorage.removeItem('userAuth');
     localStorage.removeItem('userId');
-    localStorage.removeItem('hasResetPassword');
-    localStorage.removeItem('hasFilledPersonalInfo');
     navigate('/user/login');
   };
 

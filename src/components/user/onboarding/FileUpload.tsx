@@ -121,15 +121,13 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
       const fileId = Date.now();
       const newFile: UserFile = {
         id: fileId,
-        userId: userId ? String(userId) : null, // Ensure userId is stored as string
+        userId: userId ? String(userId) : null,
         name: file.name,
         type: file.type,
         uploadedAt: new Date().toISOString(),
         size: (file.size / 1024).toFixed(2) + ' KB',
         category: normalizeCategory(category),
       };
-
-      console.log('Creating new file with userId:', newFile.userId);
 
       // Store file metadata
       const files = JSON.parse(localStorage.getItem('userFiles') || '[]');

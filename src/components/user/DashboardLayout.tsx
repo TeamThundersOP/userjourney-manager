@@ -1,13 +1,13 @@
 import { useUserAuth } from '@/contexts/UserAuthContext';
 import { Button } from "@/components/ui/button";
-import { useNavigate, Outlet, useLocation, Navigate } from 'react-router-dom';
+import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { Home, MessageSquare, UserRound, LogOut, Menu } from 'lucide-react';
 import { Toggle } from "@/components/ui/toggle";
 import { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const DashboardLayout = () => {
-  const { logout, userId } = useUserAuth();
+  const { logout } = useUserAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isDark, setIsDark] = useState(false);
@@ -26,16 +26,6 @@ const DashboardLayout = () => {
       setSidebarOpen(true);
     }
   }, [isMobile]);
-
-  // Check if user has filled personal info
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const currentUser = users.find((u: any) => u.id.toString() === userId);
-  const hasFilledPersonalInfo = currentUser?.hasFilledPersonalInfo;
-
-  // If user hasn't filled personal info and isn't on the personal-info page, redirect them
-  if (!hasFilledPersonalInfo && location.pathname !== '/user/personal-info') {
-    return <Navigate to="/user/personal-info" />;
-  }
 
   const isActive = (path: string) => {
     return location.pathname === `/user/${path}`;
@@ -134,8 +124,8 @@ const DashboardLayout = () => {
 
       <main className={`min-h-screen p-4 md:p-8 transition-all duration-200 ${
         isSidebarOpen ? 'md:ml-64' : ''
-      } ${isMobile ? 'mt-24' : ''}`}>
-        <div className="max-w-7xl mx-auto mt-8">
+      } ${isMobile ? 'mt-16' : ''}`}>
+        <div className="max-w-7xl mx-auto">
           <Outlet />
         </div>
       </main>

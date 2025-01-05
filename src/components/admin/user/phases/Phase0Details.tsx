@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import Phase0StatusGrid from "./Phase0StatusGrid";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface Phase0DetailsProps {
   user: User;
@@ -155,30 +154,6 @@ const Phase0Details = ({ user, onSaveFeedback }: Phase0DetailsProps) => {
           />
         </div>
       </Card>
-
-      <Accordion type="single" collapsible className="w-full">
-        <AccordionItem value="uk-contact" className="border rounded-lg overflow-hidden">
-          <AccordionTrigger className="px-6 py-4 hover:bg-muted/50 transition-colors">
-            <span className="text-lg font-heading font-medium text-primary">UK Contact Details</span>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="p-6 space-y-6 bg-gradient-to-br from-background via-background to-muted/20">
-              <div className="glass-card p-4 rounded-lg">
-                <Label className="text-primary font-heading mb-2 block">UK Contact Number</Label>
-                <p className="text-foreground/80 font-medium">
-                  {phase0?.ukContactNumber || 'Not provided'}
-                </p>
-              </div>
-              <div className="glass-card p-4 rounded-lg">
-                <Label className="text-primary font-heading mb-2 block">UK Address</Label>
-                <p className="text-foreground/80 font-medium whitespace-pre-line">
-                  {phase0?.ukAddress || 'Not provided'}
-                </p>
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
     </div>
   );
 };

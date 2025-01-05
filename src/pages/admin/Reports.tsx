@@ -15,22 +15,14 @@ const Reports = () => {
   const { data: reports } = useQuery({
     queryKey: ['reports', filterType, filterDate, filterSender, filterId],
     queryFn: () => {
-      // Get reports from localStorage
+      // In a real app, this would be an API call
+      // For now, we'll get reports from localStorage
       const reports = JSON.parse(localStorage.getItem('userReports') || '[]');
-      
-      // Get users to map their emails
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      
       return reports
-        .map((report: any) => {
-          // Find the user who created the report by comparing IDs as numbers
-          const user = users.find((u: any) => Number(u.id) === Number(report.userId));
-          return {
-            ...report,
-            status: report.status || 'Pending',
-            sender: user?.email || 'Unknown User',
-          };
-        })
+        .map((report: any) => ({
+          ...report,
+          status: report.status || 'Pending', // Default status if not set
+        }))
         .filter((report: any) => {
           const matchesType = filterType === "all" || report.type === filterType;
           const matchesDate = !filterDate || report.date === filterDate.toISOString().split('T')[0];
@@ -42,7 +34,7 @@ const Reports = () => {
           return matchesType && matchesDate && matchesSender && matchesId;
         });
     },
-    refetchInterval: 5000,
+    refetchInterval: 5000, // Refresh every 5 seconds
   });
 
   const handleViewReport = (report: any) => {
