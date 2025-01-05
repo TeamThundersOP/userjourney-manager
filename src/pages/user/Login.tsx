@@ -10,20 +10,43 @@ import { supabase } from "@/integrations/supabase/client";
 const UserLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+
     try {
-      // First attempt to sign in with Supabase Auth
+      // First check if the email exists in the candidates table
+      const { data: candidate, error: candidateError } = await supabase
+        .from('candidates')
+        .select('*')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (candidateError) {
+        throw new Error('Error checking candidate status');
+      }
+
+      if (!candidate) {
+        toast({
+          title: "Access Denied",
+          description: "Your account is not authorized. Please contact support.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // If candidate exists, proceed with authentication
       const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (signInError) {
-        console.error('Sign in error:', signInError);
         toast({
           title: "Login Failed",
           description: "Invalid email or password. Please check your credentials and try again.",
@@ -33,45 +56,14 @@ const UserLogin = () => {
       }
 
       if (user) {
-        // After successful auth, check if user exists in candidates table
-        const { data: candidate, error: candidateError } = await supabase
-          .from('candidates')
-          .select('*')
-          .eq('email', email)
-          .maybeSingle();
-
-        if (candidateError) {
-          console.error('Error checking candidate:', candidateError);
-          toast({
-            title: "Error",
-            description: "An error occurred while checking your access. Please try again.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        if (!candidate) {
-          console.log('No candidate found with email:', email);
-          // Sign out the user since they don't have a candidate record
-          await supabase.auth.signOut();
-          toast({
-            title: "Access Denied",
-            description: "Your account is not authorized. Please contact support.",
-            variant: "destructive",
-          });
-          return;
-        }
-
         // Set local storage items
         localStorage.setItem('userAuth', 'true');
         localStorage.setItem('userId', user.id);
         
-        // Check if this is the first login by checking last_sign_in_at
-        const { data: authUser } = await supabase.auth.getUser();
+        // Check if this is the first login
         const isFirstLogin = !user.last_sign_in_at;
         
         if (isFirstLogin) {
-          // This is the first login
           localStorage.setItem('hasResetPassword', 'false');
           toast({
             title: "Welcome!",
@@ -88,13 +80,15 @@ const UserLogin = () => {
         
         navigate('/user/dashboard');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       toast({
         title: "Error",
-        description: "An error occurred during login.",
+        description: "An error occurred during login. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -130,6 +124,7 @@ const UserLogin = () => {
                 required
                 className="w-full bg-background/50 border-input"
                 placeholder="Enter your email"
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -144,6 +139,7 @@ const UserLogin = () => {
                 required
                 className="w-full bg-background/50 border-input"
                 placeholder="Enter your password"
+                disabled={isLoading}
               />
             </div>
             <div className="flex items-center justify-end">
@@ -154,8 +150,12 @@ const UserLogin = () => {
                 Forgot password?
               </Link>
             </div>
-            <Button type="submit" className="w-full btn-primary">
-              Sign In
+            <Button 
+              type="submit" 
+              className="w-full btn-primary"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
         </CardContent>
