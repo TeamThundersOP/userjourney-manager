@@ -32,14 +32,13 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
     if (username === DEMO_USERNAME && password === DEMO_PASSWORD) {
       try {
         // First try to sign in with Supabase
-        let user;
         const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
           email: ADMIN_EMAIL,
           password: password,
         });
 
+        // If sign in fails, try to sign up
         if (signInError) {
-          // If sign in fails, try to sign up
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email: ADMIN_EMAIL,
             password: password,
@@ -50,12 +49,10 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
             throw new Error('Authentication failed');
           }
 
-          user = signUpData.user;
-        } else {
-          user = signInData.user;
-        }
+          if (!signUpData.user) {
+            throw new Error('Failed to create user');
+          }
 
-        if (user) {
           // Check if admin exists in candidates table
           const { data: existingUser, error: queryError } = await supabase
             .from('candidates')
@@ -82,11 +79,23 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
 
             if (insertError) {
               console.error('Error creating admin user:', insertError);
-              // If it's a duplicate key error, we can proceed since the user exists
-              if (insertError.code !== '23505') {
-                throw new Error('Failed to create admin user');
-              }
+              throw new Error('Failed to create admin user');
             }
+          }
+
+          setIsAuthenticated(true);
+          localStorage.setItem('adminAuth', 'true');
+          localStorage.setItem('userRole', 'admin');
+          navigate('/admin/dashboard');
+          
+          toast({
+            title: "Success",
+            description: "Account created and logged in successfully",
+          });
+        } else {
+          // Sign in successful
+          if (!signInData.user) {
+            throw new Error('No user data returned');
           }
 
           setIsAuthenticated(true);
