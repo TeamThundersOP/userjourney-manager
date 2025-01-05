@@ -23,25 +23,18 @@ const UserLogin = () => {
       });
 
       if (authError) {
-        // Check if the error is due to unconfirmed email
-        if (authError.message.includes('Email not confirmed')) {
-          // Send another confirmation email
-          await supabase.auth.resend({
-            type: 'signup',
-            email,
-          });
-          
+        if (authError.message.includes('Invalid login credentials')) {
           toast({
-            title: "Email Not Confirmed",
-            description: "We've sent another confirmation email. Please check your inbox and confirm your email before logging in.",
+            title: "Login Failed",
+            description: "Invalid email or password. Please check your credentials and try again.",
             variant: "destructive",
           });
           return;
         }
 
         toast({
-          title: "Authentication Error",
-          description: "Invalid credentials. Please check your email and password.",
+          title: "Error",
+          description: authError.message,
           variant: "destructive",
         });
         return;
