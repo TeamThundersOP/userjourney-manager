@@ -4,12 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import DocumentsTab from "@/components/user/dashboard/DocumentsTab";
-import LoadingState from "@/components/user/dashboard/LoadingState";
+import { DocumentsTab } from "@/components/user/dashboard/DocumentsTab";
+import { LoadingState } from "@/components/user/dashboard/LoadingState";
 import { toast } from "sonner";
 import { UserFile } from "@/types/userFile";
 import { calculateProgress } from "@/utils/onboarding";
-import { User } from "@/types/user";
+import { User, PersonalInfo } from "@/types/user";
 
 const Dashboard = () => {
   const { userId } = useUserAuth();
@@ -33,6 +33,19 @@ const Dashboard = () => {
       if (!data) return null;
 
       // Transform the data to match the User type
+      const personalInfo = data.personal_info as PersonalInfo;
+      const onboardingData = data.onboarding as {
+        currentPhase: number;
+        phase0: any;
+        phase1: any;
+        phase2: any;
+        approvals: {
+          phase0: boolean;
+          phase1: boolean;
+          phase2: boolean;
+        };
+      };
+
       const userData: User = {
         id: data.id,
         name: data.name,
@@ -47,9 +60,9 @@ const Dashboard = () => {
         right_to_work: data.right_to_work,
         onboarding_complete: data.onboarding_complete,
         has_reset_password: data.has_reset_password,
-        personal_info: typeof data.personal_info === 'object' ? data.personal_info : {},
-        personalInfo: typeof data.personal_info === 'object' ? data.personal_info : {},
-        onboarding: typeof data.onboarding === 'object' ? data.onboarding : {},
+        personal_info: personalInfo,
+        personalInfo: personalInfo,
+        onboarding: onboardingData,
       };
 
       return userData;
@@ -61,7 +74,7 @@ const Dashboard = () => {
     return <LoadingState />;
   }
 
-  const progress = calculateProgress(user);
+  const progress = calculateProgress(user, user.onboarding?.currentPhase || 0);
 
   return (
     <div className="space-y-6">
@@ -88,10 +101,12 @@ const Dashboard = () => {
           <TabsTrigger value="files">Files</TabsTrigger>
         </TabsList>
         <TabsContent value="documents">
-          <DocumentsTab user={user} />
+          <DocumentsTab onFileUpload={(file: UserFile) => {
+            // Handle file upload
+            toast.success(`File ${file.name} uploaded successfully`);
+          }} />
         </TabsContent>
         <TabsContent value="files">
-          {/* Files tab content will be implemented later */}
           <Card>
             <CardContent className="pt-6">
               Coming soon...
