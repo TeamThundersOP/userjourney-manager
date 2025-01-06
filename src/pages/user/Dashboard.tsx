@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { LoadingState } from "@/components/user/dashboard/LoadingState";
 import { toast } from "sonner";
 import { calculateProgress } from "@/utils/onboarding";
-import { User, PersonalInfo } from "@/types/user";
+import { User } from "@/types/user";
 import OnboardingPhases from "@/components/user/dashboard/OnboardingPhases";
 
 const Dashboard = () => {
@@ -24,6 +24,7 @@ const Dashboard = () => {
         .single();
 
       if (error) {
+        console.error('Error fetching user data:', error);
         toast.error("Error fetching user data");
         throw error;
       }
@@ -31,19 +32,6 @@ const Dashboard = () => {
       if (!data) return null;
 
       // Transform the data to match the User type
-      const personalInfo = data.personal_info as PersonalInfo;
-      const onboardingData = data.onboarding as {
-        currentPhase: number;
-        phase0: any;
-        phase1: any;
-        phase2: any;
-        approvals: {
-          phase0: boolean;
-          phase1: boolean;
-          phase2: boolean;
-        };
-      };
-
       const userData: User = {
         id: data.id,
         name: data.name,
@@ -58,14 +46,15 @@ const Dashboard = () => {
         right_to_work: data.right_to_work,
         onboarding_complete: data.onboarding_complete,
         has_reset_password: data.has_reset_password,
-        personal_info: personalInfo,
-        personalInfo: personalInfo,
-        onboarding: onboardingData,
+        personal_info: data.personal_info,
+        personalInfo: data.personal_info,
+        onboarding: data.onboarding,
       };
 
       return userData;
     },
-    enabled: !!userId
+    enabled: !!userId,
+    retry: 1
   });
 
   if (isLoading || !user) {
