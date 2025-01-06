@@ -29,29 +29,31 @@ export interface PersonalInfoFormData {
   phone: string;
 }
 
+const defaultFormData: PersonalInfoFormData = {
+  familyName: '',
+  givenName: '',
+  otherNames: '',
+  nationality: '',
+  placeOfBirth: '',
+  dateOfBirth: '',
+  gender: '',
+  countryOfResidence: '',
+  passportNumber: '',
+  passportIssueDate: '',
+  passportExpiryDate: '',
+  passportPlaceOfIssue: '',
+  address: '',
+  city: '',
+  postalCode: '',
+  country: '',
+  phone: '',
+};
+
 const PersonalInfoForm = () => {
   const { userId, setHasFilledPersonalInfo } = useUserAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [formData, setFormData] = useState<PersonalInfoFormData>({
-    familyName: '',
-    givenName: '',
-    otherNames: '',
-    nationality: '',
-    placeOfBirth: '',
-    dateOfBirth: '',
-    gender: '',
-    countryOfResidence: '',
-    passportNumber: '',
-    passportIssueDate: '',
-    passportExpiryDate: '',
-    passportPlaceOfIssue: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    country: '',
-    phone: '',
-  });
+  const [formData, setFormData] = useState<PersonalInfoFormData>(defaultFormData);
   const [initialFormData, setInitialFormData] = useState<PersonalInfoFormData | null>(null);
   const [isFormChanged, setIsFormChanged] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -76,8 +78,9 @@ const PersonalInfoForm = () => {
       }
 
       if (candidate?.personal_info) {
-        setFormData(candidate.personal_info);
-        setInitialFormData(candidate.personal_info);
+        const personalInfo = candidate.personal_info as PersonalInfoFormData;
+        setFormData(personalInfo);
+        setInitialFormData(personalInfo);
       }
     };
 
