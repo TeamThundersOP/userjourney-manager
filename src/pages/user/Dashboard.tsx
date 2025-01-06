@@ -33,16 +33,46 @@ const Dashboard = () => {
 
       // Transform the data to match the User type
       const personalInfo = data.personal_info as PersonalInfo;
-      const onboardingData = data.onboarding as {
-        currentPhase: number;
-        phase0: OnboardingPhase0;
-        phase1: OnboardingPhase1;
-        phase2: OnboardingPhase2;
+      
+      // Safely type the onboarding data with proper type assertions
+      const rawOnboarding = data.onboarding as Record<string, unknown>;
+      const onboardingData = {
+        currentPhase: (rawOnboarding?.currentPhase as number) ?? 0,
+        phase0: (rawOnboarding?.phase0 as OnboardingPhase0) ?? {
+          personalDetailsCompleted: false,
+          cvSubmitted: false,
+          interviewCompleted: false,
+          jobStatus: 'pending',
+          passportUploaded: false,
+          pccUploaded: false,
+          otherDocumentsUploaded: false,
+          offerLetterSent: false,
+          cosSent: false,
+          documentsUploaded: false,
+          visaStatus: 'pending',
+          travelDetailsUpdated: false,
+          travelDocumentsUploaded: false,
+          visaCopyUploaded: false,
+          ukContactUpdated: false,
+        },
+        phase1: (rawOnboarding?.phase1 as OnboardingPhase1) ?? {
+          hmrcChecklist: false,
+          companyAgreements: false,
+          pensionScheme: false,
+          bankStatements: false,
+          vaccinationProof: false,
+        },
+        phase2: (rawOnboarding?.phase2 as OnboardingPhase2) ?? {
+          rightToWork: false,
+          shareCode: false,
+          dbs: false,
+          onboardingComplete: false,
+        },
         approvals: {
-          phase0: boolean;
-          phase1: boolean;
-          phase2: boolean;
-        };
+          phase0: (rawOnboarding?.approvals as any)?.phase0 ?? false,
+          phase1: (rawOnboarding?.approvals as any)?.phase1 ?? false,
+          phase2: (rawOnboarding?.approvals as any)?.phase2 ?? false,
+        },
       };
 
       const userData: User = {
