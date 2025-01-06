@@ -7,6 +7,7 @@ import BasicInfoSection from './BasicInfoSection';
 import AdditionalInfoSection from './AdditionalInfoSection';
 import PassportInfoSection from './PassportInfoSection';
 import ContactInfoSection from './ContactInfoSection';
+import { supabase } from "@/integrations/supabase/client";
 
 export interface PersonalInfoFormData {
   familyName: string;
@@ -53,16 +54,35 @@ const PersonalInfoForm = () => {
   });
   const [initialFormData, setInitialFormData] = useState<PersonalInfoFormData | null>(null);
   const [isFormChanged, setIsFormChanged] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const currentUser = users.find((u: any) => u.id.toString() === userId);
-    if (currentUser?.personalInfo) {
-      const personalInfo = currentUser.personalInfo;
-      setFormData(personalInfo);
-      setInitialFormData(personalInfo);
-    }
-  }, [userId]);
+    const fetchUserData = async () => {
+      if (!userId) return;
+
+      const { data: candidate, error } = await supabase
+        .from('candidates')
+        .select('personal_info')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch user data",
+        });
+        return;
+      }
+
+      if (candidate?.personal_info) {
+        setFormData(candidate.personal_info);
+        setInitialFormData(candidate.personal_info);
+      }
+    };
+
+    fetchUserData();
+  }, [userId, toast]);
 
   useEffect(() => {
     if (initialFormData) {
@@ -101,83 +121,79 @@ const PersonalInfoForm = () => {
     }
   }, [formData, initialFormData]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const updatedUsers = users.map((u: any) => {
-      if (u.id.toString() === userId) {
-        const currentOnboarding = u.onboarding || {
-          currentPhase: 0,
-          phase0: {
-            personalDetailsCompleted: false,
-            cvSubmitted: false,
-            interviewCompleted: false,
-            jobStatus: 'pending',
-            passportUploaded: false,
-            pccUploaded: false,
-            otherDocumentsUploaded: false,
-            offerLetterSent: false,
-            cosSent: false,
-            rightToWorkSent: false,
-            documentsUploaded: false,
-            visaStatus: 'pending',
-            travelDetailsUpdated: false,
-            travelDocumentsUploaded: false,
-            visaCopyUploaded: false,
-            ukContactUpdated: false
-          },
-          phase1: {
-            hmrcChecklist: false,
-            companyAgreements: false,
-            pensionScheme: false,
-            bankStatements: false,
-            vaccinationProof: false
-          },
-          phase2: {
-            rightToWork: false,
-            shareCode: false,
-            dbs: false,
-            onboardingComplete: false
-          },
-          approvals: {
-            phase0: false,
-            phase1: false,
-            phase2: false
-          }
-        };
-
-        return {
-          ...u,
-          personalInfo: {
+    try {
+      const { error } = await supabase
+        .from('candidates')
+        .update({
+          personal_info: {
             ...formData,
             fullName: `${formData.givenName} ${formData.familyName}`,
           },
-          hasFilledPersonalInfo: true,
           onboarding: {
-            ...currentOnboarding,
+            currentPhase: 0,
             phase0: {
-              ...currentOnboarding.phase0,
-              personalDetailsCompleted: true
+              personalDetailsCompleted: true,
+              cvSubmitted: false,
+              interviewCompleted: false,
+              jobStatus: 'pending',
+              passportUploaded: false,
+              pccUploaded: false,
+              otherDocumentsUploaded: false,
+              offerLetterSent: false,
+              cosSent: false,
+              documentsUploaded: false,
+              visaStatus: 'pending',
+              travelDetailsUpdated: false,
+              travelDocumentsUploaded: false,
+              visaCopyUploaded: false,
+              ukContactUpdated: false
+            },
+            phase1: {
+              hmrcChecklist: false,
+              companyAgreements: false,
+              pensionScheme: false,
+              bankStatements: false,
+              vaccinationProof: false
+            },
+            phase2: {
+              rightToWork: false,
+              shareCode: false,
+              dbs: false,
+              onboardingComplete: false
+            },
+            approvals: {
+              phase0: false,
+              phase1: false,
+              phase2: false
             }
           }
-        };
-      }
-      return u;
-    });
+        })
+        .eq('id', userId);
 
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-    localStorage.setItem('hasFilledPersonalInfo', 'true');
-    setHasFilledPersonalInfo(true);
+      if (error) throw error;
 
-    toast({
-      title: "Success",
-      description: "Personal information saved successfully",
-    });
-
-    setInitialFormData(formData);
-    setIsFormChanged(false);
-    navigate('/user/dashboard');
+      setHasFilledPersonalInfo(true);
+      toast({
+        title: "Success",
+        description: "Personal information saved successfully",
+      });
+      setInitialFormData(formData);
+      setIsFormChanged(false);
+      navigate('/user/dashboard');
+    } catch (error) {
+      console.error('Error saving personal info:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save personal information",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -187,8 +203,12 @@ const PersonalInfoForm = () => {
       <PassportInfoSection formData={formData} setFormData={setFormData} />
       <ContactInfoSection formData={formData} setFormData={setFormData} />
       
-      <Button type="submit" className="w-full" disabled={!isFormChanged}>
-        Save Information
+      <Button 
+        type="submit" 
+        className="w-full" 
+        disabled={!isFormChanged || isLoading}
+      >
+        {isLoading ? "Saving..." : "Save Information"}
       </Button>
     </form>
   );
