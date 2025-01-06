@@ -1,17 +1,15 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useUserAuth } from "@/contexts/UserAuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useUserAuth } from "@/contexts/UserAuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { PersonalInfo } from "@/types/user";
-import { Database } from "@/integrations/supabase/types";
-
-type Candidate = Database['public']['Tables']['candidates']['Row'];
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Profile = () => {
-  const navigate = useNavigate();
   const { userId } = useUserAuth();
+  const navigate = useNavigate();
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['user', userId],
@@ -24,76 +22,83 @@ const Profile = () => {
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
-      return data as Candidate;
-    }
+      if (error) {
+        console.error('Error fetching user data:', error);
+        throw error;
+      }
+
+      return data;
+    },
+    enabled: !!userId
   });
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          Loading...
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-8 w-[200px]" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton key={i} className="h-12" />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
-  const personalInfo = user?.personal_info as PersonalInfo;
-
-  if (!personalInfo) {
-    return (
-      <Card>
-        <CardContent className="text-center py-6">
-          <p className="text-gray-500 mb-4">Please complete your personal information</p>
-          <Button onClick={() => navigate('/user/personal-info')}>
-            Fill Personal Information
-          </Button>
-        </CardContent>
-      </Card>
-    );
+  if (!user) {
+    return <div>No user data found.</div>;
   }
+
+  const personalInfo = user.personal_info as PersonalInfo;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>My Profile</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h3 className="font-medium text-sm text-gray-500">Full Name</h3>
-            <p>{personalInfo.fullName}</p>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Personal Information</CardTitle>
+          <Button 
+            variant="outline"
+            onClick={() => navigate('/user/personal-info')}
+          >
+            Update Information
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="text-sm font-medium text-gray-500">Full Name</label>
+              <p className="mt-1">{personalInfo?.fullName || 'Not provided'}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Nationality</label>
+              <p className="mt-1">{personalInfo?.nationality || 'Not provided'}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Date of Birth</label>
+              <p className="mt-1">{personalInfo?.dateOfBirth || 'Not provided'}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Phone</label>
+              <p className="mt-1">{personalInfo?.phone || 'Not provided'}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Address</label>
+              <p className="mt-1">{personalInfo?.address || 'Not provided'}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Email</label>
+              <p className="mt-1">{user.email || 'Not provided'}</p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-medium text-sm text-gray-500">Email</h3>
-            <p>{user.email}</p>
-          </div>
-          <div>
-            <h3 className="font-medium text-sm text-gray-500">Nationality</h3>
-            <p>{personalInfo.nationality}</p>
-          </div>
-          <div>
-            <h3 className="font-medium text-sm text-gray-500">Date of Birth</h3>
-            <p>{personalInfo.dateOfBirth}</p>
-          </div>
-          <div>
-            <h3 className="font-medium text-sm text-gray-500">Phone</h3>
-            <p>{personalInfo.phone}</p>
-          </div>
-          <div>
-            <h3 className="font-medium text-sm text-gray-500">Address</h3>
-            <p>{personalInfo.address}</p>
-          </div>
-        </div>
-        <Button 
-          onClick={() => navigate('/user/personal-info')}
-          variant="outline"
-        >
-          Update Personal Information
-        </Button>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
