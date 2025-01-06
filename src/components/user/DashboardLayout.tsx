@@ -33,11 +33,6 @@ const DashboardLayout = () => {
     document.documentElement.classList.toggle('dark');
   };
 
-  // Check if user has filled personal info
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const currentUser = users.find((u: any) => u.id.toString() === userId);
-  const hasFilledPersonalInfo = currentUser?.hasFilledPersonalInfo;
-
   const isActive = (path: string) => {
     return location.pathname === `/user/${path}`;
   };
