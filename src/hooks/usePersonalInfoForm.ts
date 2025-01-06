@@ -74,7 +74,6 @@ export const usePersonalInfoForm = (userId: string | null) => {
             phone: String(personalInfo.phone || ''),
           };
           
-          console.log('Fetched personal info:', transformedData);
           setFormData(transformedData);
           setInitialFormData(transformedData);
         }
@@ -92,37 +91,36 @@ export const usePersonalInfoForm = (userId: string | null) => {
   }, [userId, toast]);
 
   useEffect(() => {
-    if (initialFormData) {
-      const hasChanges = Object.keys(formData).some(key => {
-        const field = key as keyof PersonalInfoFormData;
-        return formData[field] !== initialFormData[field];
-      });
-      
-      const requiredFields: (keyof PersonalInfoFormData)[] = [
-        'familyName',
-        'givenName',
-        'nationality',
-        'placeOfBirth',
-        'dateOfBirth',
-        'gender',
-        'countryOfResidence',
-        'passportNumber',
-        'passportIssueDate',
-        'passportExpiryDate',
-        'passportPlaceOfIssue',
-        'address',
-        'city',
-        'postalCode',
-        'country',
-        'phone'
-      ];
-      
-      const allRequiredFieldsFilled = requiredFields.every(field => 
-        formData[field] && formData[field].trim() !== ''
-      );
+    const hasChanges = Object.keys(formData).some(key => {
+      const field = key as keyof PersonalInfoFormData;
+      return formData[field] !== (initialFormData?.[field] || '');
+    });
+    
+    const requiredFields: (keyof PersonalInfoFormData)[] = [
+      'familyName',
+      'givenName',
+      'nationality',
+      'placeOfBirth',
+      'dateOfBirth',
+      'gender',
+      'countryOfResidence',
+      'passportNumber',
+      'passportIssueDate',
+      'passportExpiryDate',
+      'passportPlaceOfIssue',
+      'address',
+      'city',
+      'postalCode',
+      'country',
+      'phone'
+    ];
+    
+    const allRequiredFieldsFilled = requiredFields.every(field => 
+      formData[field] && formData[field].trim() !== ''
+    );
 
-      setIsFormChanged(hasChanges || !allRequiredFieldsFilled);
-    }
+    // Enable the save button if there are changes, regardless of whether all fields are filled
+    setIsFormChanged(hasChanges);
   }, [formData, initialFormData]);
 
   return {
