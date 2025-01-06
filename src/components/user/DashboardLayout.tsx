@@ -1,9 +1,10 @@
 import { useUserAuth } from '@/contexts/UserAuthContext';
 import { Button } from "@/components/ui/button";
-import { useNavigate, Outlet, useLocation, Navigate } from 'react-router-dom';
-import { Home, MessageSquare, UserRound, LogOut, Menu } from 'lucide-react';
+import { useNavigate, Outlet, useLocation } from 'react-router-dom';
+import { Home, MessageSquare, UserRound, LogOut, Menu, Sun, Moon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Toggle } from "@/components/ui/toggle";
 
 const DashboardLayout = () => {
   const { logout, userId } = useUserAuth();
@@ -11,6 +12,7 @@ const DashboardLayout = () => {
   const location = useLocation();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const isMobile = useIsMobile();
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     if (isMobile) {
@@ -20,18 +22,21 @@ const DashboardLayout = () => {
     }
   }, [isMobile]);
 
+  useEffect(() => {
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    setIsDark(isDarkMode);
+  }, []);
+
+  const toggleTheme = () => {
+    const newIsDark = !isDark;
+    setIsDark(newIsDark);
+    document.documentElement.classList.toggle('dark');
+  };
+
   // Check if user has filled personal info
   const users = JSON.parse(localStorage.getItem('users') || '[]');
   const currentUser = users.find((u: any) => u.id.toString() === userId);
   const hasFilledPersonalInfo = currentUser?.hasFilledPersonalInfo;
-
-  // Only redirect to personal-info if the user hasn't filled it and is trying to access profile
-  const shouldRedirectToPersonalInfo = !hasFilledPersonalInfo && 
-    location.pathname === '/user/profile';
-
-  if (shouldRedirectToPersonalInfo) {
-    return <Navigate to="/user/personal-info" />;
-  }
 
   const isActive = (path: string) => {
     return location.pathname === `/user/${path}`;
@@ -42,33 +47,50 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background">
       {/* Fixed Navbar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
-        <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
-          <div className="flex items-center space-x-3">
-            <img 
-              src="/lovable-uploads/17a49967-e711-4d5a-b8fe-fb02e4469a2a.png" 
-              alt="Funelli Logo" 
-              className="h-8 w-auto"
-            />
-            <span className="text-xl font-bold font-araboto-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Funelli
-            </span>
-          </div>
-          <div className="flex items-center space-x-2">
-            {isMobile && (
-              <Button variant="ghost" size="icon" onClick={toggleSidebar}>
-                <Menu className="h-5 w-5" />
-              </Button>
-            )}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo and Brand */}
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/lovable-uploads/17a49967-e711-4d5a-b8fe-fb02e4469a2a.png" 
+                alt="Funelli Logo" 
+                className="h-8 w-auto"
+              />
+              <span className="text-xl font-bold font-araboto-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Funelli
+              </span>
+            </div>
+
+            {/* Right side actions */}
+            <div className="flex items-center space-x-4">
+              <Toggle 
+                pressed={isDark}
+                onPressedChange={toggleTheme}
+                aria-label="Toggle theme"
+              >
+                {isDark ? (
+                  <Moon className="h-4 w-4" />
+                ) : (
+                  <Sun className="h-4 w-4" />
+                )}
+              </Toggle>
+
+              {isMobile && (
+                <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+                  <Menu className="h-5 w-5" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </nav>
 
       {/* Sidebar */}
       <aside 
-        className={`fixed left-0 top-[64px] h-[calc(100vh-64px)] w-64 bg-white dark:bg-gray-800 shadow-lg border-r border-gray-100 dark:border-gray-700 transition-transform duration-200 z-40 ${
+        className={`fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-white dark:bg-gray-800 shadow-lg border-r border-gray-100 dark:border-gray-700 transition-transform duration-200 z-40 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0`}
       >
@@ -128,7 +150,7 @@ const DashboardLayout = () => {
       <main 
         className={`flex-1 min-h-screen transition-all duration-200 ${
           isSidebarOpen ? 'md:ml-64' : ''
-        } pt-[64px] p-4 md:p-8`}
+        } pt-16 p-4 md:p-8`}
       >
         <div className="max-w-7xl mx-auto">
           <Outlet />
