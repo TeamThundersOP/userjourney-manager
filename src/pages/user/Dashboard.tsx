@@ -1,13 +1,10 @@
 import { useUserAuth } from "@/contexts/UserAuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { DocumentsTab } from "@/components/user/dashboard/DocumentsTab";
 import { LoadingState } from "@/components/user/dashboard/LoadingState";
 import { toast } from "sonner";
-import { UserFile } from "@/types/userFile";
 import { calculateProgress } from "@/utils/onboarding";
 import { User, PersonalInfo } from "@/types/user";
 import OnboardingPhases from "@/components/user/dashboard/OnboardingPhases";
@@ -97,25 +94,6 @@ const Dashboard = () => {
       </Card>
 
       <OnboardingPhases user={user} />
-
-      <Tabs defaultValue="documents">
-        <TabsList>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="files">Files</TabsTrigger>
-        </TabsList>
-        <TabsContent value="documents">
-          <DocumentsTab onFileUpload={(file: UserFile) => {
-            toast.success(`File ${file.name} uploaded successfully`);
-          }} />
-        </TabsContent>
-        <TabsContent value="files">
-          <Card>
-            <CardContent className="pt-6">
-              Coming soon...
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
     </div>
   );
 };
