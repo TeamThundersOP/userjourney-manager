@@ -20,10 +20,7 @@ const Dashboard = () => {
     const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
     localStorage.setItem('userFiles', JSON.stringify([...existingFiles, file]));
 
-    toast({
-      title: "Success",
-      description: "File uploaded successfully"
-    });
+    toast("File uploaded successfully");
   };
 
   if (isLoading || !user) {

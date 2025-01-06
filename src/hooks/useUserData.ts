@@ -25,11 +25,7 @@ export const useUserData = (userId: string | null) => {
 
         if (error) {
           console.error('Error fetching user:', error);
-          toast({
-            title: "Error",
-            description: "Failed to fetch user data",
-            variant: "destructive",
-          });
+          toast("Failed to fetch user data");
           return;
         }
 
@@ -104,11 +100,7 @@ export const useUserData = (userId: string | null) => {
         }
       } catch (error) {
         console.error('Error in fetchUser:', error);
-        toast({
-          title: "Error",
-          description: "An unexpected error occurred",
-          variant: "destructive",
-        });
+        toast("An unexpected error occurred");
       } finally {
         setIsLoading(false);
       }
