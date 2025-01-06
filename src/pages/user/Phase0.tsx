@@ -4,6 +4,7 @@ import Phase0Onboarding from "@/components/user/onboarding/Phase0Onboarding";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { Json } from "@/integrations/supabase/types";
 
 const Phase0Page = () => {
   const { userId } = useUserAuth();
@@ -12,16 +13,18 @@ const Phase0Page = () => {
 
   const handleSave = async (formData: any) => {
     try {
+      const updatedOnboarding = {
+        ...user?.onboarding,
+        phase0: {
+          ...user?.onboarding?.phase0,
+          ...formData
+        }
+      };
+
       const { error } = await supabase
         .from('candidates')
         .update({
-          onboarding: {
-            ...user?.onboarding,
-            phase0: {
-              ...user?.onboarding?.phase0,
-              ...formData
-            }
-          }
+          onboarding: updatedOnboarding as Json
         })
         .eq('id', userId);
 
