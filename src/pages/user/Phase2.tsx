@@ -24,7 +24,7 @@ const Phase2Page = () => {
       const { error } = await supabase
         .from('candidates')
         .update({
-          onboarding: updatedOnboarding as Json
+          onboarding: JSON.parse(JSON.stringify(updatedOnboarding)) as Json
         })
         .eq('id', userId);
 
