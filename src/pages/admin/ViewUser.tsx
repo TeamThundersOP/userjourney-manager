@@ -7,106 +7,72 @@ import ProgressStatus from '@/components/admin/user/ProgressStatus';
 import UserFiles from '@/components/admin/UserFiles';
 import { ReportsTable } from '@/components/admin/reports/ReportsTable';
 import { User } from '@/types/user';
-
-const mockUser: User = {
-  id: "1",
-  name: "John Doe",
-  username: "johndoe",
-  email: "user1@example.com",
-  status: "Active",
-  personal_info: {
-    fullName: "John Doe",
-    nationality: "British",
-    dateOfBirth: "1990-01-01",
-    gender: "Male",
-    passportNumber: "123456789",
-    address: "123 Main St",
-    city: "London",
-    postalCode: "SW1A 1AA",
-    country: "United Kingdom",
-    phone: "+44 123 456 7890"
-  },
-  personalInfo: {
-    fullName: "John Doe",
-    nationality: "British",
-    dateOfBirth: "1990-01-01",
-    gender: "Male",
-    passportNumber: "123456789",
-    address: "123 Main St",
-    city: "London",
-    postalCode: "SW1A 1AA",
-    country: "United Kingdom",
-    phone: "+44 123 456 7890"
-  },
-  onboarding: {
-    currentPhase: 0,
-    phase0: {
-      personalDetailsCompleted: false,
-      cvSubmitted: false,
-      interviewCompleted: false,
-      jobStatus: 'pending',
-      passportUploaded: false,
-      pccUploaded: false,
-      otherDocumentsUploaded: false,
-      offerLetterSent: false,
-      cosSent: false,
-      documentsUploaded: false,
-      visaStatus: 'pending',
-      travelDetailsUpdated: false,
-      travelDocumentsUploaded: false,
-      visaCopyUploaded: false,
-      ukContactUpdated: false
-    },
-    phase1: {
-      hmrcChecklist: false,
-      companyAgreements: false,
-      pensionScheme: false,
-      bankStatements: false,
-      vaccinationProof: false
-    },
-    phase2: {
-      rightToWork: false,
-      shareCode: false,
-      dbs: false,
-      onboardingComplete: false
-    },
-    approvals: {
-      phase0: false,
-      phase1: false,
-      phase2: false
-    }
-  }
-};
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const fetchUser = async (userId: string): Promise<User> => {
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const user = users.find((u: User) => String(u.id) === userId);
-  
+  const { data: user, error } = await supabase
+    .from('candidates')
+    .select('*')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching user:', error);
+    toast.error('Failed to fetch user details');
+    throw error;
+  }
+
   if (!user) {
-    return mockUser;
+    toast.error('User not found');
+    throw new Error('User not found');
   }
-  
-  if (!user.onboarding) {
-    user.onboarding = mockUser.onboarding;
-  }
-  
+
+  // Transform the data to match our User type
   return {
-    ...mockUser,
-    ...user,
-    onboarding: {
-      ...mockUser.onboarding,
-      ...user.onboarding,
+    id: user.id,
+    name: user.name || '',
+    username: user.username || '',
+    email: user.email || '',
+    status: user.status || 'pending',
+    personal_info: user.personal_info,
+    personalInfo: user.personal_info, // Alias for frontend compatibility
+    onboarding: user.onboarding || {
+      currentPhase: 0,
       phase0: {
-        ...mockUser.onboarding.phase0,
-        ...user.onboarding?.phase0
+        personalDetailsCompleted: false,
+        cvSubmitted: false,
+        interviewCompleted: false,
+        jobStatus: 'pending',
+        passportUploaded: false,
+        pccUploaded: false,
+        otherDocumentsUploaded: false,
+        offerLetterSent: false,
+        cosSent: false,
+        documentsUploaded: false,
+        visaStatus: 'pending',
+        travelDetailsUpdated: false,
+        travelDocumentsUploaded: false,
+        visaCopyUploaded: false,
+        ukContactUpdated: false
       },
       phase1: {
-        ...mockUser.onboarding.phase1,
-        ...user.onboarding?.phase1
+        hmrcChecklist: false,
+        companyAgreements: false,
+        pensionScheme: false,
+        bankStatements: false,
+        vaccinationProof: false
       },
       phase2: {
-        ...mockUser.onboarding.phase2,
-        ...user.onboarding?.phase2
+        rightToWork: false,
+        shareCode: false,
+        dbs: false,
+        onboardingComplete: false
+      },
+      approvals: {
+        phase0: false,
+        phase1: false,
+        phase2: false
       }
     }
   };
@@ -123,7 +89,9 @@ const ViewUser = () => {
 
   const { data: reports } = useQuery({
     queryKey: ['reports', userId, user?.email],
-    queryFn: () => {
+    queryFn: async () => {
+      // For now, we'll keep using localStorage for reports
+      // This can be updated later when we add reports to the database
       const allReports = JSON.parse(localStorage.getItem('userReports') || '[]');
       return allReports.filter((report: any) => 
         String(report.userId) === userId || 
