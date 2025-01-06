@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
     })
 
     if (createError) {
-      console.error('Error creating user:', createError)
+      console.error('Error creating auth user:', createError)
       return new Response(
         JSON.stringify({ error: createError.message }),
         {
@@ -65,13 +65,12 @@ Deno.serve(async (req) => {
     const generateUniqueUsername = async () => {
       const baseUsername = email.split('@')[0].toLowerCase()
       let counter = 0
-      const maxAttempts = 10 // Prevent infinite loops
+      const maxAttempts = 10
       
       while (counter < maxAttempts) {
         const timestamp = Date.now().toString().slice(-6)
         const username = counter === 0 ? baseUsername : `${baseUsername}${timestamp}`
         
-        // Check if username exists
         const { data: existingUser, error: checkError } = await supabaseClient
           .from('candidates')
           .select('username')
@@ -97,14 +96,17 @@ Deno.serve(async (req) => {
       const username = await generateUniqueUsername()
       console.log('Generated unique username:', username)
 
+      // Create the candidate record
       const { error: insertError } = await supabaseClient
         .from('candidates')
         .insert([
           {
             id: userData.user.id,
-            name: email.split('@')[0], // Use part before @ as name
+            name: email.split('@')[0],
             username: username,
-            email: email,
+            email: email.toLowerCase().trim(),
+            has_reset_password: false,
+            status: 'pending',
           }
         ])
 
