@@ -66,10 +66,38 @@ const PersonalInfoForm = () => {
 
   useEffect(() => {
     if (initialFormData) {
-      const hasChanges = Object.keys(formData).some(
-        key => formData[key as keyof PersonalInfoFormData] !== initialFormData[key as keyof PersonalInfoFormData]
+      // Check if any field has been changed from its initial value
+      const hasChanges = Object.keys(formData).some(key => {
+        const field = key as keyof PersonalInfoFormData;
+        return formData[field] !== initialFormData[field];
+      });
+      
+      // Also check if all required fields are filled
+      const requiredFields: (keyof PersonalInfoFormData)[] = [
+        'familyName',
+        'givenName',
+        'nationality',
+        'placeOfBirth',
+        'dateOfBirth',
+        'gender',
+        'countryOfResidence',
+        'passportNumber',
+        'passportIssueDate',
+        'passportExpiryDate',
+        'passportPlaceOfIssue',
+        'address',
+        'city',
+        'postalCode',
+        'country',
+        'phone'
+      ];
+      
+      const allRequiredFieldsFilled = requiredFields.every(field => 
+        formData[field] && formData[field].trim() !== ''
       );
-      setIsFormChanged(hasChanges);
+
+      // Enable the button if either there are changes or all required fields are filled
+      setIsFormChanged(hasChanges || allRequiredFieldsFilled);
     }
   }, [formData, initialFormData]);
 
