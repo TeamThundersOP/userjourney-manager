@@ -4,6 +4,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { User, PersonalInfo, OnboardingPhase0, OnboardingPhase1, OnboardingPhase2 } from "@/types/user";
 import { Tables } from "@/integrations/supabase/types";
 
+interface OnboardingData {
+  currentPhase: number;
+  phase0: OnboardingPhase0;
+  phase1: OnboardingPhase1;
+  phase2: OnboardingPhase2;
+  approvals: {
+    phase0: boolean;
+    phase1: boolean;
+    phase2: boolean;
+  };
+}
+
 export const transformUserData = (candidate: Tables<'candidates'>): User => {
   // Transform personal_info
   const personalInfo = candidate.personal_info as Record<string, unknown>;
@@ -28,50 +40,49 @@ export const transformUserData = (candidate: Tables<'candidates'>): User => {
     phone: String(personalInfo?.phone || ''),
   };
 
-  // Transform onboarding data
-  const defaultPhase0: OnboardingPhase0 = {
-    personalDetailsCompleted: false,
-    cvSubmitted: false,
-    interviewCompleted: false,
-    jobStatus: 'pending',
-    passportUploaded: false,
-    pccUploaded: false,
-    otherDocumentsUploaded: false,
-    offerLetterSent: false,
-    cosSent: false,
-    documentsUploaded: false,
-    visaStatus: 'pending',
-    travelDetailsUpdated: false,
-    travelDocumentsUploaded: false,
-    visaCopyUploaded: false,
-    ukContactUpdated: false,
-  };
-
-  const defaultPhase1: OnboardingPhase1 = {
-    hmrcChecklist: false,
-    companyAgreements: false,
-    pensionScheme: false,
-    bankStatements: false,
-    vaccinationProof: false,
-  };
-
-  const defaultPhase2: OnboardingPhase2 = {
-    rightToWork: false,
-    shareCode: false,
-    dbs: false,
-    onboardingComplete: false,
-  };
-
+  // Transform onboarding data with proper type assertion
   const onboardingData = candidate.onboarding as Record<string, unknown>;
-  const transformedOnboarding = {
+  const transformedOnboarding: OnboardingData = {
     currentPhase: Number(onboardingData?.currentPhase ?? 0),
-    phase0: { ...defaultPhase0, ...(onboardingData?.phase0 as Partial<OnboardingPhase0> ?? {}) },
-    phase1: { ...defaultPhase1, ...(onboardingData?.phase1 as Partial<OnboardingPhase1> ?? {}) },
-    phase2: { ...defaultPhase2, ...(onboardingData?.phase2 as Partial<OnboardingPhase2> ?? {}) },
+    phase0: {
+      personalDetailsCompleted: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.personalDetailsCompleted ?? false),
+      cvSubmitted: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.cvSubmitted ?? false),
+      interviewCompleted: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.interviewCompleted ?? false),
+      jobStatus: String((onboardingData?.phase0 as Record<string, unknown>)?.jobStatus ?? 'pending') as 'pending' | 'accepted' | 'rejected',
+      passportUploaded: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.passportUploaded ?? false),
+      pccUploaded: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.pccUploaded ?? false),
+      otherDocumentsUploaded: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.otherDocumentsUploaded ?? false),
+      offerLetterSent: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.offerLetterSent ?? false),
+      cosSent: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.cosSent ?? false),
+      documentsUploaded: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.documentsUploaded ?? false),
+      visaStatus: String((onboardingData?.phase0 as Record<string, unknown>)?.visaStatus ?? 'pending') as 'pending' | 'approved' | 'rejected',
+      travelDetailsUpdated: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.travelDetailsUpdated ?? false),
+      travelDocumentsUploaded: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.travelDocumentsUploaded ?? false),
+      visaCopyUploaded: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.visaCopyUploaded ?? false),
+      ukContactUpdated: Boolean((onboardingData?.phase0 as Record<string, unknown>)?.ukContactUpdated ?? false),
+      ukContactNumber: String((onboardingData?.phase0 as Record<string, unknown>)?.ukContactNumber ?? ''),
+      ukAddress: String((onboardingData?.phase0 as Record<string, unknown>)?.ukAddress ?? ''),
+      feedback: String((onboardingData?.phase0 as Record<string, unknown>)?.feedback ?? ''),
+    },
+    phase1: {
+      hmrcChecklist: Boolean((onboardingData?.phase1 as Record<string, unknown>)?.hmrcChecklist ?? false),
+      companyAgreements: Boolean((onboardingData?.phase1 as Record<string, unknown>)?.companyAgreements ?? false),
+      pensionScheme: Boolean((onboardingData?.phase1 as Record<string, unknown>)?.pensionScheme ?? false),
+      bankStatements: Boolean((onboardingData?.phase1 as Record<string, unknown>)?.bankStatements ?? false),
+      vaccinationProof: Boolean((onboardingData?.phase1 as Record<string, unknown>)?.vaccinationProof ?? false),
+      feedback: String((onboardingData?.phase1 as Record<string, unknown>)?.feedback ?? ''),
+    },
+    phase2: {
+      rightToWork: Boolean((onboardingData?.phase2 as Record<string, unknown>)?.rightToWork ?? false),
+      shareCode: Boolean((onboardingData?.phase2 as Record<string, unknown>)?.shareCode ?? false),
+      dbs: Boolean((onboardingData?.phase2 as Record<string, unknown>)?.dbs ?? false),
+      onboardingComplete: Boolean((onboardingData?.phase2 as Record<string, unknown>)?.onboardingComplete ?? false),
+      feedback: String((onboardingData?.phase2 as Record<string, unknown>)?.feedback ?? ''),
+    },
     approvals: {
-      phase0: Boolean(onboardingData?.approvals?.phase0 ?? false),
-      phase1: Boolean(onboardingData?.approvals?.phase1 ?? false),
-      phase2: Boolean(onboardingData?.approvals?.phase2 ?? false),
+      phase0: Boolean((onboardingData?.approvals as Record<string, unknown>)?.phase0 ?? false),
+      phase1: Boolean((onboardingData?.approvals as Record<string, unknown>)?.phase1 ?? false),
+      phase2: Boolean((onboardingData?.approvals as Record<string, unknown>)?.phase2 ?? false),
     },
   };
 
