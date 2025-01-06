@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { signInUser, signUpUser, getErrorMessage } from '@/utils/auth';
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from 'react-router-dom';
 
 interface LoginFormProps {
   onSuccess: () => void;
@@ -13,6 +15,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,15 +27,76 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       
       // First try to sign in
       try {
-        await signInUser(normalizedEmail, password);
-        onSuccess();
+        const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password: password,
+        });
+
+        if (signInError) throw signInError;
+
+        // Check if user exists in candidates table and their password reset status
+        const { data: candidate, error: candidateError } = await supabase
+          .from('candidates')
+          .select('has_reset_password, id')
+          .eq('email', normalizedEmail)
+          .single();
+
+        if (candidateError) {
+          console.error('Error fetching candidate:', candidateError);
+          throw new Error('Failed to fetch user data');
+        }
+
+        // Store auth state
+        localStorage.setItem('userAuth', 'true');
+        localStorage.setItem('userId', candidate.id);
+
+        if (!candidate.has_reset_password) {
+          // First time login - redirect to reset password
+          navigate('/user/reset-password');
+          toast({
+            title: "Welcome!",
+            description: "Please reset your password to continue.",
+          });
+        } else {
+          // Regular login - proceed to dashboard
+          onSuccess();
+        }
       } catch (signInError: any) {
         // If login fails, try to sign up
         if (signInError.status === 400) {
-          await signUpUser(normalizedEmail, password);
-          // Try signing in again after successful signup
-          await signInUser(normalizedEmail, password);
-          onSuccess();
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email: normalizedEmail,
+            password: password,
+          });
+
+          if (signUpError) throw signUpError;
+
+          // Create candidate record
+          const { data: candidate, error: insertError } = await supabase
+            .from('candidates')
+            .insert([
+              { 
+                email: normalizedEmail,
+                has_reset_password: false,
+                name: email.split('@')[0], // Use email prefix as initial name
+                username: email.split('@')[0], // Use email prefix as initial username
+              }
+            ])
+            .select()
+            .single();
+
+          if (insertError) throw insertError;
+
+          // Store auth state
+          localStorage.setItem('userAuth', 'true');
+          localStorage.setItem('userId', candidate.id);
+
+          // Redirect to reset password for first-time users
+          navigate('/user/reset-password');
+          toast({
+            title: "Welcome!",
+            description: "Please reset your password to continue.",
+          });
         } else {
           throw signInError;
         }
