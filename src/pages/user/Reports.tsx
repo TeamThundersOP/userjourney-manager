@@ -20,7 +20,7 @@ const Reports = () => {
   const [type, setType] = useState("");
   const queryClient = useQueryClient();
 
-  const { data: userReports, isLoading } = useQuery({
+  const { data: userReports = [], isLoading } = useQuery({
     queryKey: ['userReports', userId],
     queryFn: async () => {
       if (!userId) return [];
@@ -35,7 +35,7 @@ const Reports = () => {
         throw error;
       }
 
-      return data as Report[];
+      return (data || []) as Report[];
     },
     enabled: !!userId
   });
@@ -44,14 +44,16 @@ const Reports = () => {
     mutationFn: async (reportData: { type: string; description: string }) => {
       if (!userId) throw new Error("User not authenticated");
 
+      const newReport = {
+        user_id: userId,
+        type: reportData.type,
+        description: reportData.description,
+        status: 'Pending'
+      };
+
       const { data, error } = await supabase
         .from('reports')
-        .insert([{
-          user_id: userId,
-          type: reportData.type,
-          description: reportData.description,
-          status: 'Pending'
-        }])
+        .insert([newReport])
         .select()
         .single();
 
