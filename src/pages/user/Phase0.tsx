@@ -1,13 +1,13 @@
 import { useUserData } from "@/hooks/useUserData";
-import { useAuth } from "@/contexts/UserAuthContext";
+import { useUserAuth } from "@/contexts/UserAuthContext";
 import Phase0Onboarding from "@/components/user/onboarding/Phase0Onboarding";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
 const Phase0Page = () => {
-  const { session } = useAuth();
-  const { user, isLoading } = useUserData(session?.user?.id || null);
+  const { userId } = useUserAuth();
+  const { user, isLoading } = useUserData(userId);
   const navigate = useNavigate();
 
   const handleSave = async (formData: any) => {
@@ -23,7 +23,7 @@ const Phase0Page = () => {
             }
           }
         })
-        .eq('id', session?.user?.id);
+        .eq('id', userId);
 
       if (error) throw error;
       toast.success("Progress saved successfully");

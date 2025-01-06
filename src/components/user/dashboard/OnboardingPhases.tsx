@@ -61,7 +61,7 @@ const OnboardingPhases = ({ user }: OnboardingPhasesProps) => {
         </div>
 
         <div className="flex justify-between items-center">
-          <Badge variant={isApproved ? "success" : "secondary"}>
+          <Badge variant={isApproved ? "default" : "secondary"} className={isApproved ? "bg-green-500" : ""}>
             {isApproved ? "Approved" : "Pending Approval"}
           </Badge>
           <Button
