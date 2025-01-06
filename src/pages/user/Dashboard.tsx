@@ -8,9 +8,10 @@ import { LoadingState } from "@/components/user/dashboard/LoadingState";
 import { useUserData } from "@/hooks/useUserData";
 import { toast } from "sonner";
 import { UserFile } from "@/types/userFile";
+import { calculateProgress } from "@/utils/onboarding";
 
 const Dashboard = () => {
-  const { userId, setHasFilledPersonalInfo } = useUserAuth();
+  const { userId } = useUserAuth();
   const { user, isLoading } = useUserData(userId);
 
   const handleFileUpload = (file: UserFile) => {
@@ -27,14 +28,11 @@ const Dashboard = () => {
     return <LoadingState />;
   }
 
-  const phase0Progress = user.onboarding?.phase0 
-    ? Object.values(user.onboarding.phase0).filter(value => value === true).length / 
-      Object.values(user.onboarding.phase0).filter(value => typeof value === 'boolean').length * 100
-    : 0;
+  const progress = calculateProgress(user, 0); // Calculate progress for phase 0
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <ProgressCard userName={user.name} progress={phase0Progress} />
+      <ProgressCard userName={user.name} progress={progress} />
 
       <Tabs defaultValue="personal-info">
         <TabsList className="grid w-full grid-cols-3">
