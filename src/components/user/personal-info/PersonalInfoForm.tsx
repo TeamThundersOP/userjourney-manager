@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '@/contexts/UserAuthContext';
 import { useToast } from "@/components/ui/use-toast";
@@ -8,6 +7,7 @@ import AdditionalInfoSection from './AdditionalInfoSection';
 import PassportInfoSection from './PassportInfoSection';
 import ContactInfoSection from './ContactInfoSection';
 import { supabase } from "@/integrations/supabase/client";
+import { usePersonalInfoForm } from '@/hooks/usePersonalInfoForm';
 
 export interface PersonalInfoFormData {
   familyName: string;
@@ -29,100 +29,19 @@ export interface PersonalInfoFormData {
   phone: string;
 }
 
-const defaultFormData: PersonalInfoFormData = {
-  familyName: '',
-  givenName: '',
-  otherNames: '',
-  nationality: '',
-  placeOfBirth: '',
-  dateOfBirth: '',
-  gender: '',
-  countryOfResidence: '',
-  passportNumber: '',
-  passportIssueDate: '',
-  passportExpiryDate: '',
-  passportPlaceOfIssue: '',
-  address: '',
-  city: '',
-  postalCode: '',
-  country: '',
-  phone: '',
-};
-
 const PersonalInfoForm = () => {
   const { userId, setHasFilledPersonalInfo } = useUserAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [formData, setFormData] = useState<PersonalInfoFormData>(defaultFormData);
-  const [initialFormData, setInitialFormData] = useState<PersonalInfoFormData | null>(null);
-  const [isFormChanged, setIsFormChanged] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!userId) return;
-
-      const { data: candidate, error } = await supabase
-        .from('candidates')
-        .select('personal_info')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user data:', error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch user data",
-        });
-        return;
-      }
-
-      if (candidate?.personal_info) {
-        const personalInfo = candidate.personal_info as PersonalInfoFormData;
-        setFormData(personalInfo);
-        setInitialFormData(personalInfo);
-      }
-    };
-
-    fetchUserData();
-  }, [userId, toast]);
-
-  useEffect(() => {
-    if (initialFormData) {
-      // Check if any field has been changed from its initial value
-      const hasChanges = Object.keys(formData).some(key => {
-        const field = key as keyof PersonalInfoFormData;
-        return formData[field] !== initialFormData[field];
-      });
-      
-      // Also check if all required fields are filled
-      const requiredFields: (keyof PersonalInfoFormData)[] = [
-        'familyName',
-        'givenName',
-        'nationality',
-        'placeOfBirth',
-        'dateOfBirth',
-        'gender',
-        'countryOfResidence',
-        'passportNumber',
-        'passportIssueDate',
-        'passportExpiryDate',
-        'passportPlaceOfIssue',
-        'address',
-        'city',
-        'postalCode',
-        'country',
-        'phone'
-      ];
-      
-      const allRequiredFieldsFilled = requiredFields.every(field => 
-        formData[field] && formData[field].trim() !== ''
-      );
-
-      // Enable the button if either there are changes or all required fields are filled
-      setIsFormChanged(hasChanges || allRequiredFieldsFilled);
-    }
-  }, [formData, initialFormData]);
+  const {
+    formData,
+    setFormData,
+    isFormChanged,
+    isLoading,
+    setIsLoading,
+    initialFormData,
+    setInitialFormData,
+  } = usePersonalInfoForm(userId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -185,7 +104,6 @@ const PersonalInfoForm = () => {
         description: "Personal information saved successfully",
       });
       setInitialFormData(formData);
-      setIsFormChanged(false);
       navigate('/user/dashboard');
     } catch (error) {
       console.error('Error saving personal info:', error);
