@@ -25,7 +25,7 @@ const UserLogin = () => {
       // First check if the email exists in the candidates table
       const { data: candidate, error: candidateError } = await supabase
         .from('candidates')
-        .select('*')
+        .select('has_reset_password')
         .eq('email', normalizedEmail)
         .maybeSingle();
 
@@ -72,26 +72,9 @@ const UserLogin = () => {
       if (data.user) {
         console.log('Login successful, checking password reset status');
         
-        // Fetch the latest candidate data to check password reset status
-        const { data: updatedCandidate, error: fetchError } = await supabase
-          .from('candidates')
-          .select('has_reset_password')
-          .eq('email', normalizedEmail)
-          .maybeSingle();
-
-        if (fetchError) {
-          console.error('Error fetching updated candidate status:', fetchError);
-          toast({
-            title: "Error",
-            description: "An error occurred while checking your account status.",
-            variant: "destructive",
-          });
-          return;
-        }
-
         // Check if the user has reset their password
-        if (!updatedCandidate?.has_reset_password) {
-          console.log('First time login detected, redirecting to password reset');
+        if (!candidate.has_reset_password) {
+          console.log('Password not reset, redirecting to reset page');
           toast({
             title: "Welcome!",
             description: "Please reset your password for security.",
@@ -99,7 +82,7 @@ const UserLogin = () => {
           navigate('/user/reset-password');
         } else {
           // If password has been reset, go directly to dashboard
-          console.log('Regular login, redirecting to dashboard');
+          console.log('Password already reset, redirecting to dashboard');
           toast({
             title: "Success",
             description: "Logged in successfully",
