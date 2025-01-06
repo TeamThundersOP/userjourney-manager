@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useUserAuth } from "@/contexts/UserAuthContext";
 import {
   Select,
   SelectContent,
@@ -9,59 +10,83 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Reports = () => {
+  const { userId } = useUserAuth();
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
+  const queryClient = useQueryClient();
 
-  const { data: userReports, refetch } = useQuery({
-    queryKey: ['userReports'],
-    queryFn: () => {
-      const reports = JSON.parse(localStorage.getItem('userReports') || '[]');
-      return reports;
+  const { data: userReports, isLoading } = useQuery({
+    queryKey: ['userReports', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('reports')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        toast.error("Error fetching reports");
+        throw error;
+      }
+
+      return data || [];
     },
+    enabled: !!userId
+  });
+
+  const submitReport = useMutation({
+    mutationFn: async (reportData: { type: string; description: string }) => {
+      if (!userId) throw new Error("User not authenticated");
+
+      const { data, error } = await supabase
+        .from('reports')
+        .insert([{
+          user_id: userId,
+          type: reportData.type,
+          description: reportData.description,
+          status: 'Pending'
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Report submitted successfully");
+      setDescription("");
+      setType("");
+      queryClient.invalidateQueries({ queryKey: ['userReports', userId] });
+    },
+    onError: () => {
+      toast.error("Failed to submit report");
+    }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!type) {
-      toast.error("Please select a report type.");
+      toast.error("Please select a report type");
       return;
     }
 
     if (!description.trim()) {
-      toast.error("Please provide a description.");
+      toast.error("Please provide a description");
       return;
     }
 
-    // Get existing reports
-    const existingReports = JSON.parse(localStorage.getItem('userReports') || '[]');
-    
-    // Create new report
-    const newReport = {
-      id: Date.now(),
-      type,
-      status: 'Pending',
-      date: new Date().toISOString().split('T')[0],
-      sender: localStorage.getItem('userEmail') || 'user@example.com',
-      description: description.trim()
-    };
-
-    // Save to localStorage
-    localStorage.setItem('userReports', JSON.stringify([...existingReports, newReport]));
-
-    // Show success message
-    toast.success("Report submitted successfully");
-    
-    // Reset form
-    setDescription("");
-    setType("");
-    
-    // Refetch reports
-    refetch();
+    submitReport.mutate({ type, description });
   };
+
+  if (!userId) {
+    return null;
+  }
 
   return (
     <div className="space-y-6">
@@ -100,7 +125,12 @@ const Reports = () => {
                 required
               />
             </div>
-            <Button type="submit">Submit Report</Button>
+            <Button 
+              type="submit" 
+              disabled={submitReport.isPending}
+            >
+              {submitReport.isPending ? 'Submitting...' : 'Submit Report'}
+            </Button>
           </form>
         </CardContent>
       </Card>
@@ -120,7 +150,9 @@ const Reports = () => {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-medium">{report.type}</h3>
-                      <p className="text-sm text-gray-500">{report.date}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(report.created_at).toLocaleDateString()}
+                      </p>
                     </div>
                     <span className={`px-2 py-1 text-sm rounded-full ${
                       report.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :

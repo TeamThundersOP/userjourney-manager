@@ -5,18 +5,38 @@ import PersonalInfoForm from "@/components/user/personal-info/PersonalInfoForm";
 import { ProgressCard } from "@/components/user/dashboard/ProgressCard";
 import { DocumentsTab } from "@/components/user/dashboard/DocumentsTab";
 import { LoadingState } from "@/components/user/dashboard/LoadingState";
-import { useUserData } from "@/hooks/useUserData";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { UserFile } from "@/types/userFile";
 import { calculateProgress } from "@/utils/onboarding";
 
 const Dashboard = () => {
   const { userId } = useUserAuth();
-  const { user, isLoading } = useUserData(userId);
+
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: async () => {
+      if (!userId) return null;
+      const { data, error } = await supabase
+        .from('candidates')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        toast.error("Error fetching user data");
+        throw error;
+      }
+
+      return data;
+    },
+    enabled: !!userId
+  });
 
   const handleFileUpload = (file: UserFile) => {
     if (!user) return;
-    toast("File uploaded successfully");
+    toast.success("File uploaded successfully");
   };
 
   if (isLoading || !user) {
