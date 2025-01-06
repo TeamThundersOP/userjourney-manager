@@ -23,11 +23,13 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
     setIsLoading(true);
     
     try {
+      const normalizedEmail = email.toLowerCase().trim();
+      
       // First check if email already exists in candidates table
       const { data: existingUsers, error: queryError } = await supabase
         .from('candidates')
         .select('email')
-        .eq('email', email)
+        .ilike('email', normalizedEmail)
         .maybeSingle();
 
       if (queryError) {
@@ -51,14 +53,29 @@ const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
 
       // Call the edge function to create the user
       const response = await supabase.functions.invoke('create-user', {
-        body: { email, password }
+        body: { 
+          email: normalizedEmail,
+          password 
+        }
       });
 
       if (response.error) {
+        console.error('Error response from create-user function:', response.error);
         const errorData = JSON.parse(response.error.message);
         toast({
           title: "Error",
           description: errorData.message || "Failed to create user. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Verify the response contains the necessary data
+      if (!response.data?.user?.id) {
+        console.error('Invalid response from create-user function:', response);
+        toast({
+          title: "Error",
+          description: "Failed to create user properly. Please try again.",
           variant: "destructive",
         });
         return;
