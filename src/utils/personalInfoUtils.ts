@@ -6,23 +6,25 @@ export const transformPersonalInfo = (data: Json): PersonalInfoFormData => {
     throw new Error('Invalid personal info data');
   }
 
+  const personalInfo = data as Record<string, Json>;
+  
   return {
-    familyName: (data.familyName as string) || '',
-    givenName: (data.givenName as string) || '',
-    otherNames: (data.otherNames as string) || '',
-    nationality: (data.nationality as string) || '',
-    placeOfBirth: (data.placeOfBirth as string) || '',
-    dateOfBirth: (data.dateOfBirth as string) || '',
-    gender: (data.gender as string) || '',
-    countryOfResidence: (data.countryOfResidence as string) || '',
-    passportNumber: (data.passportNumber as string) || '',
-    passportIssueDate: (data.passportIssueDate as string) || '',
-    passportExpiryDate: (data.passportExpiryDate as string) || '',
-    passportPlaceOfIssue: (data.passportPlaceOfIssue as string) || '',
-    address: (data.address as string) || '',
-    city: (data.city as string) || '',
-    postalCode: (data.postalCode as string) || '',
-    country: (data.country as string) || '',
-    phone: (data.phone as string) || '',
+    familyName: (personalInfo.familyName as string) || '',
+    givenName: (personalInfo.givenName as string) || '',
+    otherNames: (personalInfo.otherNames as string) || '',
+    nationality: (personalInfo.nationality as string) || '',
+    placeOfBirth: (personalInfo.placeOfBirth as string) || '',
+    dateOfBirth: (personalInfo.dateOfBirth as string) || '',
+    gender: (personalInfo.gender as string) || '',
+    countryOfResidence: (personalInfo.countryOfResidence as string) || '',
+    passportNumber: (personalInfo.passportNumber as string) || '',
+    passportIssueDate: (personalInfo.passportIssueDate as string) || '',
+    passportExpiryDate: (personalInfo.passportExpiryDate as string) || '',
+    passportPlaceOfIssue: (personalInfo.passportPlaceOfIssue as string) || '',
+    address: (personalInfo.address as string) || '',
+    city: (personalInfo.city as string) || '',
+    postalCode: (personalInfo.postalCode as string) || '',
+    country: (personalInfo.country as string) || '',
+    phone: (personalInfo.phone as string) || '',
   };
 };
