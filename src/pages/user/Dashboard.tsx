@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserAuth } from "@/contexts/UserAuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { User } from "@/types/user";
 import { useToast } from "@/components/ui/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import FileUpload from "@/components/user/onboarding/FileUpload";
 import { UserFiles } from "@/components/user/UserFiles";
 import PersonalInfoForm from "@/components/user/personal-info/PersonalInfoForm";
+import { ProgressCard } from "@/components/user/dashboard/ProgressCard";
+import { DocumentsTab } from "@/components/user/dashboard/DocumentsTab";
+import { User } from "@/types/user";
+import { UserFile } from "@/types/userFile";
 
 const Dashboard = () => {
   const { userId, setHasFilledPersonalInfo } = useUserAuth();
@@ -42,28 +42,14 @@ const Dashboard = () => {
       }
 
       if (candidate) {
-        // Convert database fields to match our User type
-        const userData: User = {
-          id: candidate.id,
-          name: candidate.name,
-          username: candidate.username,
-          email: candidate.email,
-          status: candidate.status,
-          created_at: candidate.created_at,
-          cv_submitted: candidate.cv_submitted,
-          interview_status: candidate.interview_status,
-          offer_letter_sent: candidate.offer_letter_sent,
-          cos_sent: candidate.cos_sent,
-          right_to_work: candidate.right_to_work,
-          onboarding_complete: candidate.onboarding_complete,
-          has_reset_password: candidate.has_reset_password,
-          personalInfo: candidate.personal_info as any,
-          onboarding: candidate.onboarding as any
+        const userData = {
+          ...candidate,
+          personalInfo: candidate.personal_info,
+          onboarding: candidate.onboarding
         };
 
         setUser(userData);
 
-        // Check if personal info is filled
         const hasFilledInfo = candidate.personal_info && 
           Object.values(candidate.personal_info).some(value => value !== null);
         setHasFilledPersonalInfo(hasFilledInfo);
@@ -73,29 +59,18 @@ const Dashboard = () => {
     fetchUser();
   }, [userId, navigate, setHasFilledPersonalInfo, toast]);
 
-  const handleFileUpload = async (file: File, category: string) => {
+  const handleFileUpload = (file: UserFile) => {
     if (!user) return;
-
-    const timestamp = new Date().toISOString();
-    const newFile = {
-      id: Date.now(),
-      userId: user.id,
-      name: file.name,
-      type: file.type,
-      size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-      uploadedAt: timestamp,
-      category: category,
-    };
 
     // Update local storage
     const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
-    localStorage.setItem('userFiles', JSON.stringify([...existingFiles, newFile]));
+    localStorage.setItem('userFiles', JSON.stringify([...existingFiles, file]));
 
     // Update onboarding status based on file category
     if (user.onboarding) {
       const updatedOnboarding = { ...user.onboarding };
       
-      switch (category) {
+      switch(file.category) {
         case 'passport':
           updatedOnboarding.phase0.passportUploaded = true;
           break;
@@ -126,7 +101,7 @@ const Dashboard = () => {
 
     toast({
       title: "Success",
-      description: "File uploaded successfully",
+      description: "File uploaded successfully"
     });
   };
 
@@ -148,20 +123,7 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Welcome, {user.name}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-500">Onboarding Progress</span>
-              <span className="text-sm font-medium">{Math.round(phase0Progress)}%</span>
-            </div>
-            <Progress value={phase0Progress} className="h-2" />
-          </div>
-        </CardContent>
-      </Card>
+      <ProgressCard userName={user.name} progress={phase0Progress} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
@@ -175,31 +137,7 @@ const Dashboard = () => {
         </TabsContent>
 
         <TabsContent value="documents" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Required Documents</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FileUpload
-                category="passport"
-                onFileUpload={handleFileUpload}
-                label="Upload Passport"
-                accept=".pdf,.jpg,.jpeg,.png"
-              />
-              <FileUpload
-                category="pcc"
-                onFileUpload={handleFileUpload}
-                label="Upload Police Clearance Certificate"
-                accept=".pdf"
-              />
-              <FileUpload
-                category="other"
-                onFileUpload={handleFileUpload}
-                label="Upload Other Documents"
-                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-              />
-            </CardContent>
-          </Card>
+          <DocumentsTab onFileUpload={handleFileUpload} />
         </TabsContent>
 
         <TabsContent value="files">
