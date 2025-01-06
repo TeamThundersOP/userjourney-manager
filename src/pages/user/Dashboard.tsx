@@ -16,9 +16,6 @@ const Dashboard = () => {
 
   const handleFileUpload = (file: UserFile) => {
     if (!user) return;
-
-    const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
-    localStorage.setItem('userFiles', JSON.stringify([...existingFiles, file]));
     toast("File uploaded successfully");
   };
 
@@ -27,10 +24,11 @@ const Dashboard = () => {
   }
 
   const progress = calculateProgress(user, 0);
+  const userName = user.name || user.username || 'User';
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <ProgressCard userName={user.name} progress={progress} />
+      <ProgressCard userName={userName} progress={progress} />
 
       <Tabs defaultValue="personal-info" className="w-full">
         <TabsList className="grid w-full grid-cols-3">

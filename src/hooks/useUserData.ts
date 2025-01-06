@@ -77,7 +77,6 @@ export const useUserData = (userId: string | null) => {
           const personalInfo = candidate.personal_info as PersonalInfo;
           const rawOnboarding = candidate.onboarding as Record<string, unknown>;
           
-          // Create a properly typed onboarding object with default values
           const onboarding: OnboardingData = {
             currentPhase: (rawOnboarding?.currentPhase as number) ?? 0,
             phase0: {
