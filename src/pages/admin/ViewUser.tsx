@@ -4,81 +4,75 @@ import { supabase } from "@/integrations/supabase/client";
 import { User, PersonalInfo, OnboardingPhase0, OnboardingPhase1, OnboardingPhase2 } from "@/types/user";
 import { Tables } from "@/integrations/supabase/types";
 
-type CandidateRow = Tables<"candidates">;
-
-export const transformUserData = (candidate: CandidateRow): User => {
-  if (!candidate) {
-    throw new Error('No candidate data provided');
-  }
-
-  // Transform personal_info to ensure it matches PersonalInfo type
-  const personalInfo = (candidate.personal_info || {}) as PersonalInfo;
-
-  // Define default onboarding structure with correct types
-  const defaultOnboarding = {
-    currentPhase: 0,
-    phase0: {
-      personalDetailsCompleted: false,
-      cvSubmitted: false,
-      interviewCompleted: false,
-      jobStatus: 'pending' as const,
-      passportUploaded: false,
-      pccUploaded: false,
-      otherDocumentsUploaded: false,
-      offerLetterSent: false,
-      cosSent: false,
-      documentsUploaded: false,
-      visaStatus: 'pending' as const,
-      travelDetailsUpdated: false,
-      travelDocumentsUploaded: false,
-      visaCopyUploaded: false,
-      ukContactUpdated: false,
-    },
-    phase1: {
-      hmrcChecklist: false,
-      companyAgreements: false,
-      pensionScheme: false,
-      bankStatements: false,
-      vaccinationProof: false,
-    },
-    phase2: {
-      rightToWork: false,
-      shareCode: false,
-      dbs: false,
-      onboardingComplete: false,
-    },
-    approvals: {
-      phase0: false,
-      phase1: false,
-      phase2: false,
-    },
+export const transformUserData = (candidate: Tables<'candidates'>): User => {
+  // Transform personal_info
+  const personalInfo: PersonalInfo = {
+    familyName: candidate.personal_info?.familyName as string || '',
+    givenName: candidate.personal_info?.givenName as string || '',
+    otherNames: candidate.personal_info?.otherNames as string || '',
+    fullName: candidate.personal_info?.fullName as string || '',
+    nationality: candidate.personal_info?.nationality as string || '',
+    placeOfBirth: candidate.personal_info?.placeOfBirth as string || '',
+    dateOfBirth: candidate.personal_info?.dateOfBirth as string || '',
+    gender: candidate.personal_info?.gender as string || '',
+    countryOfResidence: candidate.personal_info?.countryOfResidence as string || '',
+    passportNumber: candidate.personal_info?.passportNumber as string || '',
+    passportIssueDate: candidate.personal_info?.passportIssueDate as string || '',
+    passportExpiryDate: candidate.personal_info?.passportExpiryDate as string || '',
+    passportPlaceOfIssue: candidate.personal_info?.passportPlaceOfIssue as string || '',
+    address: candidate.personal_info?.address as string || '',
+    city: candidate.personal_info?.city as string || '',
+    postalCode: candidate.personal_info?.postalCode as string || '',
+    country: candidate.personal_info?.country as string || '',
+    phone: candidate.personal_info?.phone as string || '',
   };
 
-  // Safely merge the database onboarding data with defaults
-  const rawOnboarding = candidate.onboarding as Record<string, unknown> || {};
-  
+  // Transform onboarding data
+  const defaultPhase0: OnboardingPhase0 = {
+    personalDetailsCompleted: false,
+    cvSubmitted: false,
+    interviewCompleted: false,
+    jobStatus: 'pending',
+    passportUploaded: false,
+    pccUploaded: false,
+    otherDocumentsUploaded: false,
+    offerLetterSent: false,
+    cosSent: false,
+    documentsUploaded: false,
+    visaStatus: 'pending',
+    travelDetailsUpdated: false,
+    travelDocumentsUploaded: false,
+    visaCopyUploaded: false,
+    ukContactUpdated: false,
+  };
+
+  const defaultPhase1: OnboardingPhase1 = {
+    hmrcChecklist: false,
+    companyAgreements: false,
+    pensionScheme: false,
+    bankStatements: false,
+    vaccinationProof: false,
+  };
+
+  const defaultPhase2: OnboardingPhase2 = {
+    rightToWork: false,
+    shareCode: false,
+    dbs: false,
+    onboardingComplete: false,
+  };
+
   const onboardingData = {
-    ...defaultOnboarding,
-    currentPhase: (rawOnboarding.currentPhase as number) ?? defaultOnboarding.currentPhase,
-    phase0: {
-      ...defaultOnboarding.phase0,
-      ...(rawOnboarding.phase0 as Partial<OnboardingPhase0> || {}),
-    },
-    phase1: {
-      ...defaultOnboarding.phase1,
-      ...(rawOnboarding.phase1 as Partial<OnboardingPhase1> || {}),
-    },
-    phase2: {
-      ...defaultOnboarding.phase2,
-      ...(rawOnboarding.phase2 as Partial<OnboardingPhase2> || {}),
-    },
+    currentPhase: candidate.onboarding?.currentPhase ?? 0,
+    phase0: { ...defaultPhase0, ...(candidate.onboarding?.phase0 ?? {}) },
+    phase1: { ...defaultPhase1, ...(candidate.onboarding?.phase1 ?? {}) },
+    phase2: { ...defaultPhase2, ...(candidate.onboarding?.phase2 ?? {}) },
     approvals: {
-      ...defaultOnboarding.approvals,
-      ...(rawOnboarding.approvals as typeof defaultOnboarding.approvals || {}),
+      phase0: candidate.onboarding?.approvals?.phase0 ?? false,
+      phase1: candidate.onboarding?.approvals?.phase1 ?? false,
+      phase2: candidate.onboarding?.approvals?.phase2 ?? false,
     },
   };
 
-  // Transform the data to match our User type
   return {
     id: candidate.id,
     name: candidate.name,
