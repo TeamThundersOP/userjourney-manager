@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
 import { User, PersonalInfo, OnboardingPhase0, OnboardingPhase1, OnboardingPhase2 } from "@/types/user";
 import { Tables } from "@/integrations/supabase/types";
 
@@ -95,3 +98,70 @@ export const transformUserData = (candidate: CandidateRow): User => {
     onboarding: onboardingData,
   };
 };
+
+const ViewUser = () => {
+  const { userId } = useParams();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!userId) return;
+
+      try {
+        const { data: candidate, error } = await supabase
+          .from('candidates')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+        if (error) throw error;
+        if (candidate) {
+          const transformedUser = transformUserData(candidate);
+          setUser(transformedUser);
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <div>User not found</div>;
+  }
+
+  return (
+    <div className="container mx-auto py-6">
+      <h1 className="text-2xl font-bold mb-6">User Details</h1>
+      <div className="space-y-6">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-600">Name</p>
+              <p className="font-medium">{user.name}</p>
+            </div>
+            <div>
+              <p className="text-gray-600">Email</p>
+              <p className="font-medium">{user.email}</p>
+            </div>
+            <div>
+              <p className="text-gray-600">Status</p>
+              <p className="font-medium capitalize">{user.status}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ViewUser;
