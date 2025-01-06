@@ -43,14 +43,15 @@ const ResetPassword = () => {
       const { data: candidates, error: checkError } = await supabase
         .from('candidates')
         .select('*')
-        .eq('email', user.email);
+        .eq('email', user.email)
+        .maybeSingle();
 
       if (checkError) {
         console.error('Error checking candidate:', checkError);
         throw new Error('Error verifying candidate status');
       }
 
-      if (!candidates || candidates.length === 0) {
+      if (!candidates) {
         toast({
           title: "Error",
           description: "Your account is not registered as a candidate. Please contact support.",
@@ -91,6 +92,9 @@ const ResetPassword = () => {
         throw new Error('Failed to update password reset status');
       }
 
+      // Wait a moment for the update to propagate
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       // Verify the update was successful by checking the updated record
       const { data: verifyData, error: verifyError } = await supabase
         .from('candidates')
@@ -103,9 +107,14 @@ const ResetPassword = () => {
         throw new Error('Failed to verify password reset status');
       }
 
-      if (!verifyData || !verifyData.has_reset_password) {
-        console.error('Password reset status not updated correctly');
-        throw new Error('Failed to confirm password reset status update');
+      if (!verifyData) {
+        console.error('No candidate record found after update');
+        throw new Error('Failed to confirm password reset status - record not found');
+      }
+
+      if (!verifyData.has_reset_password) {
+        console.error('Password reset flag not set correctly');
+        throw new Error('Failed to confirm password reset status - flag not set');
       }
 
       // Update local state
