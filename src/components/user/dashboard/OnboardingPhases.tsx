@@ -1,11 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Check, ArrowRight } from "lucide-react";
-import { User } from "@/types/user";
-import { calculateProgress } from "@/utils/onboarding";
 import { Button } from "@/components/ui/button";
+import { User } from "@/types/user";
 import { useNavigate } from "react-router-dom";
+import { CheckCircle2, XCircle } from "lucide-react";
 
 interface OnboardingPhasesProps {
   user: User;
@@ -13,120 +12,78 @@ interface OnboardingPhasesProps {
 
 const OnboardingPhases = ({ user }: OnboardingPhasesProps) => {
   const navigate = useNavigate();
-  
-  if (!user.onboarding) return null;
 
-  const phase0Progress = calculateProgress(user, 0);
-  const phase1Progress = calculateProgress(user, 1);
-  const phase2Progress = calculateProgress(user, 2);
+  const getPhaseProgress = (phase: string) => {
+    if (!user.onboarding) return 0;
+    const phaseData = user.onboarding[phase as keyof typeof user.onboarding];
+    if (!phaseData || typeof phaseData !== 'object') return 0;
+    
+    const totalSteps = Object.keys(phaseData).filter(key => typeof phaseData[key] === 'boolean').length;
+    const completedSteps = Object.values(phaseData).filter(value => value === true).length;
+    
+    return (completedSteps / totalSteps) * 100;
+  };
 
-  const getPhaseStatus = (phase: number) => {
-    if (user.onboarding?.approvals[`phase${phase}`]) {
-      return "completed";
-    }
-    if (user.onboarding?.currentPhase === phase) {
-      return "current";
-    }
-    return "pending";
+  const isPhaseApproved = (phaseNumber: number) => {
+    return user.onboarding?.approvals?.[`phase${phaseNumber}` as keyof typeof user.onboarding.approvals] || false;
+  };
+
+  const isPhaseAccessible = (phaseNumber: number) => {
+    if (phaseNumber === 0) return true;
+    return isPhaseApproved(phaseNumber - 1);
+  };
+
+  const renderPhaseCard = (phaseNumber: number, title: string, description: string) => {
+    const progress = getPhaseProgress(`phase${phaseNumber}`);
+    const isApproved = isPhaseApproved(phaseNumber);
+    const canAccess = isPhaseAccessible(phaseNumber);
+
+    return (
+      <Card className="p-6 space-y-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="text-lg font-semibold">{title}</h3>
+            <p className="text-sm text-gray-500">{description}</p>
+          </div>
+          {isApproved ? (
+            <CheckCircle2 className="h-6 w-6 text-green-500" />
+          ) : (
+            <XCircle className="h-6 w-6 text-gray-300" />
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span>Progress</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
+
+        <div className="flex justify-between items-center">
+          <Badge variant={isApproved ? "success" : "secondary"}>
+            {isApproved ? "Approved" : "Pending Approval"}
+          </Badge>
+          <Button
+            onClick={() => navigate(`/user/phase${phaseNumber}`)}
+            disabled={!canAccess}
+          >
+            {progress === 100 ? "Review" : "Continue"}
+          </Button>
+        </div>
+      </Card>
+    );
   };
 
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle>Your Onboarding Progress</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold">Phase 0: Initial Setup</h3>
-              {getPhaseStatus(0) === "completed" && (
-                <Badge variant="default" className="flex items-center gap-1">
-                  <Check className="h-3 w-3" />
-                  Completed
-                </Badge>
-              )}
-              {getPhaseStatus(0) === "current" && (
-                <Badge variant="secondary">Current Phase</Badge>
-              )}
-            </div>
-            {getPhaseStatus(0) === "current" && (
-              <Button 
-                size="sm" 
-                onClick={() => navigate("/user/onboarding")}
-                className="flex items-center gap-1"
-              >
-                Continue <ArrowRight className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-          <Progress value={phase0Progress} className="mb-2" />
-          <p className="text-sm text-gray-500">
-            Complete your personal details, submit required documents, and prepare for your journey.
-          </p>
-        </div>
-
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold">Phase 1: Documentation</h3>
-              {getPhaseStatus(1) === "completed" && (
-                <Badge variant="default" className="flex items-center gap-1">
-                  <Check className="h-3 w-3" />
-                  Completed
-                </Badge>
-              )}
-              {getPhaseStatus(1) === "current" && (
-                <Badge variant="secondary">Current Phase</Badge>
-              )}
-            </div>
-            {getPhaseStatus(1) === "current" && (
-              <Button 
-                size="sm" 
-                onClick={() => navigate("/user/onboarding")}
-                className="flex items-center gap-1"
-              >
-                Continue <ArrowRight className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-          <Progress value={phase1Progress} className="mb-2" />
-          <p className="text-sm text-gray-500">
-            Submit your HMRC documents, company agreements, and other essential paperwork.
-          </p>
-        </div>
-
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold">Phase 2: Final Steps</h3>
-              {getPhaseStatus(2) === "completed" && (
-                <Badge variant="default" className="flex items-center gap-1">
-                  <Check className="h-3 w-3" />
-                  Completed
-                </Badge>
-              )}
-              {getPhaseStatus(2) === "current" && (
-                <Badge variant="secondary">Current Phase</Badge>
-              )}
-            </div>
-            {getPhaseStatus(2) === "current" && (
-              <Button 
-                size="sm" 
-                onClick={() => navigate("/user/onboarding")}
-                className="flex items-center gap-1"
-              >
-                Continue <ArrowRight className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-          <Progress value={phase2Progress} className="mb-2" />
-          <p className="text-sm text-gray-500">
-            Complete your right to work verification and final documentation.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Onboarding Progress</h2>
+      <div className="grid gap-6 md:grid-cols-3">
+        {renderPhaseCard(0, "Phase 0: Initial Setup", "Complete your personal details and submit required documents")}
+        {renderPhaseCard(1, "Phase 1: Documentation", "Submit additional documentation and complete HMRC checklist")}
+        {renderPhaseCard(2, "Phase 2: Final Steps", "Complete final verifications and checks")}
+      </div>
+    </div>
   );
 };
 
