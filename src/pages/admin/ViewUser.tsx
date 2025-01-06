@@ -6,7 +6,7 @@ import UserPersonalInfo from '@/components/admin/UserPersonalInfo';
 import ProgressStatus from '@/components/admin/user/ProgressStatus';
 import UserFiles from '@/components/admin/UserFiles';
 import { ReportsTable } from '@/components/admin/reports/ReportsTable';
-import { User } from '@/types/user';
+import { User, PersonalInfo, OnboardingPhase0, OnboardingPhase1, OnboardingPhase2 } from '@/types/user';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -28,6 +28,54 @@ const fetchUser = async (userId: string): Promise<User> => {
     throw new Error('User not found');
   }
 
+  // Transform personal_info to ensure it matches PersonalInfo type
+  const personalInfo = user.personal_info as PersonalInfo;
+
+  // Transform onboarding data to ensure it matches our types
+  const defaultOnboarding = {
+    currentPhase: 0,
+    phase0: {
+      personalDetailsCompleted: false,
+      cvSubmitted: false,
+      interviewCompleted: false,
+      jobStatus: 'pending' as const,
+      passportUploaded: false,
+      pccUploaded: false,
+      otherDocumentsUploaded: false,
+      offerLetterSent: false,
+      cosSent: false,
+      documentsUploaded: false,
+      visaStatus: 'pending' as const,
+      travelDetailsUpdated: false,
+      travelDocumentsUploaded: false,
+      visaCopyUploaded: false,
+      ukContactUpdated: false
+    } as OnboardingPhase0,
+    phase1: {
+      hmrcChecklist: false,
+      companyAgreements: false,
+      pensionScheme: false,
+      bankStatements: false,
+      vaccinationProof: false
+    } as OnboardingPhase1,
+    phase2: {
+      rightToWork: false,
+      shareCode: false,
+      dbs: false,
+      onboardingComplete: false
+    } as OnboardingPhase2,
+    approvals: {
+      phase0: false,
+      phase1: false,
+      phase2: false
+    }
+  };
+
+  const onboardingData = user.onboarding ? {
+    ...defaultOnboarding,
+    ...(user.onboarding as typeof defaultOnboarding)
+  } : defaultOnboarding;
+
   // Transform the data to match our User type
   return {
     id: user.id,
@@ -35,46 +83,17 @@ const fetchUser = async (userId: string): Promise<User> => {
     username: user.username || '',
     email: user.email || '',
     status: user.status || 'pending',
-    personal_info: user.personal_info,
-    personalInfo: user.personal_info, // Alias for frontend compatibility
-    onboarding: user.onboarding || {
-      currentPhase: 0,
-      phase0: {
-        personalDetailsCompleted: false,
-        cvSubmitted: false,
-        interviewCompleted: false,
-        jobStatus: 'pending',
-        passportUploaded: false,
-        pccUploaded: false,
-        otherDocumentsUploaded: false,
-        offerLetterSent: false,
-        cosSent: false,
-        documentsUploaded: false,
-        visaStatus: 'pending',
-        travelDetailsUpdated: false,
-        travelDocumentsUploaded: false,
-        visaCopyUploaded: false,
-        ukContactUpdated: false
-      },
-      phase1: {
-        hmrcChecklist: false,
-        companyAgreements: false,
-        pensionScheme: false,
-        bankStatements: false,
-        vaccinationProof: false
-      },
-      phase2: {
-        rightToWork: false,
-        shareCode: false,
-        dbs: false,
-        onboardingComplete: false
-      },
-      approvals: {
-        phase0: false,
-        phase1: false,
-        phase2: false
-      }
-    }
+    personal_info: personalInfo,
+    personalInfo: personalInfo, // Alias for frontend compatibility
+    onboarding: onboardingData,
+    created_at: user.created_at,
+    cv_submitted: user.cv_submitted,
+    interview_status: user.interview_status,
+    offer_letter_sent: user.offer_letter_sent,
+    cos_sent: user.cos_sent,
+    right_to_work: user.right_to_work,
+    onboarding_complete: user.onboarding_complete,
+    has_reset_password: user.has_reset_password
   };
 };
 
