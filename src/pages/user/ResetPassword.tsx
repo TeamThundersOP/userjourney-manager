@@ -94,13 +94,18 @@ const ResetPassword = () => {
       // Verify the update was successful by checking the updated record
       const { data: verifyData, error: verifyError } = await supabase
         .from('candidates')
-        .select('has_reset_password')
+        .select('*')
         .eq('email', user.email)
-        .single();
+        .maybeSingle();
 
-      if (verifyError || !verifyData || !verifyData.has_reset_password) {
-        console.error('Failed to verify password reset update:', verifyError);
+      if (verifyError) {
+        console.error('Error verifying password reset update:', verifyError);
         throw new Error('Failed to verify password reset status');
+      }
+
+      if (!verifyData || !verifyData.has_reset_password) {
+        console.error('Password reset status not updated correctly');
+        throw new Error('Failed to confirm password reset status update');
       }
 
       // Update local state
