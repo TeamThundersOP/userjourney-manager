@@ -4,6 +4,50 @@ import { User, PersonalInfo } from "@/types/user";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
+interface OnboardingData {
+  currentPhase: number;
+  phase0: {
+    personalDetailsCompleted: boolean;
+    cvSubmitted: boolean;
+    interviewCompleted: boolean;
+    jobStatus: string;
+    passportUploaded: boolean;
+    pccUploaded: boolean;
+    otherDocumentsUploaded: boolean;
+    offerLetterSent: boolean;
+    cosSent: boolean;
+    documentsUploaded: boolean;
+    visaStatus: string;
+    travelDetailsUpdated: boolean;
+    travelDocumentsUploaded: boolean;
+    visaCopyUploaded: boolean;
+    ukContactUpdated: boolean;
+    ukContactNumber?: string;
+    ukAddress?: string;
+    feedback?: string;
+  };
+  phase1: {
+    hmrcChecklist: boolean;
+    companyAgreements: boolean;
+    pensionScheme: boolean;
+    bankStatements: boolean;
+    vaccinationProof: boolean;
+    feedback?: string;
+  };
+  phase2: {
+    rightToWork: boolean;
+    shareCode: boolean;
+    dbs: boolean;
+    onboardingComplete: boolean;
+    feedback?: string;
+  };
+  approvals: {
+    phase0: boolean;
+    phase1: boolean;
+    phase2: boolean;
+  };
+}
+
 export const useUserData = (userId: string | null) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +75,7 @@ export const useUserData = (userId: string | null) => {
 
         if (candidate) {
           const personalInfo = candidate.personal_info as PersonalInfo;
-          const onboarding = candidate.onboarding;
+          const onboarding = candidate.onboarding as OnboardingData;
           
           const userData: User = {
             id: candidate.id,
