@@ -33,12 +33,12 @@ const ViewUser = () => {
     const fetchUser = async () => {
       try {
         if (!userId) {
-          setError("No user ID provided");
+          setError("No user ID or email provided");
           setLoading(false);
           return;
         }
 
-        console.log('Fetching user data...');
+        console.log('Fetching user data for:', userId);
         const { data: candidate, error: fetchError } = await supabase
           .from('candidates')
           .select('*')
