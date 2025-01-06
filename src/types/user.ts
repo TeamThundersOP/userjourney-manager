@@ -12,6 +12,8 @@ export interface User {
   right_to_work?: boolean | null;
   onboarding_complete?: boolean | null;
   has_reset_password?: boolean | null;
+  personal_info?: PersonalInfo | null;
+  personalInfo?: PersonalInfo | null; // Alias for frontend compatibility
   onboarding?: {
     currentPhase: number;
     phase0: OnboardingPhase0;
@@ -23,6 +25,27 @@ export interface User {
       phase2: boolean;
     };
   };
+}
+
+export interface PersonalInfo {
+  familyName?: string | null;
+  givenName?: string | null;
+  otherNames?: string | null;
+  fullName?: string | null;
+  nationality?: string | null;
+  placeOfBirth?: string | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  countryOfResidence?: string | null;
+  passportNumber?: string | null;
+  passportIssueDate?: string | null;
+  passportExpiryDate?: string | null;
+  passportPlaceOfIssue?: string | null;
+  address?: string | null;
+  city?: string | null;
+  postalCode?: string | null;
+  country?: string | null;
+  phone?: string | null;
 }
 
 export interface OnboardingPhase0 {

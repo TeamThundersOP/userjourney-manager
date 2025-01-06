@@ -9,11 +9,23 @@ import { ReportsTable } from '@/components/admin/reports/ReportsTable';
 import { User } from '@/types/user';
 
 const mockUser: User = {
-  id: "1", // Changed from number to string
+  id: "1",
   name: "John Doe",
   username: "johndoe",
   email: "user1@example.com",
   status: "Active",
+  personal_info: {
+    fullName: "John Doe",
+    nationality: "British",
+    dateOfBirth: "1990-01-01",
+    gender: "Male",
+    passportNumber: "123456789",
+    address: "123 Main St",
+    city: "London",
+    postalCode: "SW1A 1AA",
+    country: "United Kingdom",
+    phone: "+44 123 456 7890"
+  },
   personalInfo: {
     fullName: "John Doe",
     nationality: "British",
@@ -118,7 +130,7 @@ const ViewUser = () => {
         (user?.email && report.sender === user.email)
       );
     },
-    enabled: !!user?.email, // Only run query when user email is available
+    enabled: !!user?.email,
   });
 
   if (isLoading) {

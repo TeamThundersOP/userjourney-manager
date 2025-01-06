@@ -1,163 +1,204 @@
-import { useUserAuth } from '@/contexts/UserAuthContext';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
-import Phase0Onboarding from '@/components/user/onboarding/Phase0Onboarding';
-import Phase1Onboarding from '@/components/user/onboarding/Phase1Onboarding';
-import Phase2Onboarding from '@/components/user/onboarding/Phase2Onboarding';
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { User } from '@/types/user';
-import { CheckCircle2 } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUserAuth } from "@/contexts/UserAuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { User } from "@/types/user";
+import { useToast } from "@/components/ui/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FileUpload } from "@/components/user/FileUpload";
+import { UserFiles } from "@/components/user/UserFiles";
+import PersonalInfoForm from "@/components/user/personal-info/PersonalInfoForm";
 
-const UserDashboard = () => {
-  const { userId } = useUserAuth();
-  const [isLoading, setIsLoading] = useState(false);
+const Dashboard = () => {
+  const { userId, setHasFilledPersonalInfo } = useUserAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
+  const [activeTab, setActiveTab] = useState("personal-info");
 
-  const { data: userData, isError } = useQuery({
-    queryKey: ['user', userId],
-    queryFn: async () => {
-      try {
-        console.log('Fetching user data for ID:', userId);
-        const { data, error } = await supabase
-          .from('candidates')
-          .select('*')
-          .eq('id', userId)
-          .single();
-
-        if (error) {
-          console.error('Error fetching user data:', error);
-          throw error;
-        }
-
-        console.log('User data fetched:', data);
-        return data as User;
-      } catch (error) {
-        console.error('Error in query function:', error);
-        throw error;
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!userId) {
+        navigate('/user/login');
+        return;
       }
-    },
-    enabled: !!userId,
-  });
 
-  if (!userData) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Card className="w-full max-w-2xl">
-          <CardHeader>
-            <CardTitle>Welcome to Your Dashboard</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              Loading your dashboard information...
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const renderCurrentPhase = () => {
-    const currentPhase = userData?.onboarding?.currentPhase || 0;
-
-    switch (currentPhase) {
-      case 0:
-        return (
-          <Phase0Onboarding 
-            userData={userData}
-            onSave={handleSave}
-            isLoading={isLoading}
-          />
-        );
-      case 1:
-        if (userData?.onboarding?.approvals?.phase0) {
-          return (
-            <Phase1Onboarding 
-              userData={userData}
-              onSave={handleSave}
-              isLoading={isLoading}
-            />
-          );
-        }
-        return null;
-      case 2:
-        if (userData?.onboarding?.approvals?.phase1) {
-          return (
-            <Phase2Onboarding 
-              userData={userData}
-              onSave={handleSave}
-              isLoading={isLoading}
-            />
-          );
-        }
-        return null;
-      default:
-        return null;
-    }
-  };
-
-  const handleSave = async (formData: any) => {
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
+      const { data: candidate, error } = await supabase
         .from('candidates')
-        .update({
-          onboarding: {
-            ...userData.onboarding,
-            [`phase${userData.onboarding?.currentPhase || 0}`]: {
-              ...userData.onboarding?.[`phase${userData.onboarding?.currentPhase || 0}`],
-              ...formData
-            }
-          }
-        })
-        .eq('id', userId);
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-      if (error) throw error;
-      toast.success('Progress saved successfully');
-    } catch (error) {
-      console.error('Error saving progress:', error);
-      toast.error('Failed to save progress');
-    } finally {
-      setIsLoading(false);
+      if (error) {
+        console.error('Error fetching user:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch user data",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (candidate) {
+        // Convert database fields to match our User type
+        const userData: User = {
+          ...candidate,
+          personalInfo: candidate.personal_info,
+          onboarding: candidate.onboarding as User['onboarding']
+        };
+        setUser(userData);
+
+        // Check if personal info is filled
+        const hasFilledInfo = candidate.personal_info && 
+          Object.values(candidate.personal_info).some(value => value !== null);
+        setHasFilledPersonalInfo(hasFilledInfo);
+      }
+    };
+
+    fetchUser();
+  }, [userId, navigate, setHasFilledPersonalInfo, toast]);
+
+  const handleFileUpload = async (file: File, category: string) => {
+    if (!user) return;
+
+    const timestamp = new Date().toISOString();
+    const newFile = {
+      id: Date.now(),
+      userId: user.id,
+      name: file.name,
+      type: file.type,
+      size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+      uploadedAt: timestamp,
+      category: category,
+    };
+
+    // Update local storage
+    const existingFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
+    localStorage.setItem('userFiles', JSON.stringify([...existingFiles, newFile]));
+
+    // Update onboarding status based on file category
+    if (user.onboarding) {
+      const updatedOnboarding = { ...user.onboarding };
+      
+      switch (category) {
+        case 'passport':
+          updatedOnboarding.phase0.passportUploaded = true;
+          break;
+        case 'pcc':
+          updatedOnboarding.phase0.pccUploaded = true;
+          break;
+        case 'other':
+          updatedOnboarding.phase0.otherDocumentsUploaded = true;
+          break;
+        case 'visa':
+          updatedOnboarding.phase0.visaCopyUploaded = true;
+          break;
+        case 'travel':
+          updatedOnboarding.phase0.travelDocumentsUploaded = true;
+          break;
+      }
+
+      // Update user in local storage
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const updatedUsers = users.map((u: User) => 
+        u.id === user.id ? { ...u, onboarding: updatedOnboarding } : u
+      );
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+      // Update local state
+      setUser(prev => prev ? { ...prev, onboarding: updatedOnboarding } : null);
     }
+
+    toast({
+      title: "Success",
+      description: "File uploaded successfully",
+    });
   };
 
-  const isOnboardingComplete = userData?.onboarding?.approvals?.phase2;
-
-  if (isOnboardingComplete) {
+  if (!user) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <Card className="bg-green-50 dark:bg-green-900/10">
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center justify-center text-center space-y-4">
-              <CheckCircle2 className="h-16 w-16 text-green-500" />
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-green-700 dark:text-green-300">
-                  Onboarding Complete!
-                </h2>
-                <p className="text-green-600 dark:text-green-400">
-                  Thank you for completing your onboarding process.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Loading...</h2>
+          <p>Please wait while we fetch your information.</p>
+        </div>
       </div>
     );
   }
+
+  const phase0Progress = user.onboarding?.phase0 
+    ? Object.values(user.onboarding.phase0).filter(value => value === true).length / 
+      Object.values(user.onboarding.phase0).filter(value => typeof value === 'boolean').length * 100
+    : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto py-6 space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Welcome to Your Dashboard</CardTitle>
+          <CardTitle>Welcome, {user.name}</CardTitle>
         </CardHeader>
         <CardContent>
-          {renderCurrentPhase()}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500">Onboarding Progress</span>
+              <span className="text-sm font-medium">{Math.round(phase0Progress)}%</span>
+            </div>
+            <Progress value={phase0Progress} className="h-2" />
+          </div>
         </CardContent>
       </Card>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="personal-info">Personal Info</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="files">My Files</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="personal-info" className="space-y-4">
+          <PersonalInfoForm />
+        </TabsContent>
+
+        <TabsContent value="documents" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Required Documents</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FileUpload
+                category="passport"
+                onUpload={handleFileUpload}
+                label="Upload Passport"
+                description="Please upload a clear copy of your passport"
+                acceptedFileTypes={['.pdf', '.jpg', '.jpeg', '.png']}
+              />
+              <FileUpload
+                category="pcc"
+                onUpload={handleFileUpload}
+                label="Upload Police Clearance Certificate"
+                description="Please upload your police clearance certificate"
+                acceptedFileTypes={['.pdf']}
+              />
+              <FileUpload
+                category="other"
+                onUpload={handleFileUpload}
+                label="Upload Other Documents"
+                description="Please upload any other required documents"
+                acceptedFileTypes={['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx']}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="files">
+          <UserFiles userId={user.id} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
 
-export default UserDashboard;
+export default Dashboard;
