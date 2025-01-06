@@ -40,24 +40,22 @@ const ResetPassword = () => {
       console.log('Attempting to update password for user:', user.email);
 
       // First check if the candidate exists using email
-      const { data: existingCandidate, error: checkError } = await supabase
+      const { data: candidates, error: checkError } = await supabase
         .from('candidates')
         .select('*')
-        .eq('email', user.email)
-        .maybeSingle();
+        .eq('email', user.email);
 
       if (checkError) {
         console.error('Error checking candidate:', checkError);
         throw new Error('Error verifying candidate status');
       }
 
-      if (!existingCandidate) {
+      if (!candidates || candidates.length === 0) {
         toast({
           title: "Error",
           description: "Your account is not registered as a candidate. Please contact support.",
           variant: "destructive",
         });
-        setIsLoading(false);
         return;
       }
 
@@ -74,7 +72,6 @@ const ResetPassword = () => {
             description: "New password must be different from your current password",
             variant: "destructive",
           });
-          setIsLoading(false);
           return;
         }
         throw updateAuthError;
@@ -87,8 +84,7 @@ const ResetPassword = () => {
         .from('candidates')
         .update({ has_reset_password: true })
         .eq('email', user.email)
-        .select()
-        .maybeSingle();
+        .select();
 
       if (updateCandidateError) {
         console.error('Error updating candidate:', updateCandidateError);
@@ -96,7 +92,7 @@ const ResetPassword = () => {
       }
 
       // Verify the update was successful
-      if (!updateResult) {
+      if (!updateResult || updateResult.length === 0) {
         console.error('Failed to verify password reset update');
         throw new Error('Failed to update password reset status');
       }
