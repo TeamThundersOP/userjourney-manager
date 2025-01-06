@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
+import { AuthError, AuthApiError } from '@supabase/supabase-js';
 
 const UserLogin = () => {
   const [email, setEmail] = useState('');
@@ -35,6 +36,20 @@ const UserLogin = () => {
     };
   }, [navigate]);
 
+  const getErrorMessage = (error: AuthError) => {
+    if (error instanceof AuthApiError) {
+      switch (error.status) {
+        case 400:
+          return 'Invalid email or password. Please check your credentials and try again.';
+        case 422:
+          return 'Invalid email format. Please enter a valid email address.';
+        default:
+          return error.message;
+      }
+    }
+    return 'An unexpected error occurred. Please try again.';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -53,7 +68,7 @@ const UserLogin = () => {
         console.error('Authentication error:', signInError);
         toast({
           title: "Login Failed",
-          description: "Invalid email or password. Please check your credentials and try again.",
+          description: getErrorMessage(signInError),
           variant: "destructive",
         });
         return;
