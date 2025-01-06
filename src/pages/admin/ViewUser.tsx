@@ -29,9 +29,28 @@ const fetchUser = async (userId: string): Promise<User> => {
   }
 
   // Transform personal_info to ensure it matches PersonalInfo type
-  const personalInfo = user.personal_info as PersonalInfo;
+  const personalInfo = user.personal_info as PersonalInfo || {
+    familyName: null,
+    givenName: null,
+    otherNames: null,
+    fullName: null,
+    nationality: null,
+    placeOfBirth: null,
+    dateOfBirth: null,
+    gender: null,
+    countryOfResidence: null,
+    passportNumber: null,
+    passportIssueDate: null,
+    passportExpiryDate: null,
+    passportPlaceOfIssue: null,
+    address: null,
+    city: null,
+    postalCode: null,
+    country: null,
+    phone: null,
+  };
 
-  // Transform onboarding data to ensure it matches our types
+  // Define default onboarding structure with correct types
   const defaultOnboarding = {
     currentPhase: 0,
     phase0: {
@@ -49,32 +68,54 @@ const fetchUser = async (userId: string): Promise<User> => {
       travelDetailsUpdated: false,
       travelDocumentsUploaded: false,
       visaCopyUploaded: false,
-      ukContactUpdated: false
+      ukContactUpdated: false,
+      feedback: '',
     } as OnboardingPhase0,
     phase1: {
       hmrcChecklist: false,
       companyAgreements: false,
       pensionScheme: false,
       bankStatements: false,
-      vaccinationProof: false
+      vaccinationProof: false,
+      feedback: '',
     } as OnboardingPhase1,
     phase2: {
       rightToWork: false,
       shareCode: false,
       dbs: false,
-      onboardingComplete: false
+      onboardingComplete: false,
+      feedback: '',
     } as OnboardingPhase2,
     approvals: {
       phase0: false,
       phase1: false,
-      phase2: false
+      phase2: false,
     }
   };
 
-  const onboardingData = user.onboarding ? {
-    ...defaultOnboarding,
-    ...(user.onboarding as typeof defaultOnboarding)
-  } : defaultOnboarding;
+  // Merge the database onboarding data with defaults, ensuring type safety
+  const onboardingData = user.onboarding
+    ? {
+        ...defaultOnboarding,
+        ...(user.onboarding as typeof defaultOnboarding),
+        phase0: {
+          ...defaultOnboarding.phase0,
+          ...(user.onboarding as any).phase0,
+        },
+        phase1: {
+          ...defaultOnboarding.phase1,
+          ...(user.onboarding as any).phase1,
+        },
+        phase2: {
+          ...defaultOnboarding.phase2,
+          ...(user.onboarding as any).phase2,
+        },
+        approvals: {
+          ...defaultOnboarding.approvals,
+          ...(user.onboarding as any).approvals,
+        },
+      }
+    : defaultOnboarding;
 
   // Transform the data to match our User type
   return {
@@ -84,7 +125,7 @@ const fetchUser = async (userId: string): Promise<User> => {
     email: user.email || '',
     status: user.status || 'pending',
     personal_info: personalInfo,
-    personalInfo: personalInfo, // Alias for frontend compatibility
+    personalInfo: personalInfo,
     onboarding: onboardingData,
     created_at: user.created_at,
     cv_submitted: user.cv_submitted,
@@ -109,8 +150,6 @@ const ViewUser = () => {
   const { data: reports } = useQuery({
     queryKey: ['reports', userId, user?.email],
     queryFn: async () => {
-      // For now, we'll keep using localStorage for reports
-      // This can be updated later when we add reports to the database
       const allReports = JSON.parse(localStorage.getItem('userReports') || '[]');
       return allReports.filter((report: any) => 
         String(report.userId) === userId || 
