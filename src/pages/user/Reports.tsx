@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Report } from "@/types/reports";
 
 const Reports = () => {
   const { userId } = useUserAuth();
@@ -34,7 +35,7 @@ const Reports = () => {
         throw error;
       }
 
-      return data || [];
+      return data as Report[];
     },
     enabled: !!userId
   });
@@ -142,7 +143,7 @@ const Reports = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {userReports.map((report: any) => (
+              {userReports.map((report: Report) => (
                 <div
                   key={report.id}
                   className="p-4 border rounded-lg space-y-2"

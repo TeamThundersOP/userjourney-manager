@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { UserFile } from "@/types/userFile";
 import { calculateProgress } from "@/utils/onboarding";
+import { User } from "@/types/user";
 
 const Dashboard = () => {
   const { userId } = useUserAuth();
@@ -29,7 +30,27 @@ const Dashboard = () => {
         throw error;
       }
 
-      return data;
+      // Transform the data to match the User type
+      const userData: User = {
+        id: data.id,
+        name: data.name,
+        username: data.username,
+        email: data.email || '',
+        status: data.status || 'pending',
+        created_at: data.created_at,
+        cv_submitted: data.cv_submitted,
+        interview_status: data.interview_status,
+        offer_letter_sent: data.offer_letter_sent,
+        cos_sent: data.cos_sent,
+        right_to_work: data.right_to_work,
+        onboarding_complete: data.onboarding_complete,
+        has_reset_password: data.has_reset_password,
+        personal_info: data.personal_info as any, // We'll properly type this later
+        personalInfo: data.personal_info as any,
+        onboarding: data.onboarding as any,
+      };
+
+      return userData;
     },
     enabled: !!userId
   });
