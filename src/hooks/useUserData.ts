@@ -10,14 +10,14 @@ interface OnboardingData {
     personalDetailsCompleted: boolean;
     cvSubmitted: boolean;
     interviewCompleted: boolean;
-    jobStatus: string;
+    jobStatus: 'pending' | 'accepted' | 'rejected';
     passportUploaded: boolean;
     pccUploaded: boolean;
     otherDocumentsUploaded: boolean;
     offerLetterSent: boolean;
     cosSent: boolean;
     documentsUploaded: boolean;
-    visaStatus: string;
+    visaStatus: 'pending' | 'approved' | 'rejected';
     travelDetailsUpdated: boolean;
     travelDocumentsUploaded: boolean;
     visaCopyUploaded: boolean;
@@ -75,7 +75,52 @@ export const useUserData = (userId: string | null) => {
 
         if (candidate) {
           const personalInfo = candidate.personal_info as PersonalInfo;
-          const onboarding = candidate.onboarding as OnboardingData;
+          const rawOnboarding = candidate.onboarding as Record<string, unknown>;
+          
+          // Create a properly typed onboarding object with default values
+          const onboarding: OnboardingData = {
+            currentPhase: (rawOnboarding?.currentPhase as number) ?? 0,
+            phase0: {
+              personalDetailsCompleted: (rawOnboarding?.phase0 as any)?.personalDetailsCompleted ?? false,
+              cvSubmitted: (rawOnboarding?.phase0 as any)?.cvSubmitted ?? false,
+              interviewCompleted: (rawOnboarding?.phase0 as any)?.interviewCompleted ?? false,
+              jobStatus: ((rawOnboarding?.phase0 as any)?.jobStatus as 'pending' | 'accepted' | 'rejected') ?? 'pending',
+              passportUploaded: (rawOnboarding?.phase0 as any)?.passportUploaded ?? false,
+              pccUploaded: (rawOnboarding?.phase0 as any)?.pccUploaded ?? false,
+              otherDocumentsUploaded: (rawOnboarding?.phase0 as any)?.otherDocumentsUploaded ?? false,
+              offerLetterSent: (rawOnboarding?.phase0 as any)?.offerLetterSent ?? false,
+              cosSent: (rawOnboarding?.phase0 as any)?.cosSent ?? false,
+              documentsUploaded: (rawOnboarding?.phase0 as any)?.documentsUploaded ?? false,
+              visaStatus: ((rawOnboarding?.phase0 as any)?.visaStatus as 'pending' | 'approved' | 'rejected') ?? 'pending',
+              travelDetailsUpdated: (rawOnboarding?.phase0 as any)?.travelDetailsUpdated ?? false,
+              travelDocumentsUploaded: (rawOnboarding?.phase0 as any)?.travelDocumentsUploaded ?? false,
+              visaCopyUploaded: (rawOnboarding?.phase0 as any)?.visaCopyUploaded ?? false,
+              ukContactUpdated: (rawOnboarding?.phase0 as any)?.ukContactUpdated ?? false,
+              ukContactNumber: (rawOnboarding?.phase0 as any)?.ukContactNumber ?? '',
+              ukAddress: (rawOnboarding?.phase0 as any)?.ukAddress ?? '',
+              feedback: (rawOnboarding?.phase0 as any)?.feedback ?? '',
+            },
+            phase1: {
+              hmrcChecklist: (rawOnboarding?.phase1 as any)?.hmrcChecklist ?? false,
+              companyAgreements: (rawOnboarding?.phase1 as any)?.companyAgreements ?? false,
+              pensionScheme: (rawOnboarding?.phase1 as any)?.pensionScheme ?? false,
+              bankStatements: (rawOnboarding?.phase1 as any)?.bankStatements ?? false,
+              vaccinationProof: (rawOnboarding?.phase1 as any)?.vaccinationProof ?? false,
+              feedback: (rawOnboarding?.phase1 as any)?.feedback ?? '',
+            },
+            phase2: {
+              rightToWork: (rawOnboarding?.phase2 as any)?.rightToWork ?? false,
+              shareCode: (rawOnboarding?.phase2 as any)?.shareCode ?? false,
+              dbs: (rawOnboarding?.phase2 as any)?.dbs ?? false,
+              onboardingComplete: (rawOnboarding?.phase2 as any)?.onboardingComplete ?? false,
+              feedback: (rawOnboarding?.phase2 as any)?.feedback ?? '',
+            },
+            approvals: {
+              phase0: (rawOnboarding?.approvals as any)?.phase0 ?? false,
+              phase1: (rawOnboarding?.approvals as any)?.phase1 ?? false,
+              phase2: (rawOnboarding?.approvals as any)?.phase2 ?? false,
+            },
+          };
           
           const userData: User = {
             id: candidate.id,
@@ -93,49 +138,7 @@ export const useUserData = (userId: string | null) => {
             has_reset_password: candidate.has_reset_password,
             personal_info: personalInfo,
             personalInfo: personalInfo,
-            onboarding: {
-              currentPhase: onboarding?.currentPhase ?? 0,
-              phase0: {
-                personalDetailsCompleted: onboarding?.phase0?.personalDetailsCompleted ?? false,
-                cvSubmitted: onboarding?.phase0?.cvSubmitted ?? false,
-                interviewCompleted: onboarding?.phase0?.interviewCompleted ?? false,
-                jobStatus: onboarding?.phase0?.jobStatus ?? 'pending',
-                passportUploaded: onboarding?.phase0?.passportUploaded ?? false,
-                pccUploaded: onboarding?.phase0?.pccUploaded ?? false,
-                otherDocumentsUploaded: onboarding?.phase0?.otherDocumentsUploaded ?? false,
-                offerLetterSent: onboarding?.phase0?.offerLetterSent ?? false,
-                cosSent: onboarding?.phase0?.cosSent ?? false,
-                documentsUploaded: onboarding?.phase0?.documentsUploaded ?? false,
-                visaStatus: onboarding?.phase0?.visaStatus ?? 'pending',
-                travelDetailsUpdated: onboarding?.phase0?.travelDetailsUpdated ?? false,
-                travelDocumentsUploaded: onboarding?.phase0?.travelDocumentsUploaded ?? false,
-                visaCopyUploaded: onboarding?.phase0?.visaCopyUploaded ?? false,
-                ukContactUpdated: onboarding?.phase0?.ukContactUpdated ?? false,
-                ukContactNumber: onboarding?.phase0?.ukContactNumber ?? '',
-                ukAddress: onboarding?.phase0?.ukAddress ?? '',
-                feedback: onboarding?.phase0?.feedback ?? '',
-              },
-              phase1: {
-                hmrcChecklist: onboarding?.phase1?.hmrcChecklist ?? false,
-                companyAgreements: onboarding?.phase1?.companyAgreements ?? false,
-                pensionScheme: onboarding?.phase1?.pensionScheme ?? false,
-                bankStatements: onboarding?.phase1?.bankStatements ?? false,
-                vaccinationProof: onboarding?.phase1?.vaccinationProof ?? false,
-                feedback: onboarding?.phase1?.feedback ?? '',
-              },
-              phase2: {
-                rightToWork: onboarding?.phase2?.rightToWork ?? false,
-                shareCode: onboarding?.phase2?.shareCode ?? false,
-                dbs: onboarding?.phase2?.dbs ?? false,
-                onboardingComplete: onboarding?.phase2?.onboardingComplete ?? false,
-                feedback: onboarding?.phase2?.feedback ?? '',
-              },
-              approvals: {
-                phase0: onboarding?.approvals?.phase0 ?? false,
-                phase1: onboarding?.approvals?.phase1 ?? false,
-                phase2: onboarding?.approvals?.phase2 ?? false,
-              },
-            },
+            onboarding,
           };
 
           setUser(userData);
