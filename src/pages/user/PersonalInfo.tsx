@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '@/contexts/UserAuthContext';
 import PersonalInfoForm from '@/components/user/personal-info/PersonalInfoForm';
 import { useToast } from "@/components/ui/use-toast";
+import PersonalInfoHeader from '@/components/user/PersonalInfoHeader';
 
 const PersonalInfo = () => {
   const { userId } = useUserAuth();
@@ -20,13 +21,15 @@ const PersonalInfo = () => {
     }
   }, [userId, navigate, toast]);
 
+  // Render content only if userId exists
   if (!userId) {
-    return null;
+    return null; // Early return after all hooks are called
   }
 
   return (
     <div className="min-h-screen py-8 px-4 bg-gray-50/50">
       <div className="max-w-4xl mx-auto">
+        <PersonalInfoHeader />
         <PersonalInfoForm />
       </div>
     </div>

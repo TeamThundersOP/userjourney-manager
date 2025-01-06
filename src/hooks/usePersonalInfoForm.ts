@@ -33,9 +33,7 @@ export const usePersonalInfoForm = (userId: string | null) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!userId) {
-        return;
-      }
+      if (!userId) return;
 
       try {
         const { data: candidate, error } = await supabase
