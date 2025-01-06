@@ -36,12 +36,6 @@ export const usePersonalInfoForm = (userId: string | null) => {
   useEffect(() => {
     const fetchUserData = async () => {
       if (!userId) {
-        toast({
-          title: "Error",
-          description: "User ID is missing. Please log in again.",
-          variant: "destructive",
-        });
-        navigate('/user/login');
         return;
       }
 
@@ -98,7 +92,7 @@ export const usePersonalInfoForm = (userId: string | null) => {
     };
 
     fetchUserData();
-  }, [userId, toast, navigate]);
+  }, [userId, toast]);
 
   useEffect(() => {
     const hasChanges = Object.keys(formData).some(key => {
@@ -106,30 +100,6 @@ export const usePersonalInfoForm = (userId: string | null) => {
       return formData[field] !== (initialFormData?.[field] || '');
     });
     
-    const requiredFields: (keyof PersonalInfoFormData)[] = [
-      'familyName',
-      'givenName',
-      'nationality',
-      'placeOfBirth',
-      'dateOfBirth',
-      'gender',
-      'countryOfResidence',
-      'passportNumber',
-      'passportIssueDate',
-      'passportExpiryDate',
-      'passportPlaceOfIssue',
-      'address',
-      'city',
-      'postalCode',
-      'country',
-      'phone'
-    ];
-    
-    const allRequiredFieldsFilled = requiredFields.every(field => 
-      formData[field] && formData[field].trim() !== ''
-    );
-
-    // Enable the save button if there are changes, regardless of whether all fields are filled
     setIsFormChanged(hasChanges);
   }, [formData, initialFormData]);
 
