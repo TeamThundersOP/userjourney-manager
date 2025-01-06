@@ -2,7 +2,6 @@ import { useUserAuth } from '@/contexts/UserAuthContext';
 import { Button } from "@/components/ui/button";
 import { useNavigate, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { Home, MessageSquare, UserRound, LogOut, Menu } from 'lucide-react';
-import { Toggle } from "@/components/ui/toggle";
 import { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -10,14 +9,8 @@ const DashboardLayout = () => {
   const { logout, userId } = useUserAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isDark, setIsDark] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const isMobile = useIsMobile();
-
-  useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    setIsDark(isDarkMode);
-  }, []);
 
   useEffect(() => {
     if (isMobile) {
@@ -50,30 +43,9 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
-      {isMobile && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 p-4 border-b border-gray-100 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <img 
-                src="/lovable-uploads/17a49967-e711-4d5a-b8fe-fb02e4469a2a.png" 
-                alt="Funelli Logo" 
-                className="h-8 w-auto"
-              />
-              <span className="text-xl font-bold font-araboto-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Funelli
-              </span>
-            </div>
-            <Button variant="ghost" size="icon" onClick={toggleSidebar}>
-              <Menu className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      <aside className={`fixed top-0 left-0 h-screen w-64 bg-white dark:bg-gray-800 shadow-lg border-r border-gray-100 dark:border-gray-700 transition-all duration-200 z-40 ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } md:translate-x-0`}>
-        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+      {/* Fixed Navbar */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 p-4 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
             <img 
               src="/lovable-uploads/17a49967-e711-4d5a-b8fe-fb02e4469a2a.png" 
@@ -84,7 +56,20 @@ const DashboardLayout = () => {
               Funelli
             </span>
           </div>
+          <div className="flex items-center space-x-2">
+            {isMobile && (
+              <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+                <Menu className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
         </div>
+      </div>
+
+      {/* Sidebar */}
+      <aside className={`fixed top-[73px] left-0 h-[calc(100vh-73px)] w-64 bg-white dark:bg-gray-800 shadow-lg border-r border-gray-100 dark:border-gray-700 transition-all duration-200 z-40 ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      } md:translate-x-0`}>
         <nav className="mt-6 space-y-2 px-3">
           <Button
             variant={isActive('dashboard') ? 'default' : 'ghost'}
@@ -135,14 +120,16 @@ const DashboardLayout = () => {
         </nav>
       </aside>
 
-      <main className={`min-h-screen p-4 md:p-8 transition-all duration-200 ${
+      {/* Main Content */}
+      <main className={`min-h-screen transition-all duration-200 ${
         isSidebarOpen ? 'md:ml-64' : ''
-      } ${isMobile ? 'mt-24' : ''}`}>
-        <div className="max-w-7xl mx-auto mt-8">
+      } pt-[73px] p-4 md:p-8`}>
+        <div className="max-w-7xl mx-auto">
           <Outlet />
         </div>
       </main>
 
+      {/* Mobile Overlay */}
       {isMobile && isSidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-30"
