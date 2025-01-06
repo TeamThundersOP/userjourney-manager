@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { PersonalInfoFormData } from "@/components/user/personal-info/PersonalInfoForm";
 import { useToast } from "@/components/ui/use-toast";
 import { Json } from '@/integrations/supabase/types';
-import { useNavigate } from 'react-router-dom';
 
 export const defaultFormData: PersonalInfoFormData = {
   familyName: '',
@@ -31,7 +30,6 @@ export const usePersonalInfoForm = (userId: string | null) => {
   const [isFormChanged, setIsFormChanged] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -100,7 +98,30 @@ export const usePersonalInfoForm = (userId: string | null) => {
       return formData[field] !== (initialFormData?.[field] || '');
     });
     
-    setIsFormChanged(hasChanges);
+    const requiredFields: (keyof PersonalInfoFormData)[] = [
+      'familyName',
+      'givenName',
+      'nationality',
+      'placeOfBirth',
+      'dateOfBirth',
+      'gender',
+      'countryOfResidence',
+      'passportNumber',
+      'passportIssueDate',
+      'passportExpiryDate',
+      'passportPlaceOfIssue',
+      'address',
+      'city',
+      'postalCode',
+      'country',
+      'phone'
+    ];
+    
+    const allRequiredFieldsFilled = requiredFields.every(field => 
+      formData[field] && formData[field].trim() !== ''
+    );
+
+    setIsFormChanged(hasChanges && allRequiredFieldsFilled);
   }, [formData, initialFormData]);
 
   return {
