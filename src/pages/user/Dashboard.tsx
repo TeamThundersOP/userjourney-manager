@@ -42,16 +42,33 @@ const Dashboard = () => {
       }
 
       if (candidate) {
-        const userData = {
-          ...candidate,
-          personalInfo: candidate.personal_info,
-          onboarding: candidate.onboarding
+        // Convert database fields to match our User type
+        const personalInfo = candidate.personal_info as User['personal_info'];
+        const onboarding = candidate.onboarding as User['onboarding'];
+        
+        const userData: User = {
+          id: candidate.id,
+          name: candidate.name,
+          username: candidate.username,
+          email: candidate.email || '',
+          status: candidate.status || 'pending',
+          created_at: candidate.created_at,
+          cv_submitted: candidate.cv_submitted,
+          interview_status: candidate.interview_status,
+          offer_letter_sent: candidate.offer_letter_sent,
+          cos_sent: candidate.cos_sent,
+          right_to_work: candidate.right_to_work,
+          onboarding_complete: candidate.onboarding_complete,
+          has_reset_password: candidate.has_reset_password,
+          personal_info: personalInfo,
+          personalInfo: personalInfo, // Alias for frontend compatibility
+          onboarding: onboarding,
         };
 
         setUser(userData);
 
-        const hasFilledInfo = candidate.personal_info && 
-          Object.values(candidate.personal_info).some(value => value !== null);
+        // Check if personal info is filled
+        const hasFilledInfo = personalInfo && Object.values(personalInfo).some(value => value !== null);
         setHasFilledPersonalInfo(hasFilledInfo);
       }
     };
