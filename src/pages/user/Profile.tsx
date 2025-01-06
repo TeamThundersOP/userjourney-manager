@@ -4,6 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { useUserAuth } from "@/contexts/UserAuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { PersonalInfo } from "@/types/user";
+import { Database } from "@/integrations/supabase/types";
+
+type Candidate = Database['public']['Tables']['candidates']['Row'];
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -21,7 +25,7 @@ const Profile = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Candidate;
     }
   });
 
@@ -35,7 +39,9 @@ const Profile = () => {
     );
   }
 
-  if (!user?.personal_info) {
+  const personalInfo = user?.personal_info as PersonalInfo;
+
+  if (!personalInfo) {
     return (
       <Card>
         <CardContent className="text-center py-6">
@@ -57,7 +63,7 @@ const Profile = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <h3 className="font-medium text-sm text-gray-500">Full Name</h3>
-            <p>{user.personal_info.fullName}</p>
+            <p>{personalInfo.fullName}</p>
           </div>
           <div>
             <h3 className="font-medium text-sm text-gray-500">Email</h3>
@@ -65,19 +71,19 @@ const Profile = () => {
           </div>
           <div>
             <h3 className="font-medium text-sm text-gray-500">Nationality</h3>
-            <p>{user.personal_info.nationality}</p>
+            <p>{personalInfo.nationality}</p>
           </div>
           <div>
             <h3 className="font-medium text-sm text-gray-500">Date of Birth</h3>
-            <p>{user.personal_info.dateOfBirth}</p>
+            <p>{personalInfo.dateOfBirth}</p>
           </div>
           <div>
             <h3 className="font-medium text-sm text-gray-500">Phone</h3>
-            <p>{user.personal_info.phone}</p>
+            <p>{personalInfo.phone}</p>
           </div>
           <div>
             <h3 className="font-medium text-sm text-gray-500">Address</h3>
-            <p>{user.personal_info.address}</p>
+            <p>{personalInfo.address}</p>
           </div>
         </div>
         <Button 
