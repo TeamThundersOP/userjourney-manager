@@ -38,11 +38,11 @@ const ViewUser = () => {
           return;
         }
 
-        console.log('Fetching user with ID:', userId);
+        console.log('Fetching user data...');
         const { data: candidate, error: fetchError } = await supabase
           .from('candidates')
           .select('*')
-          .eq('id', userId)
+          .or(`id.eq.${userId},email.eq.${userId}`)
           .maybeSingle();
 
         if (fetchError) {
