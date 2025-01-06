@@ -26,7 +26,7 @@ export const defaultFormData: PersonalInfoFormData = {
 
 export const usePersonalInfoForm = (userId: string | null) => {
   const [formData, setFormData] = useState<PersonalInfoFormData>(defaultFormData);
-  const [initialFormData, setInitialFormData] = useState<PersonalInfoFormData | null>(null);
+  const [initialFormData, setInitialFormData] = useState<PersonalInfoFormData>(defaultFormData);
   const [isFormChanged, setIsFormChanged] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -91,9 +91,11 @@ export const usePersonalInfoForm = (userId: string | null) => {
   }, [userId, toast]);
 
   useEffect(() => {
+    if (!initialFormData) return;
+
     const hasChanges = Object.keys(formData).some(key => {
       const field = key as keyof PersonalInfoFormData;
-      return formData[field] !== (initialFormData?.[field] || '');
+      return formData[field] !== initialFormData[field];
     });
     
     const requiredFields: (keyof PersonalInfoFormData)[] = [

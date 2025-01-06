@@ -21,9 +21,8 @@ const PersonalInfo = () => {
     }
   }, [userId, navigate, toast]);
 
-  // Render content only if userId exists
   if (!userId) {
-    return null; // Early return after all hooks are called
+    return null;
   }
 
   return (

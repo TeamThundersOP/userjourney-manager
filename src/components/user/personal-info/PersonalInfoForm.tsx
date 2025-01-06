@@ -45,6 +45,8 @@ const PersonalInfoForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!userId) return;
+    
     setIsLoading(true);
 
     try {
