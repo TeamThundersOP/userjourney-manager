@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { PersonalInfoFormData } from "@/components/user/personal-info/PersonalInfoForm";
-import { transformPersonalInfo } from "@/utils/personalInfoUtils";
 import { useToast } from "@/components/ui/use-toast";
 import { Json } from '@/integrations/supabase/types';
 
@@ -41,7 +40,7 @@ export const usePersonalInfoForm = (userId: string | null) => {
           .from('candidates')
           .select('personal_info')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching user data:', error);
@@ -56,23 +55,23 @@ export const usePersonalInfoForm = (userId: string | null) => {
         if (candidate?.personal_info) {
           const personalInfo = candidate.personal_info as Record<string, Json>;
           const transformedData: PersonalInfoFormData = {
-            familyName: (personalInfo.familyName as string) || '',
-            givenName: (personalInfo.givenName as string) || '',
-            otherNames: (personalInfo.otherNames as string) || '',
-            nationality: (personalInfo.nationality as string) || '',
-            placeOfBirth: (personalInfo.placeOfBirth as string) || '',
-            dateOfBirth: (personalInfo.dateOfBirth as string) || '',
-            gender: (personalInfo.gender as string) || '',
-            countryOfResidence: (personalInfo.countryOfResidence as string) || '',
-            passportNumber: (personalInfo.passportNumber as string) || '',
-            passportIssueDate: (personalInfo.passportIssueDate as string) || '',
-            passportExpiryDate: (personalInfo.passportExpiryDate as string) || '',
-            passportPlaceOfIssue: (personalInfo.passportPlaceOfIssue as string) || '',
-            address: (personalInfo.address as string) || '',
-            city: (personalInfo.city as string) || '',
-            postalCode: (personalInfo.postalCode as string) || '',
-            country: (personalInfo.country as string) || '',
-            phone: (personalInfo.phone as string) || '',
+            familyName: String(personalInfo.familyName || ''),
+            givenName: String(personalInfo.givenName || ''),
+            otherNames: String(personalInfo.otherNames || ''),
+            nationality: String(personalInfo.nationality || ''),
+            placeOfBirth: String(personalInfo.placeOfBirth || ''),
+            dateOfBirth: String(personalInfo.dateOfBirth || ''),
+            gender: String(personalInfo.gender || ''),
+            countryOfResidence: String(personalInfo.countryOfResidence || ''),
+            passportNumber: String(personalInfo.passportNumber || ''),
+            passportIssueDate: String(personalInfo.passportIssueDate || ''),
+            passportExpiryDate: String(personalInfo.passportExpiryDate || ''),
+            passportPlaceOfIssue: String(personalInfo.passportPlaceOfIssue || ''),
+            address: String(personalInfo.address || ''),
+            city: String(personalInfo.city || ''),
+            postalCode: String(personalInfo.postalCode || ''),
+            country: String(personalInfo.country || ''),
+            phone: String(personalInfo.phone || ''),
           };
           
           console.log('Fetched personal info:', transformedData);
