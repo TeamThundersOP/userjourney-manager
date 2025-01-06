@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PersonalInfoFormData } from "@/components/user/personal-info/PersonalInfoForm";
 import { useToast } from "@/components/ui/use-toast";
 import { Json } from '@/integrations/supabase/types';
+import { useNavigate } from 'react-router-dom';
 
 export const defaultFormData: PersonalInfoFormData = {
   familyName: '',
@@ -30,10 +31,19 @@ export const usePersonalInfoForm = (userId: string | null) => {
   const [isFormChanged, setIsFormChanged] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!userId) return;
+      if (!userId) {
+        toast({
+          title: "Error",
+          description: "User ID is missing. Please log in again.",
+          variant: "destructive",
+        });
+        navigate('/user/login');
+        return;
+      }
 
       try {
         const { data: candidate, error } = await supabase
@@ -88,7 +98,7 @@ export const usePersonalInfoForm = (userId: string | null) => {
     };
 
     fetchUserData();
-  }, [userId, toast]);
+  }, [userId, toast, navigate]);
 
   useEffect(() => {
     const hasChanges = Object.keys(formData).some(key => {
