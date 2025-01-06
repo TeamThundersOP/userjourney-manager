@@ -90,7 +90,18 @@ const UserLogin = () => {
           return;
         }
 
-        // If we get here, both auth and candidate record exist
+        // Check if the user needs to reset their password
+        if (!candidate.has_reset_password) {
+          console.log('First time login detected, redirecting to reset password page');
+          toast({
+            title: "Welcome!",
+            description: "Please reset your password for security.",
+          });
+          navigate('/user/reset-password');
+          return;
+        }
+
+        // If we get here, both auth and candidate record exist and password has been reset
         console.log('Login successful, redirecting to dashboard');
         toast({
           title: "Success",
