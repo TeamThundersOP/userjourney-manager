@@ -110,18 +110,20 @@ const DashboardLayout = () => {
             <MessageSquare className="mr-2 h-4 w-4" />
             Reports
           </Button>
-          <Button
-            variant={isActive('profile') ? 'default' : 'ghost'}
-            className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
-              isActive('profile')
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
-            }`}
-            onClick={() => navigate('/user/profile')}
-          >
-            <UserRound className="mr-2 h-4 w-4" />
-            Profile
-          </Button>
+          {hasFilledPersonalInfo && (
+            <Button
+              variant={isActive('profile') ? 'default' : 'ghost'}
+              className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
+                isActive('profile')
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
+              }`}
+              onClick={() => navigate('/user/profile')}
+            >
+              <UserRound className="mr-2 h-4 w-4" />
+              My Profile
+            </Button>
+          )}
           <div className="absolute bottom-8 left-0 w-full px-3">
             <Button
               variant="ghost"
