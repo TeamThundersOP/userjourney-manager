@@ -34,8 +34,7 @@ const DashboardLayout = () => {
 
   // Only redirect to personal-info if the user hasn't filled it and is trying to access profile
   const shouldRedirectToPersonalInfo = !hasFilledPersonalInfo && 
-    location.pathname === '/user/profile' && 
-    location.pathname !== '/user/personal-info';
+    location.pathname === '/user/profile';
 
   if (shouldRedirectToPersonalInfo) {
     return <Navigate to="/user/personal-info" />;
