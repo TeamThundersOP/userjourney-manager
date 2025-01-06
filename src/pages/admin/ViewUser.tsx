@@ -10,12 +10,24 @@ import UserHeader from '@/components/admin/user/UserHeader';
 import UserContent from '@/components/admin/user/UserContent';
 import { transformUserData } from '@/utils/userTransform';
 
+const ADMIN_EMAIL = 'vanapallisaisriram7@gmail.com';
+
 const ViewUser = () => {
   const { userId } = useParams<{ userId: string }>();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("personal");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAdmin(user?.email === ADMIN_EMAIL);
+    };
+
+    checkAdminStatus();
+  }, []);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -59,6 +71,17 @@ const ViewUser = () => {
 
     fetchUser();
   }, [userId]);
+
+  if (!isAdmin) {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+          <strong className="font-bold">Access Denied: </strong>
+          <span className="block sm:inline">You do not have permission to view this page.</span>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
