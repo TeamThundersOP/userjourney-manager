@@ -42,10 +42,10 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Fixed Navbar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 p-4 border-b border-gray-100 dark:border-gray-700">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
           <div className="flex items-center space-x-3">
             <img 
               src="/lovable-uploads/17a49967-e711-4d5a-b8fe-fb02e4469a2a.png" 
@@ -67,47 +67,51 @@ const DashboardLayout = () => {
       </div>
 
       {/* Sidebar */}
-      <aside className={`fixed top-[73px] left-0 h-[calc(100vh-73px)] w-64 bg-white dark:bg-gray-800 shadow-lg border-r border-gray-100 dark:border-gray-700 transition-all duration-200 z-40 ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } md:translate-x-0`}>
-        <nav className="mt-6 space-y-2 px-3">
-          <Button
-            variant={isActive('dashboard') ? 'default' : 'ghost'}
-            className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
-              isActive('dashboard') 
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
-            }`}
-            onClick={() => navigate('/user/dashboard')}
-          >
-            <Home className="mr-2 h-4 w-4" />
-            Home
-          </Button>
-          <Button
-            variant={isActive('reports') ? 'default' : 'ghost'}
-            className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
-              isActive('reports')
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
-            }`}
-            onClick={() => navigate('/user/reports')}
-          >
-            <MessageSquare className="mr-2 h-4 w-4" />
-            Reports
-          </Button>
-          <Button
-            variant={isActive('profile') ? 'default' : 'ghost'}
-            className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
-              isActive('profile')
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
-            }`}
-            onClick={() => navigate('/user/profile')}
-          >
-            <UserRound className="mr-2 h-4 w-4" />
-            Profile
-          </Button>
-          <div className="absolute bottom-8 left-0 w-full px-3">
+      <aside 
+        className={`fixed left-0 top-[64px] h-[calc(100vh-64px)] w-64 bg-white dark:bg-gray-800 shadow-lg border-r border-gray-100 dark:border-gray-700 transition-transform duration-200 z-40 ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0`}
+      >
+        <nav className="flex flex-col h-full">
+          <div className="flex-1 space-y-2 p-4">
+            <Button
+              variant={isActive('dashboard') ? 'default' : 'ghost'}
+              className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
+                isActive('dashboard') 
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
+              }`}
+              onClick={() => navigate('/user/dashboard')}
+            >
+              <Home className="mr-2 h-4 w-4" />
+              Home
+            </Button>
+            <Button
+              variant={isActive('reports') ? 'default' : 'ghost'}
+              className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
+                isActive('reports')
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
+              }`}
+              onClick={() => navigate('/user/reports')}
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Reports
+            </Button>
+            <Button
+              variant={isActive('profile') ? 'default' : 'ghost'}
+              className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
+                isActive('profile')
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
+              }`}
+              onClick={() => navigate('/user/profile')}
+            >
+              <UserRound className="mr-2 h-4 w-4" />
+              Profile
+            </Button>
+          </div>
+          <div className="p-4 border-t border-gray-100 dark:border-gray-700">
             <Button
               variant="ghost"
               className="w-full justify-start px-4 py-2 text-left text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 transition-all duration-200"
@@ -121,9 +125,11 @@ const DashboardLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <main className={`min-h-screen transition-all duration-200 ${
-        isSidebarOpen ? 'md:ml-64' : ''
-      } pt-[73px] p-4 md:p-8`}>
+      <main 
+        className={`flex-1 min-h-screen transition-all duration-200 ${
+          isSidebarOpen ? 'md:ml-64' : ''
+        } pt-[64px] p-4 md:p-8`}
+      >
         <div className="max-w-7xl mx-auto">
           <Outlet />
         </div>
