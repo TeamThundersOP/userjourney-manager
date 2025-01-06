@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import Phase0Onboarding from '@/components/user/onboarding/Phase0Onboarding';
 import Phase1Onboarding from '@/components/user/onboarding/Phase1Onboarding';
 import Phase2Onboarding from '@/components/user/onboarding/Phase2Onboarding';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { User } from '@/types/user';
 import { CheckCircle2 } from 'lucide-react';
@@ -31,7 +31,7 @@ const UserDashboard = () => {
         }
 
         console.log('User data fetched:', data);
-        return data;
+        return data as User;
       } catch (error) {
         console.error('Error in query function:', error);
         throw error;
@@ -39,12 +39,6 @@ const UserDashboard = () => {
     },
     enabled: !!userId,
   });
-
-  useEffect(() => {
-    if (isError) {
-      toast.error('Failed to load dashboard data');
-    }
-  }, [isError]);
 
   if (!userData) {
     return (

@@ -20,8 +20,10 @@ export type Database = {
           interview_status: string | null
           name: string
           offer_letter_sent: boolean | null
+          onboarding: Json | null
           onboarding_complete: boolean | null
           right_to_work: boolean | null
+          status: string | null
           username: string
         }
         Insert: {
@@ -34,8 +36,10 @@ export type Database = {
           interview_status?: string | null
           name: string
           offer_letter_sent?: boolean | null
+          onboarding?: Json | null
           onboarding_complete?: boolean | null
           right_to_work?: boolean | null
+          status?: string | null
           username: string
         }
         Update: {
@@ -48,8 +52,10 @@ export type Database = {
           interview_status?: string | null
           name?: string
           offer_letter_sent?: boolean | null
+          onboarding?: Json | null
           onboarding_complete?: boolean | null
           right_to_work?: boolean | null
+          status?: string | null
           username?: string
         }
         Relationships: []
