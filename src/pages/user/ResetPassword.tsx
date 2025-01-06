@@ -66,7 +66,8 @@ const ResetPassword = () => {
 
       if (updateAuthError) {
         // Handle the same password error specifically
-        if (updateAuthError.message.includes('same_password')) {
+        if (updateAuthError.message.includes('same_password') || 
+            (updateAuthError as any)?.body?.includes('same_password')) {
           toast({
             title: "Error",
             description: "New password must be different from your current password",
