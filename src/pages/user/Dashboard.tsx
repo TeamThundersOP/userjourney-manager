@@ -44,7 +44,52 @@ const Dashboard = () => {
       if (candidate) {
         // Convert database fields to match our User type
         const personalInfo = candidate.personal_info as User['personal_info'];
-        const onboarding = candidate.onboarding as User['onboarding'];
+        
+        // Safely cast the onboarding data with default values if needed
+        const rawOnboarding = candidate.onboarding as any;
+        const onboarding = {
+          currentPhase: rawOnboarding?.currentPhase ?? 0,
+          phase0: {
+            personalDetailsCompleted: rawOnboarding?.phase0?.personalDetailsCompleted ?? false,
+            cvSubmitted: rawOnboarding?.phase0?.cvSubmitted ?? false,
+            interviewCompleted: rawOnboarding?.phase0?.interviewCompleted ?? false,
+            jobStatus: rawOnboarding?.phase0?.jobStatus ?? 'pending',
+            passportUploaded: rawOnboarding?.phase0?.passportUploaded ?? false,
+            pccUploaded: rawOnboarding?.phase0?.pccUploaded ?? false,
+            otherDocumentsUploaded: rawOnboarding?.phase0?.otherDocumentsUploaded ?? false,
+            offerLetterSent: rawOnboarding?.phase0?.offerLetterSent ?? false,
+            cosSent: rawOnboarding?.phase0?.cosSent ?? false,
+            documentsUploaded: rawOnboarding?.phase0?.documentsUploaded ?? false,
+            visaStatus: rawOnboarding?.phase0?.visaStatus ?? 'pending',
+            travelDetailsUpdated: rawOnboarding?.phase0?.travelDetailsUpdated ?? false,
+            travelDocumentsUploaded: rawOnboarding?.phase0?.travelDocumentsUploaded ?? false,
+            visaCopyUploaded: rawOnboarding?.phase0?.visaCopyUploaded ?? false,
+            ukContactUpdated: rawOnboarding?.phase0?.ukContactUpdated ?? false,
+            ukContactNumber: rawOnboarding?.phase0?.ukContactNumber ?? '',
+            ukAddress: rawOnboarding?.phase0?.ukAddress ?? '',
+            feedback: rawOnboarding?.phase0?.feedback ?? '',
+          },
+          phase1: {
+            hmrcChecklist: rawOnboarding?.phase1?.hmrcChecklist ?? false,
+            companyAgreements: rawOnboarding?.phase1?.companyAgreements ?? false,
+            pensionScheme: rawOnboarding?.phase1?.pensionScheme ?? false,
+            bankStatements: rawOnboarding?.phase1?.bankStatements ?? false,
+            vaccinationProof: rawOnboarding?.phase1?.vaccinationProof ?? false,
+            feedback: rawOnboarding?.phase1?.feedback ?? '',
+          },
+          phase2: {
+            rightToWork: rawOnboarding?.phase2?.rightToWork ?? false,
+            shareCode: rawOnboarding?.phase2?.shareCode ?? false,
+            dbs: rawOnboarding?.phase2?.dbs ?? false,
+            onboardingComplete: rawOnboarding?.phase2?.onboardingComplete ?? false,
+            feedback: rawOnboarding?.phase2?.feedback ?? '',
+          },
+          approvals: {
+            phase0: rawOnboarding?.approvals?.phase0 ?? false,
+            phase1: rawOnboarding?.approvals?.phase1 ?? false,
+            phase2: rawOnboarding?.approvals?.phase2 ?? false,
+          },
+        };
         
         const userData: User = {
           id: candidate.id,
