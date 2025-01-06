@@ -11,7 +11,7 @@ import UserContent from '@/components/admin/user/UserContent';
 import { transformUserData } from '@/utils/userTransform';
 
 const ViewUser = () => {
-  const { userId } = useParams();
+  const { userId } = useParams<{ userId: string }>();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,13 +19,14 @@ const ViewUser = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (!userId) {
-        setError("No user ID provided");
-        setLoading(false);
-        return;
-      }
-
       try {
+        if (!userId) {
+          setError("No user ID provided");
+          setLoading(false);
+          return;
+        }
+
+        console.log('Fetching user with ID:', userId);
         const { data: candidate, error: fetchError } = await supabase
           .from('candidates')
           .select('*')
@@ -33,6 +34,7 @@ const ViewUser = () => {
           .maybeSingle();
 
         if (fetchError) {
+          console.error('Error fetching user:', fetchError);
           throw fetchError;
         }
 
@@ -42,10 +44,12 @@ const ViewUser = () => {
           return;
         }
 
+        console.log('Fetched candidate data:', candidate);
         const transformedUser = transformUserData(candidate as Tables<'candidates'>);
+        console.log('Transformed user data:', transformedUser);
         setUser(transformedUser);
       } catch (error: any) {
-        console.error('Error fetching user:', error);
+        console.error('Error in fetchUser:', error);
         toast.error("Failed to load user data");
         setError(error.message || "Failed to fetch user data");
       } finally {
@@ -77,9 +81,9 @@ const ViewUser = () => {
   if (error) {
     return (
       <div className="container mx-auto py-6">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          <p className="font-medium">Error</p>
-          <p>{error}</p>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+          <strong className="font-bold">Error: </strong>
+          <span className="block sm:inline">{error}</span>
         </div>
       </div>
     );
@@ -88,9 +92,9 @@ const ViewUser = () => {
   if (!user) {
     return (
       <div className="container mx-auto py-6">
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded">
-          <p className="font-medium">User Not Found</p>
-          <p>The requested user could not be found.</p>
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded relative">
+          <strong className="font-bold">Not Found: </strong>
+          <span className="block sm:inline">The requested user could not be found.</span>
         </div>
       </div>
     );
