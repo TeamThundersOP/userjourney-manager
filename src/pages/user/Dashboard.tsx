@@ -5,10 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types/user";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileUpload } from "@/components/user/FileUpload";
+import FileUpload from "@/components/user/onboarding/FileUpload";
 import { UserFiles } from "@/components/user/UserFiles";
 import PersonalInfoForm from "@/components/user/personal-info/PersonalInfoForm";
 
@@ -45,10 +44,23 @@ const Dashboard = () => {
       if (candidate) {
         // Convert database fields to match our User type
         const userData: User = {
-          ...candidate,
-          personalInfo: candidate.personal_info,
-          onboarding: candidate.onboarding as User['onboarding']
+          id: candidate.id,
+          name: candidate.name,
+          username: candidate.username,
+          email: candidate.email,
+          status: candidate.status,
+          created_at: candidate.created_at,
+          cv_submitted: candidate.cv_submitted,
+          interview_status: candidate.interview_status,
+          offer_letter_sent: candidate.offer_letter_sent,
+          cos_sent: candidate.cos_sent,
+          right_to_work: candidate.right_to_work,
+          onboarding_complete: candidate.onboarding_complete,
+          has_reset_password: candidate.has_reset_password,
+          personalInfo: candidate.personal_info as any,
+          onboarding: candidate.onboarding as any
         };
+
         setUser(userData);
 
         // Check if personal info is filled
@@ -103,7 +115,7 @@ const Dashboard = () => {
 
       // Update user in local storage
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const updatedUsers = users.map((u: User) => 
+      const updatedUsers = users.map((u: any) => 
         u.id === user.id ? { ...u, onboarding: updatedOnboarding } : u
       );
       localStorage.setItem('users', JSON.stringify(updatedUsers));
@@ -170,24 +182,21 @@ const Dashboard = () => {
             <CardContent className="space-y-4">
               <FileUpload
                 category="passport"
-                onUpload={handleFileUpload}
+                onFileUpload={handleFileUpload}
                 label="Upload Passport"
-                description="Please upload a clear copy of your passport"
-                acceptedFileTypes={['.pdf', '.jpg', '.jpeg', '.png']}
+                accept=".pdf,.jpg,.jpeg,.png"
               />
               <FileUpload
                 category="pcc"
-                onUpload={handleFileUpload}
+                onFileUpload={handleFileUpload}
                 label="Upload Police Clearance Certificate"
-                description="Please upload your police clearance certificate"
-                acceptedFileTypes={['.pdf']}
+                accept=".pdf"
               />
               <FileUpload
                 category="other"
-                onUpload={handleFileUpload}
+                onFileUpload={handleFileUpload}
                 label="Upload Other Documents"
-                description="Please upload any other required documents"
-                acceptedFileTypes={['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx']}
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
               />
             </CardContent>
           </Card>
