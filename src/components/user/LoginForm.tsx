@@ -50,6 +50,8 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
         localStorage.setItem('userAuth', 'true');
         localStorage.setItem('userId', candidate.id);
 
+        console.log('Has reset password:', candidate.has_reset_password);
+
         if (!candidate.has_reset_password) {
           // First time login - redirect to reset password
           navigate('/user/reset-password');
@@ -57,6 +59,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
             title: "Welcome!",
             description: "Please reset your password to continue.",
           });
+          return; // Important: return here to prevent onSuccess from being called
         } else {
           // Regular login - proceed to dashboard
           onSuccess();
@@ -97,6 +100,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
             title: "Welcome!",
             description: "Please reset your password to continue.",
           });
+          return; // Important: return here to prevent onSuccess from being called
         } else {
           throw signInError;
         }
