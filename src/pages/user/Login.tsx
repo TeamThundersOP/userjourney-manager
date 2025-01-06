@@ -41,44 +41,13 @@ const UserLogin = () => {
 
     try {
       const normalizedEmail = email.toLowerCase().trim();
-      console.log('Attempting login process for:', normalizedEmail);
+      console.log('Starting login process for:', normalizedEmail);
       
-      // First check if the email exists in the candidates table using ilike for case-insensitive matching
-      const { data: candidate, error: candidateError } = await supabase
-        .from('candidates')
-        .select('has_reset_password')
-        .ilike('email', normalizedEmail)
-        .maybeSingle();
-
-      console.log('Candidate check result:', { candidate, candidateError });
-
-      if (candidateError) {
-        console.error('Error checking candidate status:', candidateError);
-        toast({
-          title: "Error",
-          description: "An error occurred while checking your registration status. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!candidate) {
-        console.log('No candidate found for email:', normalizedEmail);
-        toast({
-          title: "Access Restricted",
-          description: "This email is not registered in our system. Please contact the administrator for access.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Now attempt to sign in
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      // First attempt to sign in with Supabase Auth
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
         password,
       });
-
-      console.log('Authentication result:', { data, signInError });
 
       if (signInError) {
         console.error('Authentication error:', signInError);
@@ -90,24 +59,44 @@ const UserLogin = () => {
         return;
       }
 
-      if (data.user) {
-        console.log('Login successful, checking password reset status');
-        
-        if (!candidate.has_reset_password) {
-          console.log('Password not reset, redirecting to reset page');
+      if (authData.user) {
+        // After successful auth, check if user exists in candidates table
+        const { data: candidate, error: candidateError } = await supabase
+          .from('candidates')
+          .select('*')
+          .eq('id', authData.user.id)
+          .maybeSingle();
+
+        console.log('Candidate check result:', { candidate, candidateError });
+
+        if (candidateError) {
+          console.error('Error fetching candidate:', candidateError);
           toast({
-            title: "Welcome!",
-            description: "Please reset your password for security.",
+            title: "Error",
+            description: "An error occurred while verifying your account. Please try again.",
+            variant: "destructive",
           });
-          navigate('/user/reset-password');
-        } else {
-          console.log('Password already reset, redirecting to dashboard');
-          toast({
-            title: "Success",
-            description: "Logged in successfully",
-          });
-          navigate('/user/dashboard');
+          return;
         }
+
+        if (!candidate) {
+          // If no candidate record exists, sign out the user
+          await supabase.auth.signOut();
+          toast({
+            title: "Access Restricted",
+            description: "Your account is not properly set up. Please contact the administrator.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // If we get here, both auth and candidate record exist
+        console.log('Login successful, redirecting to dashboard');
+        toast({
+          title: "Success",
+          description: "Logged in successfully",
+        });
+        navigate('/user/dashboard');
       }
     } catch (error: any) {
       console.error('Unexpected error during login:', error);
