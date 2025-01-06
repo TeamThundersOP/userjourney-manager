@@ -8,6 +8,7 @@ import PassportInfoSection from './PassportInfoSection';
 import ContactInfoSection from './ContactInfoSection';
 import { supabase } from "@/integrations/supabase/client";
 import { usePersonalInfoForm } from '@/hooks/usePersonalInfoForm';
+import { useQuery } from '@tanstack/react-query';
 
 export interface PersonalInfoFormData {
   familyName: string;
@@ -42,6 +43,28 @@ const PersonalInfoForm = () => {
     initialFormData,
     setInitialFormData,
   } = usePersonalInfoForm(userId);
+
+  // Fetch existing user data
+  const { data: userData } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: async () => {
+      if (!userId) return null;
+
+      const { data, error } = await supabase
+        .from('candidates')
+        .select('personal_info')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching user data:', error);
+        return null;
+      }
+
+      return data;
+    },
+    enabled: !!userId,
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
