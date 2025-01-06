@@ -29,26 +29,7 @@ const fetchUser = async (userId: string): Promise<User> => {
   }
 
   // Transform personal_info to ensure it matches PersonalInfo type
-  const personalInfo = user.personal_info as PersonalInfo || {
-    familyName: null,
-    givenName: null,
-    otherNames: null,
-    fullName: null,
-    nationality: null,
-    placeOfBirth: null,
-    dateOfBirth: null,
-    gender: null,
-    countryOfResidence: null,
-    passportNumber: null,
-    passportIssueDate: null,
-    passportExpiryDate: null,
-    passportPlaceOfIssue: null,
-    address: null,
-    city: null,
-    postalCode: null,
-    country: null,
-    phone: null,
-  };
+  const personalInfo = (user.personal_info || {}) as PersonalInfo;
 
   // Define default onboarding structure with correct types
   const defaultOnboarding = {
@@ -93,29 +74,28 @@ const fetchUser = async (userId: string): Promise<User> => {
     }
   };
 
-  // Merge the database onboarding data with defaults, ensuring type safety
-  const onboardingData = user.onboarding
-    ? {
-        ...defaultOnboarding,
-        ...(user.onboarding as typeof defaultOnboarding),
-        phase0: {
-          ...defaultOnboarding.phase0,
-          ...(user.onboarding as any).phase0,
-        },
-        phase1: {
-          ...defaultOnboarding.phase1,
-          ...(user.onboarding as any).phase1,
-        },
-        phase2: {
-          ...defaultOnboarding.phase2,
-          ...(user.onboarding as any).phase2,
-        },
-        approvals: {
-          ...defaultOnboarding.approvals,
-          ...(user.onboarding as any).approvals,
-        },
-      }
-    : defaultOnboarding;
+  // Safely merge the database onboarding data with defaults
+  const rawOnboarding = user.onboarding as Record<string, unknown> || {};
+  const onboardingData = {
+    ...defaultOnboarding,
+    currentPhase: (rawOnboarding.currentPhase as number) ?? 0,
+    phase0: {
+      ...defaultOnboarding.phase0,
+      ...(rawOnboarding.phase0 as Partial<OnboardingPhase0> || {}),
+    },
+    phase1: {
+      ...defaultOnboarding.phase1,
+      ...(rawOnboarding.phase1 as Partial<OnboardingPhase1> || {}),
+    },
+    phase2: {
+      ...defaultOnboarding.phase2,
+      ...(rawOnboarding.phase2 as Partial<OnboardingPhase2> || {}),
+    },
+    approvals: {
+      ...defaultOnboarding.approvals,
+      ...(rawOnboarding.approvals as typeof defaultOnboarding.approvals || {}),
+    },
+  };
 
   // Transform the data to match our User type
   return {
