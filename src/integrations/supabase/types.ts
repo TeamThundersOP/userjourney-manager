@@ -22,6 +22,7 @@ export type Database = {
           offer_letter_sent: boolean | null
           onboarding: Json | null
           onboarding_complete: boolean | null
+          personal_info: Json | null
           right_to_work: boolean | null
           status: string | null
           username: string
@@ -38,6 +39,7 @@ export type Database = {
           offer_letter_sent?: boolean | null
           onboarding?: Json | null
           onboarding_complete?: boolean | null
+          personal_info?: Json | null
           right_to_work?: boolean | null
           status?: string | null
           username: string
@@ -54,6 +56,7 @@ export type Database = {
           offer_letter_sent?: boolean | null
           onboarding?: Json | null
           onboarding_complete?: boolean | null
+          personal_info?: Json | null
           right_to_work?: boolean | null
           status?: string | null
           username?: string

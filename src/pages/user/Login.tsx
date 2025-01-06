@@ -14,19 +14,16 @@ const UserLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Add effect to check authentication status on mount and changes
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // If user is already authenticated, redirect to dashboard
         navigate('/user/dashboard');
       }
     };
 
     checkAuth();
 
-    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         navigate('/user/dashboard');
@@ -46,11 +43,11 @@ const UserLogin = () => {
       const normalizedEmail = email.toLowerCase().trim();
       console.log('Attempting login process for:', normalizedEmail);
       
-      // First check if the email exists in the candidates table
+      // First check if the email exists in the candidates table using ilike for case-insensitive matching
       const { data: candidate, error: candidateError } = await supabase
         .from('candidates')
         .select('has_reset_password')
-        .eq('email', normalizedEmail)
+        .ilike('email', normalizedEmail)
         .maybeSingle();
 
       console.log('Candidate check result:', { candidate, candidateError });
@@ -96,7 +93,6 @@ const UserLogin = () => {
       if (data.user) {
         console.log('Login successful, checking password reset status');
         
-        // Check if the user has reset their password
         if (!candidate.has_reset_password) {
           console.log('Password not reset, redirecting to reset page');
           toast({
@@ -105,7 +101,6 @@ const UserLogin = () => {
           });
           navigate('/user/reset-password');
         } else {
-          // If password has been reset, go directly to dashboard
           console.log('Password already reset, redirecting to dashboard');
           toast({
             title: "Success",
