@@ -6,25 +6,26 @@ import { Tables } from "@/integrations/supabase/types";
 
 export const transformUserData = (candidate: Tables<'candidates'>): User => {
   // Transform personal_info
-  const personalInfo: PersonalInfo = {
-    familyName: candidate.personal_info?.familyName as string || '',
-    givenName: candidate.personal_info?.givenName as string || '',
-    otherNames: candidate.personal_info?.otherNames as string || '',
-    fullName: candidate.personal_info?.fullName as string || '',
-    nationality: candidate.personal_info?.nationality as string || '',
-    placeOfBirth: candidate.personal_info?.placeOfBirth as string || '',
-    dateOfBirth: candidate.personal_info?.dateOfBirth as string || '',
-    gender: candidate.personal_info?.gender as string || '',
-    countryOfResidence: candidate.personal_info?.countryOfResidence as string || '',
-    passportNumber: candidate.personal_info?.passportNumber as string || '',
-    passportIssueDate: candidate.personal_info?.passportIssueDate as string || '',
-    passportExpiryDate: candidate.personal_info?.passportExpiryDate as string || '',
-    passportPlaceOfIssue: candidate.personal_info?.passportPlaceOfIssue as string || '',
-    address: candidate.personal_info?.address as string || '',
-    city: candidate.personal_info?.city as string || '',
-    postalCode: candidate.personal_info?.postalCode as string || '',
-    country: candidate.personal_info?.country as string || '',
-    phone: candidate.personal_info?.phone as string || '',
+  const personalInfo = candidate.personal_info as Record<string, unknown>;
+  const transformedPersonalInfo: PersonalInfo = {
+    familyName: String(personalInfo?.familyName || ''),
+    givenName: String(personalInfo?.givenName || ''),
+    otherNames: String(personalInfo?.otherNames || ''),
+    fullName: String(personalInfo?.fullName || ''),
+    nationality: String(personalInfo?.nationality || ''),
+    placeOfBirth: String(personalInfo?.placeOfBirth || ''),
+    dateOfBirth: String(personalInfo?.dateOfBirth || ''),
+    gender: String(personalInfo?.gender || ''),
+    countryOfResidence: String(personalInfo?.countryOfResidence || ''),
+    passportNumber: String(personalInfo?.passportNumber || ''),
+    passportIssueDate: String(personalInfo?.passportIssueDate || ''),
+    passportExpiryDate: String(personalInfo?.passportExpiryDate || ''),
+    passportPlaceOfIssue: String(personalInfo?.passportPlaceOfIssue || ''),
+    address: String(personalInfo?.address || ''),
+    city: String(personalInfo?.city || ''),
+    postalCode: String(personalInfo?.postalCode || ''),
+    country: String(personalInfo?.country || ''),
+    phone: String(personalInfo?.phone || ''),
   };
 
   // Transform onboarding data
@@ -61,15 +62,16 @@ export const transformUserData = (candidate: Tables<'candidates'>): User => {
     onboardingComplete: false,
   };
 
-  const onboardingData = {
-    currentPhase: candidate.onboarding?.currentPhase ?? 0,
-    phase0: { ...defaultPhase0, ...(candidate.onboarding?.phase0 ?? {}) },
-    phase1: { ...defaultPhase1, ...(candidate.onboarding?.phase1 ?? {}) },
-    phase2: { ...defaultPhase2, ...(candidate.onboarding?.phase2 ?? {}) },
+  const onboardingData = candidate.onboarding as Record<string, unknown>;
+  const transformedOnboarding = {
+    currentPhase: Number(onboardingData?.currentPhase ?? 0),
+    phase0: { ...defaultPhase0, ...(onboardingData?.phase0 as Partial<OnboardingPhase0> ?? {}) },
+    phase1: { ...defaultPhase1, ...(onboardingData?.phase1 as Partial<OnboardingPhase1> ?? {}) },
+    phase2: { ...defaultPhase2, ...(onboardingData?.phase2 as Partial<OnboardingPhase2> ?? {}) },
     approvals: {
-      phase0: candidate.onboarding?.approvals?.phase0 ?? false,
-      phase1: candidate.onboarding?.approvals?.phase1 ?? false,
-      phase2: candidate.onboarding?.approvals?.phase2 ?? false,
+      phase0: Boolean(onboardingData?.approvals?.phase0 ?? false),
+      phase1: Boolean(onboardingData?.approvals?.phase1 ?? false),
+      phase2: Boolean(onboardingData?.approvals?.phase2 ?? false),
     },
   };
 
@@ -87,9 +89,9 @@ export const transformUserData = (candidate: Tables<'candidates'>): User => {
     right_to_work: candidate.right_to_work,
     onboarding_complete: candidate.onboarding_complete,
     has_reset_password: candidate.has_reset_password,
-    personal_info: personalInfo,
-    personalInfo: personalInfo,
-    onboarding: onboardingData,
+    personal_info: transformedPersonalInfo,
+    personalInfo: transformedPersonalInfo,
+    onboarding: transformedOnboarding,
   };
 };
 
@@ -107,7 +109,7 @@ const ViewUser = () => {
           .from('candidates')
           .select('*')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         if (candidate) {

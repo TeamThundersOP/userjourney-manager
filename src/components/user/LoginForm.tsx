@@ -39,11 +39,15 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
           .from('candidates')
           .select('has_reset_password, id')
           .eq('email', normalizedEmail)
-          .single();
+          .maybeSingle();
 
         if (candidateError) {
           console.error('Error fetching candidate:', candidateError);
           throw new Error('Failed to fetch user data');
+        }
+
+        if (!candidate) {
+          throw new Error('User not found');
         }
 
         // Store auth state
