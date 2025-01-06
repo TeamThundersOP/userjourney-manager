@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { User } from "@/types/user";
+import { User, PersonalInfo } from "@/types/user";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -30,8 +30,8 @@ export const useUserData = (userId: string | null) => {
         }
 
         if (candidate) {
-          const personalInfo = candidate.personal_info;
-          const onboarding = candidate.onboarding as any;
+          const personalInfo = candidate.personal_info as PersonalInfo;
+          const onboarding = candidate.onboarding;
           
           const userData: User = {
             id: candidate.id,
