@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { UserFile } from "@/types/userFile";
 import { calculateProgress } from "@/utils/onboarding";
 import { User, PersonalInfo } from "@/types/user";
+import OnboardingPhases from "@/components/user/dashboard/OnboardingPhases";
 
 const Dashboard = () => {
   const { userId } = useUserAuth();
@@ -86,7 +87,7 @@ const Dashboard = () => {
           <div className="space-y-4">
             <div>
               <div className="flex justify-between mb-2">
-                <span className="text-sm font-medium">Onboarding Progress</span>
+                <span className="text-sm font-medium">Overall Progress</span>
                 <span className="text-sm text-gray-500">{progress}%</span>
               </div>
               <Progress value={progress} className="h-2" />
@@ -95,6 +96,8 @@ const Dashboard = () => {
         </CardContent>
       </Card>
 
+      <OnboardingPhases user={user} />
+
       <Tabs defaultValue="documents">
         <TabsList>
           <TabsTrigger value="documents">Documents</TabsTrigger>
@@ -102,7 +105,6 @@ const Dashboard = () => {
         </TabsList>
         <TabsContent value="documents">
           <DocumentsTab onFileUpload={(file: UserFile) => {
-            // Handle file upload
             toast.success(`File ${file.name} uploaded successfully`);
           }} />
         </TabsContent>
