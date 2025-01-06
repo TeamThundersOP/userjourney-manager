@@ -3,6 +3,12 @@ import { useParams } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { User, PersonalInfo, OnboardingPhase0, OnboardingPhase1, OnboardingPhase2 } from "@/types/user";
 import { Tables } from "@/integrations/supabase/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+import UserPersonalInfo from '@/components/admin/UserPersonalInfo';
+import StatusTabs from '@/components/admin/user/StatusTabs';
+import ProgressStatus from '@/components/admin/user/ProgressStatus';
+import UserFiles from '@/components/admin/UserFiles';
 
 interface OnboardingData {
   currentPhase: number;
@@ -110,25 +116,40 @@ const ViewUser = () => {
   const { userId } = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("personal");
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (!userId) return;
+      if (!userId) {
+        setError("No user ID provided");
+        setLoading(false);
+        return;
+      }
 
       try {
-        const { data: candidate, error } = await supabase
+        const { data: candidate, error: fetchError } = await supabase
           .from('candidates')
           .select('*')
           .eq('id', userId)
           .maybeSingle();
 
-        if (error) throw error;
-        if (candidate) {
-          const transformedUser = transformUserData(candidate);
-          setUser(transformedUser);
+        if (fetchError) {
+          throw fetchError;
         }
-      } catch (error) {
+
+        if (!candidate) {
+          setError("User not found");
+          setLoading(false);
+          return;
+        }
+
+        const transformedUser = transformUserData(candidate);
+        setUser(transformedUser);
+      } catch (error: any) {
         console.error('Error fetching user:', error);
+        toast.error("Failed to load user data");
+        setError(error.message || "Failed to fetch user data");
       } finally {
         setLoading(false);
       }
@@ -138,34 +159,76 @@ const ViewUser = () => {
   }, [userId]);
 
   if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!user) {
-    return <div>User not found</div>;
-  }
-
-  return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-6">User Details</h1>
-      <div className="space-y-6">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-gray-600">Name</p>
-              <p className="font-medium">{user.name}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">Email</p>
-              <p className="font-medium">{user.email}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">Status</p>
-              <p className="font-medium capitalize">{user.status}</p>
+    return (
+      <div className="container mx-auto py-6 space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <div className="space-y-6">
+          <div className="bg-white p-6 rounded-lg shadow space-y-4">
+            <Skeleton className="h-6 w-36" />
+            <div className="grid grid-cols-2 gap-4">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
             </div>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <p className="font-medium">Error</p>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded">
+          <p className="font-medium">User Not Found</p>
+          <p>The requested user could not be found.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case "personal":
+        return <UserPersonalInfo user={user} />;
+      case "onboarding":
+        return <ProgressStatus user={user} />;
+      case "files":
+        return <UserFiles userId={user.id} />;
+      case "reports":
+        return (
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">Reports</h2>
+            <p>Reports functionality coming soon...</p>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">User Details</h1>
+        <div className="text-sm text-gray-500">ID: #{user.id}</div>
+      </div>
+
+      <StatusTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      
+      <div className="mt-6">
+        {renderActiveTab()}
       </div>
     </div>
   );
