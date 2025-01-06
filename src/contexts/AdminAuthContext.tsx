@@ -31,15 +31,15 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   const login = async (username: string, password: string) => {
     if (username === DEMO_USERNAME && password === DEMO_PASSWORD) {
       try {
-        // First try to sign in with Supabase
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        // First check if the user exists in Supabase auth
+        const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
           email: ADMIN_EMAIL,
           password: password,
         });
 
         if (signInError) {
           // If sign in fails, try to sign up
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          const { data: { user: newUser }, error: signUpError } = await supabase.auth.signUp({
             email: ADMIN_EMAIL,
             password: password,
           });
@@ -49,18 +49,14 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
             throw new Error('Authentication failed');
           }
 
-          if (!signUpData.user) {
-            throw new Error('Failed to create user');
-          }
-
           // Check if admin exists in candidates table
           const { data: existingUser, error: queryError } = await supabase
             .from('candidates')
             .select('*')
             .eq('email', ADMIN_EMAIL)
-            .maybeSingle();
+            .single();
 
-          if (queryError) {
+          if (queryError && queryError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
             console.error('Error querying user:', queryError);
             throw new Error('Failed to query user');
           }
@@ -78,41 +74,21 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
               ]);
 
             if (insertError) {
-              // If it's a duplicate key error, we can proceed since the user exists
-              if (insertError.code === '23505') {
-                console.log('Admin user already exists in candidates table');
-              } else {
-                console.error('Error creating admin user:', insertError);
-                throw new Error('Failed to create admin user');
-              }
+              console.error('Error creating admin user:', insertError);
+              throw new Error('Failed to create admin user');
             }
           }
-
-          setIsAuthenticated(true);
-          localStorage.setItem('adminAuth', 'true');
-          localStorage.setItem('userRole', 'admin');
-          navigate('/admin/dashboard');
-          
-          toast({
-            title: "Success",
-            description: "Account created and logged in successfully",
-          });
-        } else {
-          // Sign in successful
-          if (!signInData.user) {
-            throw new Error('No user data returned');
-          }
-
-          setIsAuthenticated(true);
-          localStorage.setItem('adminAuth', 'true');
-          localStorage.setItem('userRole', 'admin');
-          navigate('/admin/dashboard');
-          
-          toast({
-            title: "Success",
-            description: "Logged in successfully",
-          });
         }
+
+        setIsAuthenticated(true);
+        localStorage.setItem('adminAuth', 'true');
+        localStorage.setItem('userRole', 'admin');
+        navigate('/admin/dashboard');
+        
+        toast({
+          title: "Success",
+          description: "Logged in successfully",
+        });
       } catch (error) {
         console.error('Login error:', error);
         toast({
@@ -133,16 +109,25 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    setIsAuthenticated(false);
-    localStorage.removeItem('adminAuth');
-    localStorage.removeItem('userRole');
-    navigate('/admin/login');
-    
-    toast({
-      title: "Success",
-      description: "Logged out successfully",
-    });
+    try {
+      await supabase.auth.signOut();
+      setIsAuthenticated(false);
+      localStorage.removeItem('adminAuth');
+      localStorage.removeItem('userRole');
+      navigate('/admin/login');
+      
+      toast({
+        title: "Success",
+        description: "Logged out successfully",
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to logout",
+        variant: "destructive",
+      });
+    }
   };
 
   useEffect(() => {
