@@ -32,8 +32,12 @@ const DashboardLayout = () => {
   const currentUser = users.find((u: any) => u.id.toString() === userId);
   const hasFilledPersonalInfo = currentUser?.hasFilledPersonalInfo;
 
-  // If user hasn't filled personal info and isn't on the personal-info page, redirect them
-  if (!hasFilledPersonalInfo && location.pathname !== '/user/personal-info') {
+  // Only redirect to personal-info if the user hasn't filled it and is trying to access profile
+  const shouldRedirectToPersonalInfo = !hasFilledPersonalInfo && 
+    location.pathname === '/user/profile' && 
+    location.pathname !== '/user/personal-info';
+
+  if (shouldRedirectToPersonalInfo) {
     return <Navigate to="/user/personal-info" />;
   }
 
@@ -107,18 +111,20 @@ const DashboardLayout = () => {
             <MessageSquare className="mr-2 h-4 w-4" />
             Reports
           </Button>
-          <Button
-            variant={isActive('profile') ? 'default' : 'ghost'}
-            className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
-              isActive('profile')
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
-            }`}
-            onClick={() => navigate('/user/profile')}
-          >
-            <UserRound className="mr-2 h-4 w-4" />
-            My Profile
-          </Button>
+          {hasFilledPersonalInfo && (
+            <Button
+              variant={isActive('profile') ? 'default' : 'ghost'}
+              className={`w-full justify-start px-4 py-2 text-left transition-all duration-200 ${
+                isActive('profile')
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary'
+              }`}
+              onClick={() => navigate('/user/profile')}
+            >
+              <UserRound className="mr-2 h-4 w-4" />
+              My Profile
+            </Button>
+          )}
           <div className="absolute bottom-8 left-0 w-full px-3">
             <Button
               variant="ghost"
