@@ -12,12 +12,12 @@ const MainContent = () => {
   return (
     <main className={cn(
       "flex-1 transition-[margin] duration-300",
-      !isMobile && isOpen ? "ml-64" : "ml-0"
+      !isMobile && isOpen ? "ml-16" : "ml-0" // Reduced from ml-64 to ml-16
     )}>
-      <div className="flex h-14 items-center border-b px-4 lg:px-8">
+      <div className="flex h-14 items-center border-b px-4 lg:px-6">
         <SidebarTrigger />
       </div>
-      <div className="p-4 lg:p-8">
+      <div className="container mx-auto p-4 lg:p-6">
         <Outlet />
       </div>
     </main>
