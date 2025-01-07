@@ -43,7 +43,7 @@ const ViewUser = () => {
           .from('candidates')
           .select('*')
           .or(`id.eq.${userId},email.eq.${userId}`)
-          .maybeSingle();
+          .single();
 
         if (fetchError) {
           console.error('Error fetching user:', fetchError);
