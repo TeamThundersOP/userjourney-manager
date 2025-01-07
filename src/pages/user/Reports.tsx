@@ -21,11 +21,8 @@ const Reports = () => {
   const queryClient = useQueryClient();
 
   const { data: userReports = [], isLoading } = useQuery({
-    queryKey: ['userReports', userId],
+    queryKey: ['userReports'],
     queryFn: async () => {
-      if (!userId) return [];
-      
-      // Modified query to rely on RLS instead of explicit user_id filtering
       const { data, error } = await supabase
         .from('reports')
         .select('*')
@@ -37,15 +34,12 @@ const Reports = () => {
         throw error;
       }
 
-      return (data || []) as Report[];
-    },
-    enabled: !!userId
+      return data as Report[];
+    }
   });
 
   const submitReport = useMutation({
     mutationFn: async (reportData: { type: string; description: string }) => {
-      if (!userId) throw new Error("User not authenticated");
-
       const newReport = {
         user_id: userId,
         type: reportData.type,
@@ -69,7 +63,7 @@ const Reports = () => {
       toast.success("Report submitted successfully");
       setDescription("");
       setType("");
-      queryClient.invalidateQueries({ queryKey: ['userReports', userId] });
+      queryClient.invalidateQueries({ queryKey: ['userReports'] });
     },
     onError: (error) => {
       console.error('Mutation error:', error);
