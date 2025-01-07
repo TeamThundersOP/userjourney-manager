@@ -98,6 +98,54 @@ export type Database = {
           },
         ]
       }
+      user_files: {
+        Row: {
+          category: string
+          file_path: string
+          id: string
+          name: string
+          size: string
+          type: string
+          uploaded_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category: string
+          file_path: string
+          id?: string
+          name: string
+          size: string
+          type: string
+          uploaded_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          file_path?: string
+          id?: string
+          name?: string
+          size?: string
+          type?: string
+          uploaded_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_user"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_files_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

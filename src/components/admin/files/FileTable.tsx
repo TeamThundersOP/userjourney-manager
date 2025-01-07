@@ -3,6 +3,7 @@ import { Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserFile } from "@/types/userFile";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FileTableProps {
   files: UserFile[];
@@ -39,6 +40,31 @@ const FileTable = ({ files, onDownload, onDelete }: FileTableProps) => {
     ).join(' ');
   };
 
+  const handleDownload = async (file: UserFile) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('user_files')
+        .download(file.file_path);
+
+      if (error) {
+        throw error;
+      }
+
+      // Create a download link
+      const url = URL.createObjectURL(data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error("Failed to download file");
+    }
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -63,14 +89,14 @@ const FileTable = ({ files, onDownload, onDelete }: FileTableProps) => {
                 {formatCategoryName(file.category)}
               </Badge>
             </TableCell>
-            <TableCell>{new Date(file.uploadedAt).toLocaleDateString()}</TableCell>
+            <TableCell>{new Date(file.uploaded_at).toLocaleDateString()}</TableCell>
             <TableCell>{file.size}</TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onDownload(file)}
+                  onClick={() => handleDownload(file)}
                   className="flex items-center gap-2"
                 >
                   <Download className="h-4 w-4" />
