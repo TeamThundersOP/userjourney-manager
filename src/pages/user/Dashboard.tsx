@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { calculateProgress } from "@/utils/onboarding";
 import { User } from "@/types/user";
 import OnboardingPhases from "@/components/user/dashboard/OnboardingPhases";
+import { transformUserData } from "@/utils/userTransform";
 
 const Dashboard = () => {
   const { userId } = useUserAuth();
@@ -31,73 +32,10 @@ const Dashboard = () => {
 
       if (!data) return null;
 
-      // Transform the data to match the User type
-      const personalInfo = data.personal_info;
-
-      // Safely type the onboarding data with proper type assertions
-      const rawOnboarding = data.onboarding;
-      const onboardingData = {
-        currentPhase: (rawOnboarding?.currentPhase) ?? 0,
-        phase0: (rawOnboarding?.phase0) ?? {
-          personalDetailsCompleted: false,
-          cvSubmitted: false,
-          interviewCompleted: false,
-          jobStatus: 'pending',
-          passportUploaded: false,
-          pccUploaded: false,
-          otherDocumentsUploaded: false,
-          offerLetterSent: false,
-          cosSent: false,
-          documentsUploaded: false,
-          visaStatus: 'pending',
-          travelDetailsUpdated: false,
-          travelDocumentsUploaded: false,
-          visaCopyUploaded: false,
-          ukContactUpdated: false,
-        },
-        phase1: (rawOnboarding?.phase1) ?? {
-          hmrcChecklist: false,
-          companyAgreements: false,
-          pensionScheme: false,
-          bankStatements: false,
-          vaccinationProof: false,
-        },
-        phase2: (rawOnboarding?.phase2) ?? {
-          rightToWork: false,
-          shareCode: false,
-          dbs: false,
-          onboardingComplete: false,
-        },
-        approvals: {
-          phase0: (rawOnboarding?.approvals)?.phase0 ?? false,
-          phase1: (rawOnboarding?.approvals)?.phase1 ?? false,
-          phase2: (rawOnboarding?.approvals)?.phase2 ?? false,
-        },
-      };
-
-      const userData = {
-        id: data.id,
-        name: data.name,
-        username: data.username,
-        email: data.email || '',
-        status: data.status || 'pending',
-        created_at: data.created_at,
-        cv_submitted: data.cv_submitted,
-        interview_status: data.interview_status,
-        offer_letter_sent: data.offer_letter_sent,
-        cos_sent: data.cos_sent,
-        right_to_work: data.right_to_work,
-        onboarding_complete: data.onboarding_complete,
-        has_reset_password: data.has_reset_password,
-        personal_info: personalInfo,
-        personalInfo: personalInfo,
-        onboarding: onboardingData,
-      };
-
-      return userData;
+      // Transform the data using our utility function
+      return transformUserData(data);
     },
-    enabled: !!userId,
-    retry: 1
+    enabled: !!userId
   });
 
   if (isLoading || !user) {
