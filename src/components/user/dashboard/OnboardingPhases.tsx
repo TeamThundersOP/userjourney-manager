@@ -1,8 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Circle, XCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
 import { User } from "@/types/user";
 
