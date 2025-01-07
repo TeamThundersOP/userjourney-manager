@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User } from "@/types/user";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, ArrowRight } from "lucide-react";
 
 interface OnboardingPhasesProps {
   user: User;
@@ -39,46 +39,61 @@ const OnboardingPhases = ({ user }: OnboardingPhasesProps) => {
     const canAccess = isPhaseAccessible(phaseNumber);
 
     return (
-      <Card className="p-6 space-y-4">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="text-lg font-semibold">{title}</h3>
-            <p className="text-sm text-gray-500">{description}</p>
+      <div className="relative">
+        <Card className={`p-6 space-y-4 transition-all duration-300 ${canAccess ? 'hover:shadow-lg' : 'opacity-70'}`}>
+          <div className="flex justify-between items-start">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold">
+                  {phaseNumber}
+                </span>
+                <h3 className="text-lg font-semibold">{title}</h3>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">{description}</p>
+            </div>
+            {isApproved ? (
+              <CheckCircle2 className="h-6 w-6 text-green-500" />
+            ) : (
+              <XCircle className="h-6 w-6 text-gray-300" />
+            )}
           </div>
-          {isApproved ? (
-            <CheckCircle2 className="h-6 w-6 text-green-500" />
-          ) : (
-            <XCircle className="h-6 w-6 text-gray-300" />
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>Progress</span>
-            <span>{Math.round(progress)}%</span>
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Progress</span>
+              <span>{Math.round(progress)}%</span>
+            </div>
+            <Progress value={progress} className="h-2" />
           </div>
-          <Progress value={progress} className="h-2" />
-        </div>
 
-        <div className="flex justify-between items-center">
-          <Badge variant={isApproved ? "default" : "secondary"} className={isApproved ? "bg-green-500" : ""}>
-            {isApproved ? "Approved" : "Pending Approval"}
-          </Badge>
-          <Button
-            onClick={() => navigate(`/user/phase${phaseNumber}`)}
-            disabled={!canAccess}
-          >
-            {progress === 100 ? "Review" : "Continue"}
-          </Button>
-        </div>
-      </Card>
+          <div className="flex justify-between items-center">
+            <Badge 
+              variant={isApproved ? "default" : "secondary"} 
+              className={`${isApproved ? "bg-green-500" : ""} transition-colors duration-300`}
+            >
+              {isApproved ? "Approved" : "Pending Approval"}
+            </Badge>
+            <Button
+              onClick={() => navigate(`/user/phase${phaseNumber}`)}
+              disabled={!canAccess}
+              className="gap-2"
+            >
+              {progress === 100 ? "Review" : "Continue"}
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </Card>
+        {phaseNumber < 2 && (
+          <div className="absolute left-1/2 -translate-x-1/2 h-8 w-px bg-border" />
+        )}
+      </div>
     );
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <h2 className="text-2xl font-bold">Onboarding Progress</h2>
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="space-y-8">
         {renderPhaseCard(0, "Phase 0: Initial Setup", "Complete your personal details and submit required documents")}
         {renderPhaseCard(1, "Phase 1: Documentation", "Submit additional documentation and complete HMRC checklist")}
         {renderPhaseCard(2, "Phase 2: Final Steps", "Complete final verifications and checks")}
