@@ -9,6 +9,7 @@ import {
   FileText, 
   User, 
   LogOut,
+  ChevronRight,
   Menu
 } from "lucide-react";
 import { toast } from "sonner";
@@ -38,7 +39,7 @@ export function DashboardSidebar() {
       )}
     >
       {/* Header */}
-      <div className={cn("flex h-14 items-center justify-between border-b px-3")}>
+      <div className="flex h-14 items-center justify-between border-b px-3">
         <div className={cn("flex items-center gap-2", !isOpen && "justify-center w-full")}>
           <img
             src="/lovable-uploads/17a49967-e711-4d5a-b8fe-fb02e4469a2a.png"
@@ -47,6 +48,14 @@ export function DashboardSidebar() {
           />
           {isOpen && <span className="font-semibold">Dashboard</span>}
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn("h-8 w-8", !isOpen && "hidden")}
+          onClick={toggleSidebar}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
         {!isOpen && (
           <Button
             variant="ghost"
