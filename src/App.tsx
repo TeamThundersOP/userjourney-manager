@@ -17,6 +17,8 @@ import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import Phase0Page from "@/pages/user/Phase0";
 import Phase1Page from "@/pages/user/Phase1";
 import Phase2Page from "@/pages/user/Phase2";
+import UserDashboardLayout from "@/components/user/DashboardLayout";
+import AdminDashboardLayout from "@/components/admin/DashboardLayout";
 
 function App() {
   return (
@@ -25,40 +27,65 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         
-        {/* User Routes */}
+        {/* User Routes with DashboardLayout */}
         <Route
-          path="/user/*"
+          path="/user"
           element={
             <UserAuthProvider>
-              <Routes>
-                <Route path="dashboard" element={<UserDashboard />} />
-                <Route path="login" element={<UserLogin />} />
-                <Route path="profile" element={<UserProfile />} />
-                <Route path="reports" element={<UserReports />} />
-                <Route path="personal-info" element={<UserPersonalInfo />} />
-                <Route path="reset-password" element={<UserResetPassword />} />
-                <Route path="phase0" element={<Phase0Page />} />
-                <Route path="phase1" element={<Phase1Page />} />
-                <Route path="phase2" element={<Phase2Page />} />
-                <Route path="*" element={<Navigate to="/user/dashboard" replace />} />
-              </Routes>
+              <UserDashboardLayout />
+            </UserAuthProvider>
+          }
+        >
+          <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="profile" element={<UserProfile />} />
+          <Route path="reports" element={<UserReports />} />
+          <Route path="personal-info" element={<UserPersonalInfo />} />
+          <Route path="phase0" element={<Phase0Page />} />
+          <Route path="phase1" element={<Phase1Page />} />
+          <Route path="phase2" element={<Phase2Page />} />
+          <Route path="*" element={<Navigate to="/user/dashboard" replace />} />
+        </Route>
+
+        {/* Standalone User Routes without navbar */}
+        <Route
+          path="/user/login"
+          element={
+            <UserAuthProvider>
+              <UserLogin />
+            </UserAuthProvider>
+          }
+        />
+        <Route
+          path="/user/reset-password"
+          element={
+            <UserAuthProvider>
+              <UserResetPassword />
             </UserAuthProvider>
           }
         />
 
-        {/* Admin Routes */}
+        {/* Admin Routes with DashboardLayout */}
         <Route
-          path="/admin/*"
+          path="/admin"
           element={
             <AdminAuthProvider>
-              <Routes>
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="login" element={<AdminLogin />} />
-                <Route path="users" element={<AdminUsers />} />
-                <Route path="users/:id" element={<AdminViewUser />} />
-                <Route path="reports" element={<AdminReports />} />
-                <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-              </Routes>
+              <AdminDashboardLayout />
+            </AdminAuthProvider>
+          }
+        >
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="users/:id" element={<AdminViewUser />} />
+          <Route path="reports" element={<AdminReports />} />
+          <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+        </Route>
+
+        {/* Standalone Admin Routes without navbar */}
+        <Route
+          path="/admin/login"
+          element={
+            <AdminAuthProvider>
+              <AdminLogin />
             </AdminAuthProvider>
           }
         />
