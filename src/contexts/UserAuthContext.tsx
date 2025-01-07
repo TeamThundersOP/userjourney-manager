@@ -6,18 +6,25 @@ import { useNavigate } from "react-router-dom";
 interface UserAuthContextType {
   session: Session | null;
   user: User | null;
+  userId: string | null;
   signOut: () => Promise<void>;
+  logout: () => Promise<void>;
+  setHasFilledPersonalInfo: (value: boolean) => void;
 }
 
 const UserAuthContext = createContext<UserAuthContextType>({
   session: null,
   user: null,
+  userId: null,
   signOut: async () => {},
+  logout: async () => {},
+  setHasFilledPersonalInfo: () => {},
 });
 
 export const UserAuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [hasFilledPersonalInfo, setHasFilledPersonalInfo] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,8 +55,20 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
     }
   };
 
+  // Alias for signOut to maintain compatibility
+  const logout = signOut;
+
   return (
-    <UserAuthContext.Provider value={{ session, user, signOut }}>
+    <UserAuthContext.Provider 
+      value={{ 
+        session, 
+        user, 
+        userId: user?.id ?? null,
+        signOut, 
+        logout,
+        setHasFilledPersonalInfo 
+      }}
+    >
       {children}
     </UserAuthContext.Provider>
   );
