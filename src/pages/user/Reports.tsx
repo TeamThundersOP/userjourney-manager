@@ -20,9 +20,13 @@ const Reports = () => {
   const [type, setType] = useState("");
   const queryClient = useQueryClient();
 
-  const { data: userReports = [], isLoading } = useQuery({
-    queryKey: ['userReports'],
+  const { data: userReports = [], isLoading, error } = useQuery({
+    queryKey: ['userReports', userId],
     queryFn: async () => {
+      if (!userId) {
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('reports')
         .select('*')
@@ -30,16 +34,20 @@ const Reports = () => {
 
       if (error) {
         console.error('Error fetching reports:', error);
-        toast.error("Error fetching reports");
         throw error;
       }
 
       return data as Report[];
-    }
+    },
+    enabled: !!userId // Only run the query if we have a userId
   });
 
   const submitReport = useMutation({
     mutationFn: async (reportData: { type: string; description: string }) => {
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
       const newReport = {
         user_id: userId,
         type: reportData.type,
@@ -63,7 +71,7 @@ const Reports = () => {
       toast.success("Report submitted successfully");
       setDescription("");
       setType("");
-      queryClient.invalidateQueries({ queryKey: ['userReports'] });
+      queryClient.invalidateQueries({ queryKey: ['userReports', userId] });
     },
     onError: (error) => {
       console.error('Mutation error:', error);
@@ -89,6 +97,14 @@ const Reports = () => {
 
   if (!userId) {
     return null;
+  }
+
+  if (error) {
+    return (
+      <div className="p-4">
+        <p className="text-red-500">Error loading reports: {error.message}</p>
+      </div>
+    );
   }
 
   return (
@@ -138,7 +154,9 @@ const Reports = () => {
         </CardContent>
       </Card>
 
-      {userReports && userReports.length > 0 && (
+      {isLoading ? (
+        <div className="p-4 text-center">Loading reports...</div>
+      ) : userReports && userReports.length > 0 ? (
         <Card>
           <CardHeader>
             <CardTitle>Recent Reports</CardTitle>
@@ -170,6 +188,12 @@ const Reports = () => {
                 </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="p-4 text-center text-gray-500">
+            No reports found
           </CardContent>
         </Card>
       )}
