@@ -6,9 +6,13 @@ import { CheckCircle2, Circle, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/hooks/use-user";
 import { useState } from "react";
+import { User } from "@/types/user";
 
-const OnboardingPhases = () => {
-  const { user } = useUser();
+interface OnboardingPhasesProps {
+  user?: User;
+}
+
+const OnboardingPhases = ({ user }: OnboardingPhasesProps) => {
   const [isPhaseDialogOpen, setIsPhaseDialogOpen] = useState(false);
   const [selectedPhase, setSelectedPhase] = useState<number | null>(null);
 
