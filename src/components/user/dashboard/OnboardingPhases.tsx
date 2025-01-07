@@ -43,7 +43,7 @@ const OnboardingPhases = ({ user }: OnboardingPhasesProps) => {
         <Card key={index} onClick={() => handlePhaseClick(index)} className="cursor-pointer">
           <CardHeader>
             <CardTitle>{phase.title}</CardTitle>
-            <Badge variant={phase.completed ? "success" : "destructive"}>
+            <Badge variant={phase.completed ? "default" : "destructive"}>
               {phase.completed ? <CheckCircle2 /> : <XCircle />}
             </Badge>
           </CardHeader>

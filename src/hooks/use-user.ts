@@ -30,7 +30,40 @@ export const useUser = () => {
         }
 
         if (candidate) {
-          setUser(candidate as User);
+          const onboardingData = candidate.onboarding as {
+            currentPhase: number;
+            phase0: Record<string, boolean | string>;
+            phase1: Record<string, boolean | string>;
+            phase2: Record<string, boolean | string>;
+            approvals: Record<string, boolean>;
+          };
+
+          const userData: User = {
+            id: candidate.id,
+            name: candidate.name,
+            username: candidate.username,
+            email: candidate.email || '',
+            status: candidate.status || 'pending',
+            created_at: candidate.created_at,
+            cv_submitted: candidate.cv_submitted,
+            interview_status: candidate.interview_status,
+            offer_letter_sent: candidate.offer_letter_sent,
+            cos_sent: candidate.cos_sent,
+            right_to_work: candidate.right_to_work,
+            onboarding_complete: candidate.onboarding_complete,
+            has_reset_password: candidate.has_reset_password,
+            personal_info: candidate.personal_info as any,
+            personalInfo: candidate.personal_info as any,
+            onboarding: {
+              currentPhase: onboardingData?.currentPhase || 0,
+              phase0: onboardingData?.phase0 as any,
+              phase1: onboardingData?.phase1 as any,
+              phase2: onboardingData?.phase2 as any,
+              approvals: onboardingData?.approvals || { phase0: false, phase1: false, phase2: false }
+            }
+          };
+
+          setUser(userData);
         }
       } catch (error) {
         console.error('Error in fetchUser:', error);
@@ -53,7 +86,39 @@ export const useUser = () => {
           .single();
           
         if (candidate) {
-          setUser(candidate as User);
+          const onboardingData = candidate.onboarding as {
+            currentPhase: number;
+            phase0: Record<string, boolean | string>;
+            phase1: Record<string, boolean | string>;
+            phase2: Record<string, boolean | string>;
+            approvals: Record<string, boolean>;
+          };
+
+          const userData: User = {
+            id: candidate.id,
+            name: candidate.name,
+            username: candidate.username,
+            email: candidate.email || '',
+            status: candidate.status || 'pending',
+            created_at: candidate.created_at,
+            cv_submitted: candidate.cv_submitted,
+            interview_status: candidate.interview_status,
+            offer_letter_sent: candidate.offer_letter_sent,
+            cos_sent: candidate.cos_sent,
+            right_to_work: candidate.right_to_work,
+            onboarding_complete: candidate.onboarding_complete,
+            has_reset_password: candidate.has_reset_password,
+            personal_info: candidate.personal_info as any,
+            personalInfo: candidate.personal_info as any,
+            onboarding: {
+              currentPhase: onboardingData?.currentPhase || 0,
+              phase0: onboardingData?.phase0 as any,
+              phase1: onboardingData?.phase1 as any,
+              phase2: onboardingData?.phase2 as any,
+              approvals: onboardingData?.approvals || { phase0: false, phase1: false, phase2: false }
+            }
+          };
+          setUser(userData);
         }
       }
     });
