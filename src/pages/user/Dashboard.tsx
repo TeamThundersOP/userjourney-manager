@@ -1,35 +1,39 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useUser } from "@/hooks/use-user";
-import OnboardingPhases from "@/components/user/dashboard/OnboardingPhases";
-import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DocumentsTab } from "@/components/user/dashboard/DocumentsTab";
+import { OnboardingPhases } from "@/components/user/dashboard/OnboardingPhases";
+import { LoadingState } from "@/components/user/dashboard/LoadingState";
+import { ProgressCard } from "@/components/user/dashboard/ProgressCard";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
   const { user, isLoading } = useUser();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate('/user/login');
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
-
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingState />;
   }
 
   if (!user) {
-    return null;
+    return <div>No user data found.</div>;
   }
 
   return (
     <div className="space-y-6">
-      <OnboardingPhases user={user} />
+      <ProgressCard user={user} />
+      
+      <Tabs defaultValue="onboarding" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="onboarding">Onboarding Progress</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="onboarding" className="space-y-6">
+          <OnboardingPhases user={user} />
+        </TabsContent>
+
+        <TabsContent value="documents">
+          <DocumentsTab userId={user.id} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

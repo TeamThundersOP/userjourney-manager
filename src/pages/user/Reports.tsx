@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useUserAuth } from "@/contexts/UserAuthContext";
+import { useUser } from "@/hooks/use-user";
 import {
   Select,
   SelectContent,
@@ -13,23 +13,25 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Report } from "@/types/reports";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Reports = () => {
-  const { userId } = useUserAuth();
+  const { user } = useUser();
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
   const queryClient = useQueryClient();
 
   const { data: userReports = [], isLoading, error } = useQuery({
-    queryKey: ['userReports', userId],
+    queryKey: ['userReports', user?.id],
     queryFn: async () => {
-      if (!userId) {
+      if (!user?.id) {
         return [];
       }
 
       const { data, error } = await supabase
         .from('reports')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -39,17 +41,17 @@ const Reports = () => {
 
       return data as Report[];
     },
-    enabled: !!userId // Only run the query if we have a userId
+    enabled: !!user?.id
   });
 
   const submitReport = useMutation({
     mutationFn: async (reportData: { type: string; description: string }) => {
-      if (!userId) {
+      if (!user?.id) {
         throw new Error('User not authenticated');
       }
 
       const newReport = {
-        user_id: userId,
+        user_id: user.id,
         type: reportData.type,
         description: reportData.description,
         status: 'Pending'
@@ -71,7 +73,7 @@ const Reports = () => {
       toast.success("Report submitted successfully");
       setDescription("");
       setType("");
-      queryClient.invalidateQueries({ queryKey: ['userReports', userId] });
+      queryClient.invalidateQueries({ queryKey: ['userReports', user?.id] });
     },
     onError: (error) => {
       console.error('Mutation error:', error);
@@ -95,8 +97,26 @@ const Reports = () => {
     submitReport.mutate({ type, description });
   };
 
-  if (!userId) {
+  if (!user?.id) {
     return null;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-8 w-48" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   if (error) {
@@ -154,9 +174,7 @@ const Reports = () => {
         </CardContent>
       </Card>
 
-      {isLoading ? (
-        <div className="p-4 text-center">Loading reports...</div>
-      ) : userReports && userReports.length > 0 ? (
+      {userReports && userReports.length > 0 ? (
         <Card>
           <CardHeader>
             <CardTitle>Recent Reports</CardTitle>
