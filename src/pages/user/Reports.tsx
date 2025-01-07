@@ -25,10 +25,10 @@ const Reports = () => {
     queryFn: async () => {
       if (!userId) return [];
       
+      // Modified query to rely on RLS instead of explicit user_id filtering
       const { data, error } = await supabase
         .from('reports')
         .select('*')
-        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) {
