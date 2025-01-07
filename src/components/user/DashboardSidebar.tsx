@@ -34,7 +34,7 @@ export function DashboardSidebar() {
   return (
     <div
       className={cn(
-        "relative h-screen border-r bg-background/80 backdrop-blur-sm transition-all duration-300",
+        "h-screen border-r bg-background/80 backdrop-blur-sm transition-all duration-300",
         isOpen ? "w-64" : "w-[70px]"
       )}
     >
@@ -117,9 +117,9 @@ export function DashboardSidebar() {
         {/* Footer with Logout */}
         <div className="absolute bottom-4 left-0 right-0 px-2">
           <Button
-            variant="destructive"
+            variant="ghost"
             className={cn(
-              "w-full justify-start gap-3 text-sm",
+              "w-full justify-start gap-3 text-sm hover:bg-destructive hover:text-destructive-foreground",
               !isOpen && "justify-center"
             )}
             onClick={handleSignOut}
