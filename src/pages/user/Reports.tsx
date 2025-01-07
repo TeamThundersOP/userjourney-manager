@@ -24,6 +24,7 @@ const Reports = () => {
     queryKey: ['userReports', userId],
     queryFn: async () => {
       if (!userId) return [];
+      
       const { data, error } = await supabase
         .from('reports')
         .select('*')
@@ -31,6 +32,7 @@ const Reports = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
+        console.error('Error fetching reports:', error);
         toast.error("Error fetching reports");
         throw error;
       }
@@ -57,7 +59,10 @@ const Reports = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error submitting report:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
@@ -66,7 +71,8 @@ const Reports = () => {
       setType("");
       queryClient.invalidateQueries({ queryKey: ['userReports', userId] });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Mutation error:', error);
       toast.error("Failed to submit report");
     }
   });
