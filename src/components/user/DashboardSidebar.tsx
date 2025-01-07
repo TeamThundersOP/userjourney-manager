@@ -117,9 +117,9 @@ export function DashboardSidebar() {
         {/* Footer with Logout */}
         <div className="absolute bottom-4 left-0 right-0 px-2">
           <Button
-            variant="ghost"
+            variant="destructive"
             className={cn(
-              "w-full justify-start gap-3 text-sm text-muted-foreground hover:text-foreground",
+              "w-full justify-start gap-3 text-sm",
               !isOpen && "justify-center"
             )}
             onClick={handleSignOut}
