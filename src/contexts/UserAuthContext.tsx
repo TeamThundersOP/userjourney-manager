@@ -28,7 +28,7 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Get initial session
+    // Get initial session and set up session persistence
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -41,10 +41,15 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
       console.log("Auth state changed:", _event);
       setSession(session);
       setUser(session?.user ?? null);
+
+      // Handle session expiration
+      if (!session) {
+        navigate("/user/login");
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const signOut = async () => {
     try {
