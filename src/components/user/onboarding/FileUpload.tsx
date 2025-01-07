@@ -11,10 +11,8 @@ interface FileUploadProps {
   accept?: string;
   label?: string;
   isUploaded?: boolean;
-  userId?: number;
+  userId?: string;
 }
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
 
 const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = false, userId }: FileUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -35,20 +33,11 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("File is too large. Maximum size is 5MB.");
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      return;
-    }
+    if (!file || !userId) return;
 
     setIsUploading(true);
 
     try {
-      const normalizedCategory = normalizeCategory(category);
       const fileExt = file.name.split('.').pop();
       const filePath = `${crypto.randomUUID()}.${fileExt}`;
 
@@ -68,8 +57,9 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
           name: file.name,
           type: file.type,
           size: (file.size / 1024).toFixed(2) + ' KB',
-          category: normalizedCategory,
+          category: normalizeCategory(category),
           file_path: filePath,
+          user_id: userId
         })
         .select()
         .single();
@@ -84,7 +74,7 @@ const FileUpload = ({ onFileUpload, category = '', accept, label, isUploaded = f
       }
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error("Failed to upload file. Please try again.");
+      toast.error("Failed to upload file");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {

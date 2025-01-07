@@ -1,9 +1,10 @@
 export interface UserFile {
-  id: number;
-  userId: string | number | null;
+  id: string;
+  user_id: string;
   name: string;
   type: string;
-  uploadedAt: string;
+  uploaded_at: string;
   size: string;
   category: string;
+  file_path: string;
 }

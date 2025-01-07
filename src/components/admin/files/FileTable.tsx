@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { UserFile } from "@/types/userFile";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface FileTableProps {
   files: UserFile[];
@@ -59,6 +60,8 @@ const FileTable = ({ files, onDownload, onDelete }: FileTableProps) => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      
+      toast.success("File downloaded successfully");
     } catch (error) {
       console.error('Download error:', error);
       toast.error("Failed to download file");
