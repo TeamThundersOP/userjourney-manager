@@ -25,16 +25,15 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     if (error instanceof AuthApiError) {
       switch (error.status) {
         case 400:
-          if (error.message.includes('Invalid login credentials')) {
-            return 'Invalid email or password. Please check your credentials and try again.';
-          }
-          return 'Invalid request. Please check your input and try again.';
+          return 'Invalid email or password. Please check your credentials and try again.';
+        case 401:
+          return 'Invalid login credentials or unauthorized access.';
         case 422:
           return 'Invalid email format. Please enter a valid email address.';
         case 429:
           return 'Too many login attempts. Please try again later.';
         default:
-          return error.message;
+          return error.message || 'An error occurred during authentication.';
       }
     }
     return 'An unexpected error occurred. Please try again.';
@@ -51,12 +50,16 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
-        password: password,
+        password,
       });
 
       if (signInError) {
         console.error('Sign in error:', signInError);
         throw signInError;
+      }
+
+      if (!signInData.user) {
+        throw new Error('No user data received');
       }
 
       console.log('Sign in successful:', signInData);
