@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { LoadingState } from "@/components/user/dashboard/LoadingState";
 import { toast } from "sonner";
 import { calculateProgress } from "@/utils/onboarding";
-import { User, PersonalInfo, OnboardingPhase0, OnboardingPhase1, OnboardingPhase2 } from "@/types/user";
+import { User } from "@/types/user";
 import OnboardingPhases from "@/components/user/dashboard/OnboardingPhases";
 
 const Dashboard = () => {
@@ -32,13 +32,13 @@ const Dashboard = () => {
       if (!data) return null;
 
       // Transform the data to match the User type
-      const personalInfo = data.personal_info as PersonalInfo;
-      
+      const personalInfo = data.personal_info;
+
       // Safely type the onboarding data with proper type assertions
-      const rawOnboarding = data.onboarding as Record<string, unknown>;
+      const rawOnboarding = data.onboarding;
       const onboardingData = {
-        currentPhase: (rawOnboarding?.currentPhase as number) ?? 0,
-        phase0: (rawOnboarding?.phase0 as OnboardingPhase0) ?? {
+        currentPhase: (rawOnboarding?.currentPhase) ?? 0,
+        phase0: (rawOnboarding?.phase0) ?? {
           personalDetailsCompleted: false,
           cvSubmitted: false,
           interviewCompleted: false,
@@ -55,27 +55,27 @@ const Dashboard = () => {
           visaCopyUploaded: false,
           ukContactUpdated: false,
         },
-        phase1: (rawOnboarding?.phase1 as OnboardingPhase1) ?? {
+        phase1: (rawOnboarding?.phase1) ?? {
           hmrcChecklist: false,
           companyAgreements: false,
           pensionScheme: false,
           bankStatements: false,
           vaccinationProof: false,
         },
-        phase2: (rawOnboarding?.phase2 as OnboardingPhase2) ?? {
+        phase2: (rawOnboarding?.phase2) ?? {
           rightToWork: false,
           shareCode: false,
           dbs: false,
           onboardingComplete: false,
         },
         approvals: {
-          phase0: (rawOnboarding?.approvals as any)?.phase0 ?? false,
-          phase1: (rawOnboarding?.approvals as any)?.phase1 ?? false,
-          phase2: (rawOnboarding?.approvals as any)?.phase2 ?? false,
+          phase0: (rawOnboarding?.approvals)?.phase0 ?? false,
+          phase1: (rawOnboarding?.approvals)?.phase1 ?? false,
+          phase2: (rawOnboarding?.approvals)?.phase2 ?? false,
         },
       };
 
-      const userData: User = {
+      const userData = {
         id: data.id,
         name: data.name,
         username: data.username,
@@ -107,10 +107,12 @@ const Dashboard = () => {
   const progress = calculateProgress(user, user.onboarding?.currentPhase || 0);
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-6 animate-fade-in">
+      <Card className="border-none shadow-lg bg-white/50 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>Welcome back, {user.name}!</CardTitle>
+          <CardTitle className="text-2xl font-bold tracking-tight">
+            Welcome back, {user.name}!
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -124,6 +126,41 @@ const Dashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <Card className="border-none shadow-lg bg-white/50 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>Current Phase</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-primary">
+              Phase {user.onboarding?.currentPhase || 0}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-lg bg-white/50 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold capitalize text-primary">
+              {user.status || 'Pending'}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-lg bg-white/50 backdrop-blur-sm md:col-span-2 lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Documents</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-primary">
+              {user.onboarding?.phase0?.documentsUploaded ? 'Complete' : 'Pending'}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <OnboardingPhases user={user} />
     </div>
