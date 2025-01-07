@@ -14,7 +14,7 @@ interface Phase0ActionsProps {
   onPersonalDetailsChange: (checked: boolean) => void;
   onUKContactChange: (field: 'ukContactNumber' | 'ukAddress', value: string) => void;
   onVisaStatusChange?: (status: 'pending' | 'approved' | 'rejected') => void;
-  userId?: number;
+  userId?: string;
 }
 
 const Phase0Actions = ({
