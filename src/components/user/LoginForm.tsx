@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AuthError, AuthApiError } from '@supabase/supabase-js';
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from 'react-router-dom';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface LoginFormProps {
   onSuccess: () => void;
@@ -14,6 +15,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -29,6 +31,8 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
           return 'Invalid request. Please check your input and try again.';
         case 422:
           return 'Invalid email format. Please enter a valid email address.';
+        case 429:
+          return 'Too many login attempts. Please try again later.';
         default:
           return error.message;
       }
@@ -38,13 +42,13 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
 
     try {
       const normalizedEmail = email.toLowerCase().trim();
       console.log('Starting login process for:', normalizedEmail);
       
-      // First try to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
         password: password,
@@ -89,12 +93,18 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       } else {
         // Regular login - proceed to dashboard
         onSuccess();
+        toast({
+          title: "Success",
+          description: "You have successfully logged in.",
+        });
       }
     } catch (error: any) {
       console.error('Login error:', error);
+      const errorMessage = getErrorMessage(error);
+      setError(errorMessage);
       toast({
         title: "Login Failed",
-        description: getErrorMessage(error),
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -104,6 +114,11 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium text-foreground">
           Email
