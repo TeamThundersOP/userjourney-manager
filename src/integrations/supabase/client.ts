@@ -1,6 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Ensure environment variables are defined
 const supabaseUrl = "https://rlovtflyxnclfrwmgovi.supabase.co";
 const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsb3Z0Zmx5eG5jbGZyd21nb3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDc4MjU2MDAsImV4cCI6MjAyMzQwMTYwMH0.H6FmwYTJULxltkZHgZE_2hF_KYUJGqkDGXmgNEhHfKE";
 
@@ -13,7 +12,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    storageKey: 'admin-auth-token',
     storage: localStorage,
   },
 });
