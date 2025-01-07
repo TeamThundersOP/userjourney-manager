@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User } from "@/types/user";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, XCircle, ArrowRight } from "lucide-react";
+import { CheckCircle2, XCircle, ArrowRight, Lightbulb, Rocket, CheckCircle } from "lucide-react";
 
 interface OnboardingPhasesProps {
   user: User;
@@ -33,6 +33,19 @@ const OnboardingPhases = ({ user }: OnboardingPhasesProps) => {
     return isPhaseApproved(phaseNumber - 1);
   };
 
+  const getPhaseIcon = (phaseNumber: number) => {
+    switch(phaseNumber) {
+      case 0:
+        return <Lightbulb className="h-5 w-5" />;
+      case 1:
+        return <Rocket className="h-5 w-5" />;
+      case 2:
+        return <CheckCircle className="h-5 w-5" />;
+      default:
+        return null;
+    }
+  };
+
   const renderPhaseCard = (phaseNumber: number, title: string, description: string) => {
     const progress = getPhaseProgress(`phase${phaseNumber}`);
     const isApproved = isPhaseApproved(phaseNumber);
@@ -40,23 +53,18 @@ const OnboardingPhases = ({ user }: OnboardingPhasesProps) => {
 
     return (
       <div className="relative">
-        <Card className={`p-6 space-y-4 transition-all duration-300 ${canAccess ? 'hover:shadow-lg' : 'opacity-70'}`}>
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold">
-                  {phaseNumber}
-                </span>
-                <h3 className="text-lg font-semibold">{title}</h3>
-              </div>
-              <p className="text-sm text-gray-500 mt-2">{description}</p>
-            </div>
-            {isApproved ? (
-              <CheckCircle2 className="h-6 w-6 text-green-500" />
-            ) : (
-              <XCircle className="h-6 w-6 text-gray-300" />
-            )}
+        <div className="flex items-center mb-4">
+          <div className={`flex items-center justify-center w-10 h-10 rounded-full ${isApproved ? 'bg-green-500' : 'bg-primary/10'} text-white`}>
+            {getPhaseIcon(phaseNumber)}
           </div>
+          <div className="ml-4">
+            <span className="text-sm text-muted-foreground">Phase {phaseNumber}</span>
+            <h3 className="text-lg font-semibold">{title}</h3>
+          </div>
+        </div>
+
+        <Card className={`relative p-6 space-y-4 transition-all duration-300 ${canAccess ? 'hover:shadow-lg hover:translate-y-[-2px]' : 'opacity-70'}`}>
+          <p className="text-sm text-gray-500">{description}</p>
 
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
@@ -83,20 +91,24 @@ const OnboardingPhases = ({ user }: OnboardingPhasesProps) => {
             </Button>
           </div>
         </Card>
+
         {phaseNumber < 2 && (
-          <div className="absolute left-1/2 -translate-x-1/2 h-8 w-px bg-border" />
+          <>
+            <div className="hidden md:block absolute top-5 left-[5rem] w-[calc(100%-5rem)] h-0.5 bg-gradient-to-r from-primary/20 to-primary/20" />
+            <div className="md:hidden absolute left-5 top-[5rem] h-[calc(100%+2rem)] w-0.5 bg-gradient-to-b from-primary/20 to-primary/20" />
+          </>
         )}
       </div>
     );
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <h2 className="text-2xl font-bold">Onboarding Progress</h2>
-      <div className="space-y-8">
-        {renderPhaseCard(0, "Phase 0: Initial Setup", "Complete your personal details and submit required documents")}
-        {renderPhaseCard(1, "Phase 1: Documentation", "Submit additional documentation and complete HMRC checklist")}
-        {renderPhaseCard(2, "Phase 2: Final Steps", "Complete final verifications and checks")}
+    <div className="space-y-8 animate-fade-in p-4 md:p-6">
+      <h2 className="text-2xl font-bold text-primary">Your Onboarding Journey</h2>
+      <div className="space-y-12 md:space-y-16">
+        {renderPhaseCard(0, "Initial Setup", "Complete your personal details and submit required documents")}
+        {renderPhaseCard(1, "Documentation", "Submit additional documentation and complete HMRC checklist")}
+        {renderPhaseCard(2, "Final Steps", "Complete final verifications and checks")}
       </div>
     </div>
   );
