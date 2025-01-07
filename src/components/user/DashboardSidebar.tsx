@@ -15,13 +15,14 @@ import {
 import { toast } from "sonner";
 
 export function DashboardSidebar() {
-  const { signOut } = useUserAuth();
+  const { logout } = useUserAuth();
   const navigate = useNavigate();
-  const { isOpen, setIsOpen } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
+  const isOpen = state === "expanded";
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      await logout();
       toast.success("Signed out successfully");
       navigate("/user/login");
     } catch (error) {
@@ -51,7 +52,7 @@ export function DashboardSidebar() {
           variant="ghost"
           size="icon"
           className={cn("h-8 w-8", !isOpen && "hidden")}
-          onClick={() => setIsOpen(false)}
+          onClick={toggleSidebar}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -60,7 +61,7 @@ export function DashboardSidebar() {
             variant="ghost"
             size="icon"
             className="absolute -right-4 top-[13px] h-8 w-8 rounded-full bg-primary text-white shadow-md"
-            onClick={() => setIsOpen(true)}
+            onClick={toggleSidebar}
           >
             <Menu className="h-4 w-4" />
           </Button>
