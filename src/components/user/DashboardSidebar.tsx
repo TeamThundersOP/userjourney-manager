@@ -8,15 +8,14 @@ import {
   LayoutDashboard, 
   FileText, 
   User, 
-  LogOut,
-  Menu
+  LogOut
 } from "lucide-react";
 import { toast } from "sonner";
 
 export function DashboardSidebar() {
   const { logout } = useUserAuth();
   const navigate = useNavigate();
-  const { state, toggleSidebar } = useSidebar();
+  const { state } = useSidebar();
   const isOpen = state === "expanded";
 
   const handleSignOut = async () => {
@@ -47,16 +46,6 @@ export function DashboardSidebar() {
           />
           {isOpen && <span className="font-semibold">Dashboard</span>}
         </div>
-        {!isOpen && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute -right-4 top-[13px] h-8 w-8 rounded-full bg-primary text-white shadow-md"
-            onClick={toggleSidebar}
-          >
-            <Menu className="h-4 w-4" />
-          </Button>
-        )}
       </div>
 
       {/* Navigation */}
