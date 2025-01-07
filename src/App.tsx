@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import Index from "@/pages/Index";
 import UserDashboard from "@/pages/user/Dashboard";
@@ -32,7 +32,9 @@ function App() {
           path="/user"
           element={
             <UserAuthProvider>
-              <UserDashboardLayout />
+              <UserDashboardLayout>
+                <Outlet />
+              </UserDashboardLayout>
             </UserAuthProvider>
           }
         >
