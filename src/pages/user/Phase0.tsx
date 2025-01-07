@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Json } from "@/integrations/supabase/types";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const Phase0Page = () => {
   const { userId } = useUserAuth();
@@ -37,22 +39,32 @@ const Phase0Page = () => {
   };
 
   if (isLoading) {
-    return <div className="p-8">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-pulse text-gray-500">Loading...</div>
+      </div>
+    );
   }
 
   if (!user?.onboarding?.phase0) {
-    return <div className="p-8">No phase data found</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-gray-500">No phase data found</div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto p-8">
-      <div className="mb-8">
-        <button
+    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="mb-6 sm:mb-8">
+        <Button
+          variant="ghost"
           onClick={() => navigate('/user/dashboard')}
-          className="text-primary hover:underline flex items-center gap-2"
+          className="text-primary hover:text-primary/90 hover:bg-primary/10 flex items-center gap-2"
         >
-          ← Back to Dashboard
-        </button>
+          <ArrowLeft className="h-4 w-4" />
+          Back to Dashboard
+        </Button>
       </div>
       <Phase0Onboarding
         userData={user}

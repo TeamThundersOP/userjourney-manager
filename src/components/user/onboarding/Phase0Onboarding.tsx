@@ -124,10 +124,12 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-6 animate-fade-in max-w-[95vw] mx-auto md:max-w-none">
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-primary">Phase 0: Initial Setup</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h2 className="text-xl sm:text-2xl font-semibold text-primary">
+            Phase 0: Initial Setup
+          </h2>
           <div className="text-sm text-gray-500">
             Progress: {Math.round(progress)}%
           </div>
@@ -139,28 +141,30 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
         />
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Job Status:</span>
+          <div className="flex items-center gap-2 p-3 bg-white/50 backdrop-blur-sm rounded-lg shadow-sm">
+            <span className="text-sm font-medium whitespace-nowrap">Job Status:</span>
             <Badge 
-              className={`${getStatusColor(userData?.onboarding?.phase0?.jobStatus || 'pending')}`}
+              className={`${getStatusColor(userData?.onboarding?.phase0?.jobStatus || 'pending')} whitespace-nowrap`}
             >
               {getStatusText(userData?.onboarding?.phase0?.jobStatus || 'pending')}
             </Badge>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Visa Status:</span>
+          <div className="flex items-center gap-2 p-3 bg-white/50 backdrop-blur-sm rounded-lg shadow-sm">
+            <span className="text-sm font-medium whitespace-nowrap">Visa Status:</span>
             <Badge 
-              className={`${getStatusColor(userData?.onboarding?.phase0?.visaStatus || 'pending')}`}
+              className={`${getStatusColor(userData?.onboarding?.phase0?.visaStatus || 'pending')} whitespace-nowrap`}
             >
               {getStatusText(userData?.onboarding?.phase0?.visaStatus || 'pending')}
             </Badge>
           </div>
         </div>
         
-        <PhaseFeedback 
-          feedback={userData?.onboarding?.phase0?.feedback} 
-          phase={0}
-        />
+        <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 shadow-sm">
+          <PhaseFeedback 
+            feedback={userData?.onboarding?.phase0?.feedback} 
+            phase={0}
+          />
+        </div>
       </div>
 
       <Phase0Actions
@@ -171,19 +175,19 @@ const Phase0Onboarding = ({ userData, onSave, isLoading }: Phase0OnboardingProps
         onVisaStatusChange={handleVisaStatusChange}
       />
 
-      <div className="flex justify-end space-x-4 sticky bottom-6 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-lg">
+      <div className="flex flex-col sm:flex-row justify-end gap-4 sticky bottom-6 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-lg">
         <Button
           variant="outline"
           onClick={() => onSave(formData)}
           disabled={isLoading}
-          className="hover:bg-gray-50"
+          className="w-full sm:w-auto hover:bg-gray-50"
         >
           Save Progress
         </Button>
         <Button
           onClick={handleNext}
           disabled={!userData?.onboarding?.approvals?.phase0}
-          className="bg-primary hover:bg-primary/90"
+          className="w-full sm:w-auto bg-primary hover:bg-primary/90"
         >
           Next Phase
         </Button>
