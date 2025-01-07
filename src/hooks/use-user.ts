@@ -35,7 +35,11 @@ export const useUser = () => {
             phase0: Record<string, boolean | string>;
             phase1: Record<string, boolean | string>;
             phase2: Record<string, boolean | string>;
-            approvals: Record<string, boolean>;
+            approvals: {
+              phase0: boolean;
+              phase1: boolean;
+              phase2: boolean;
+            };
           };
 
           const userData: User = {
@@ -59,7 +63,11 @@ export const useUser = () => {
               phase0: onboardingData?.phase0 as any,
               phase1: onboardingData?.phase1 as any,
               phase2: onboardingData?.phase2 as any,
-              approvals: onboardingData?.approvals || { phase0: false, phase1: false, phase2: false }
+              approvals: onboardingData?.approvals || {
+                phase0: false,
+                phase1: false,
+                phase2: false
+              }
             }
           };
 
@@ -91,7 +99,11 @@ export const useUser = () => {
             phase0: Record<string, boolean | string>;
             phase1: Record<string, boolean | string>;
             phase2: Record<string, boolean | string>;
-            approvals: Record<string, boolean>;
+            approvals: {
+              phase0: boolean;
+              phase1: boolean;
+              phase2: boolean;
+            };
           };
 
           const userData: User = {
@@ -115,7 +127,11 @@ export const useUser = () => {
               phase0: onboardingData?.phase0 as any,
               phase1: onboardingData?.phase1 as any,
               phase2: onboardingData?.phase2 as any,
-              approvals: onboardingData?.approvals || { phase0: false, phase1: false, phase2: false }
+              approvals: onboardingData?.approvals || {
+                phase0: false,
+                phase1: false,
+                phase2: false
+              }
             }
           };
           setUser(userData);
