@@ -1,4 +1,4 @@
-import { Sidebar } from "@/components/ui/sidebar";
+import { Sidebar, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { useUserAuth } from "@/contexts/UserAuthContext";
 import { Navigate } from "react-router-dom";
@@ -15,15 +15,17 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <div className="flex-1 overflow-hidden">
-        <main className="relative h-[calc(100vh-2rem)] overflow-auto rounded-[0.5rem] bg-background p-4 md:p-6 lg:p-8">
-          {children}
-          <Toaster />
-        </main>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-background">
+        <Sidebar />
+        <div className="flex-1 overflow-hidden">
+          <main className="relative h-[calc(100vh-2rem)] overflow-auto rounded-[0.5rem] bg-background p-4 md:p-6 lg:p-8">
+            {children}
+            <Toaster />
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
