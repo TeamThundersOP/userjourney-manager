@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface UserAuthContextType {
   isAuthenticated: boolean;
@@ -32,18 +34,44 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedAuth = localStorage.getItem('userAuth');
-    const storedUserId = localStorage.getItem('userId');
-    const storedHasResetPassword = localStorage.getItem('hasResetPassword') === 'true';
-    const storedHasFilledPersonalInfo = localStorage.getItem('hasFilledPersonalInfo') === 'true';
+    // Check initial session
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        handleSessionExpired();
+      }
+    };
 
-    if (storedAuth === 'true' && storedUserId) {
-      setIsAuthenticated(true);
-      setUserId(storedUserId);
-      setHasResetPassword(storedHasResetPassword);
-      setHasFilledPersonalInfo(storedHasFilledPersonalInfo);
+    checkSession();
+
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
+      
+      if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' && !session) {
+        handleSessionExpired();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  const handleSessionExpired = () => {
+    setIsAuthenticated(false);
+    setUserId(null);
+    setHasResetPassword(false);
+    setHasFilledPersonalInfo(false);
+    localStorage.removeItem('userAuth');
+    localStorage.removeItem('userId');
+    
+    // Only show toast and redirect if we were previously authenticated
+    if (isAuthenticated) {
+      toast.error("Your session has expired. Please login again.");
+      navigate('/user/login');
     }
-  }, []);
+  };
 
   const login = async (email: string, password: string) => {
     // For demo purposes, we'll use the users from localStorage
@@ -77,7 +105,14 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error signing out:', error);
+      toast.error("Error signing out");
+      return;
+    }
+    
     setIsAuthenticated(false);
     setUserId(null);
     setHasResetPassword(false);
