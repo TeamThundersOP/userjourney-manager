@@ -14,6 +14,7 @@ export const useUser = () => {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
+          setIsLoading(false);
           navigate('/user/login');
           return;
         }
@@ -26,6 +27,7 @@ export const useUser = () => {
 
         if (error) {
           console.error('Error fetching user:', error);
+          setIsLoading(false);
           return;
         }
 

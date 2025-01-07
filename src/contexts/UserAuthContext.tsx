@@ -37,7 +37,22 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
     // Check initial session
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      if (session) {
+        setIsAuthenticated(true);
+        setUserId(session.user.id);
+        
+        // Fetch user data to check reset password and personal info status
+        const { data: userData } = await supabase
+          .from('candidates')
+          .select('has_reset_password, personal_info')
+          .eq('id', session.user.id)
+          .single();
+
+        if (userData) {
+          setHasResetPassword(userData.has_reset_password || false);
+          setHasFilledPersonalInfo(!!userData.personal_info);
+        }
+      } else {
         handleSessionExpired();
       }
     };
@@ -45,10 +60,25 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
     checkSession();
 
     // Subscribe to auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event);
       
-      if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' && !session) {
+      if (event === 'SIGNED_IN' && session) {
+        setIsAuthenticated(true);
+        setUserId(session.user.id);
+        
+        // Fetch user data when signed in
+        const { data: userData } = await supabase
+          .from('candidates')
+          .select('has_reset_password, personal_info')
+          .eq('id', session.user.id)
+          .single();
+
+        if (userData) {
+          setHasResetPassword(userData.has_reset_password || false);
+          setHasFilledPersonalInfo(!!userData.personal_info);
+        }
+      } else if (event === 'SIGNED_OUT') {
         handleSessionExpired();
       }
     });
@@ -63,8 +93,6 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
     setUserId(null);
     setHasResetPassword(false);
     setHasFilledPersonalInfo(false);
-    localStorage.removeItem('userAuth');
-    localStorage.removeItem('userId');
     
     // Only show toast and redirect if we were previously authenticated
     if (isAuthenticated) {
@@ -74,34 +102,38 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   const login = async (email: string, password: string) => {
-    // For demo purposes, we'll use the users from localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find((u: any) => u.email === email);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-    if (!user || user.password !== password) {
-      throw new Error('Invalid credentials');
+    if (error) {
+      throw error;
     }
 
-    setIsAuthenticated(true);
-    setUserId(user.id.toString());
-    setIsFirstLogin(!user.hasLoggedInBefore);
+    if (data.user) {
+      setIsAuthenticated(true);
+      setUserId(data.user.id);
 
-    localStorage.setItem('userAuth', 'true');
-    localStorage.setItem('userId', user.id.toString());
+      // Fetch user data after login
+      const { data: userData } = await supabase
+        .from('candidates')
+        .select('has_reset_password, personal_info')
+        .eq('id', data.user.id)
+        .single();
 
-    // Update user's first login status
-    if (!user.hasLoggedInBefore) {
-      const updatedUsers = users.map((u: any) => 
-        u.id === user.id ? { ...u, hasLoggedInBefore: true } : u
-      );
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-      navigate('/user/reset-password');
-    } else if (!user.hasResetPassword) {
-      navigate('/user/reset-password');
-    } else if (!user.hasFilledPersonalInfo) {
-      navigate('/user/personal-info');
-    } else {
-      navigate('/user/dashboard');
+      if (userData) {
+        setHasResetPassword(userData.has_reset_password || false);
+        setHasFilledPersonalInfo(!!userData.personal_info);
+
+        if (!userData.has_reset_password) {
+          navigate('/user/reset-password');
+        } else if (!userData.personal_info) {
+          navigate('/user/personal-info');
+        } else {
+          navigate('/user/dashboard');
+        }
+      }
     }
   };
 
@@ -113,12 +145,7 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
       return;
     }
     
-    setIsAuthenticated(false);
-    setUserId(null);
-    setHasResetPassword(false);
-    setHasFilledPersonalInfo(false);
-    localStorage.removeItem('userAuth');
-    localStorage.removeItem('userId');
+    handleSessionExpired();
     navigate('/user/login');
   };
 
