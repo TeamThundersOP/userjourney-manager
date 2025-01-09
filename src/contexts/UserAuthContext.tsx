@@ -1,88 +1,107 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface UserAuthContextType {
-  session: Session | null;
-  user: User | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
   userId: string | null;
-  signOut: () => Promise<void>;
-  logout: () => Promise<void>;
+  isFirstLogin: boolean;
+  hasResetPassword: boolean;
+  hasFilledPersonalInfo: boolean;
+  setHasResetPassword: (value: boolean) => void;
   setHasFilledPersonalInfo: (value: boolean) => void;
 }
 
-const UserAuthContext = createContext<UserAuthContextType>({
-  session: null,
-  user: null,
-  userId: null,
-  signOut: async () => {},
-  logout: async () => {},
-  setHasFilledPersonalInfo: () => {},
-});
+const UserAuthContext = createContext<UserAuthContextType | null>(null);
+
+export const useUserAuth = () => {
+  const context = useContext(UserAuthContext);
+  if (!context) {
+    throw new Error('useUserAuth must be used within a UserAuthProvider');
+  }
+  return context;
+};
 
 export const UserAuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
+  const [hasResetPassword, setHasResetPassword] = useState(false);
   const [hasFilledPersonalInfo, setHasFilledPersonalInfo] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Get initial session and set up session persistence
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-    });
+    const storedAuth = localStorage.getItem('userAuth');
+    const storedUserId = localStorage.getItem('userId');
+    const storedHasResetPassword = localStorage.getItem('hasResetPassword') === 'true';
+    const storedHasFilledPersonalInfo = localStorage.getItem('hasFilledPersonalInfo') === 'true';
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Auth state changed:", _event);
-      setSession(session);
-      setUser(session?.user ?? null);
+    if (storedAuth === 'true' && storedUserId) {
+      setIsAuthenticated(true);
+      setUserId(storedUserId);
+      setHasResetPassword(storedHasResetPassword);
+      setHasFilledPersonalInfo(storedHasFilledPersonalInfo);
+    }
+  }, []);
 
-      // Handle session expiration
-      if (!session) {
-        navigate("/user/login");
-      }
-    });
+  const login = async (email: string, password: string) => {
+    // For demo purposes, we'll use the users from localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find((u: any) => u.email === email);
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    if (!user || user.password !== password) {
+      throw new Error('Invalid credentials');
+    }
 
-  const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      navigate("/user/login");
-    } catch (error) {
-      console.error("Error signing out:", error);
+    setIsAuthenticated(true);
+    setUserId(user.id.toString());
+    setIsFirstLogin(!user.hasLoggedInBefore);
+
+    localStorage.setItem('userAuth', 'true');
+    localStorage.setItem('userId', user.id.toString());
+
+    // Update user's first login status
+    if (!user.hasLoggedInBefore) {
+      const updatedUsers = users.map((u: any) => 
+        u.id === user.id ? { ...u, hasLoggedInBefore: true } : u
+      );
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+      navigate('/user/reset-password');
+    } else if (!user.hasResetPassword) {
+      navigate('/user/reset-password');
+    } else if (!user.hasFilledPersonalInfo) {
+      navigate('/user/personal-info');
+    } else {
+      navigate('/user/dashboard');
     }
   };
 
-  // Alias for signOut to maintain compatibility
-  const logout = signOut;
+  const logout = () => {
+    setIsAuthenticated(false);
+    setUserId(null);
+    setHasResetPassword(false);
+    setHasFilledPersonalInfo(false);
+    localStorage.removeItem('userAuth');
+    localStorage.removeItem('userId');
+    navigate('/user/login');
+  };
 
   return (
     <UserAuthContext.Provider 
       value={{ 
-        session, 
-        user, 
-        userId: user?.id ?? null,
-        signOut, 
-        logout,
-        setHasFilledPersonalInfo 
+        isAuthenticated, 
+        login, 
+        logout, 
+        userId,
+        isFirstLogin,
+        hasResetPassword,
+        hasFilledPersonalInfo,
+        setHasResetPassword,
+        setHasFilledPersonalInfo
       }}
     >
       {children}
     </UserAuthContext.Provider>
   );
-};
-
-export const useUserAuth = () => {
-  const context = useContext(UserAuthContext);
-  if (!context) {
-    throw new Error("useUserAuth must be used within a UserAuthProvider");
-  }
-  return context;
 };

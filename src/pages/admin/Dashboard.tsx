@@ -3,45 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Users, FileText, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email === 'vanapallisaisriram7@gmail.com') {
-        setIsAdmin(true);
-      } else {
-        toast.error("Unauthorized access");
-        navigate('/admin/login');
-      }
-    };
-
-    checkAdminStatus();
-  }, [navigate]);
 
   const { data: usersCount = 0 } = useQuery({
     queryKey: ['usersCount'],
     queryFn: async () => {
-      if (!isAdmin) return 0;
-      
       const { count, error } = await supabase
         .from('candidates')
         .select('*', { count: 'exact', head: true })
-        .neq('username', 'vanapallisaisriram7@gmail.com')
-        .neq('username', 'admin');
+        .neq('username', 'vanapallisaisriram7@gmail.com') // Filter out admin account
+        .neq('username', 'admin'); // Also filter out any user with username 'admin'
 
-      if (error) {
-        console.error('Error fetching users count:', error);
-        throw error;
-      }
+      if (error) throw error;
       return count || 0;
     },
-    enabled: isAdmin,
+    refetchInterval: 5000,
   });
 
   const { data: reportsCount } = useQuery({
@@ -50,12 +28,8 @@ const Dashboard = () => {
       const reports = JSON.parse(localStorage.getItem('userReports') || '[]');
       return reports.length;
     },
-    enabled: isAdmin,
+    refetchInterval: 5000,
   });
-
-  if (!isAdmin) {
-    return null;
-  }
 
   return (
     <div className="space-y-8">

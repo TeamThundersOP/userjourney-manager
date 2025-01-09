@@ -33,7 +33,7 @@ const ViewUser = () => {
     const fetchUser = async () => {
       try {
         if (!userId) {
-          setError("No user ID provided");
+          setError("No user ID or email provided");
           setLoading(false);
           return;
         }
@@ -42,8 +42,8 @@ const ViewUser = () => {
         const { data: candidate, error: fetchError } = await supabase
           .from('candidates')
           .select('*')
-          .eq('id', userId)
-          .maybeSingle();
+          .or(`id.eq.${userId},email.eq.${userId}`)
+          .single();
 
         if (fetchError) {
           console.error('Error fetching user:', fetchError);

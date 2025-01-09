@@ -1,12 +1,36 @@
-import { useUser } from "@/hooks/use-user";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useUserAuth } from "@/contexts/UserAuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { PersonalInfo } from "@/types/user";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Profile = () => {
-  const { user, isLoading } = useUser();
+  const { userId } = useUserAuth();
   const navigate = useNavigate();
+
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: async () => {
+      if (!userId) return null;
+
+      const { data, error } = await supabase
+        .from('candidates')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user data:', error);
+        throw error;
+      }
+
+      return data;
+    },
+    enabled: !!userId
+  });
 
   if (isLoading) {
     return (
@@ -31,7 +55,7 @@ const Profile = () => {
     return <div>No user data found.</div>;
   }
 
-  const personalInfo = user.personalInfo;
+  const personalInfo = user.personal_info as PersonalInfo;
 
   return (
     <div className="space-y-6">
@@ -49,11 +73,7 @@ const Profile = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="text-sm font-medium text-gray-500">Full Name</label>
-              <p className="mt-1">
-                {personalInfo?.givenName && personalInfo?.familyName 
-                  ? `${personalInfo.givenName} ${personalInfo.familyName}`
-                  : 'Not provided'}
-              </p>
+              <p className="mt-1">{personalInfo?.fullName || 'Not provided'}</p>
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">Nationality</label>
@@ -69,14 +89,7 @@ const Profile = () => {
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">Address</label>
-              <p className="mt-1">
-                {[
-                  personalInfo?.address,
-                  personalInfo?.city,
-                  personalInfo?.postalCode,
-                  personalInfo?.country
-                ].filter(Boolean).join(', ') || 'Not provided'}
-              </p>
+              <p className="mt-1">{personalInfo?.address || 'Not provided'}</p>
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">Email</label>
