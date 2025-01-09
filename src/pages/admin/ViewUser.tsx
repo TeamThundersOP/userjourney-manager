@@ -33,9 +33,7 @@ const ViewUser = () => {
     const fetchUser = async () => {
       try {
         if (!userId) {
-          setError("No user ID provided");
-          setLoading(false);
-          return;
+          throw new Error("User ID is required");
         }
 
         console.log('Fetching user data for:', userId);
@@ -43,7 +41,7 @@ const ViewUser = () => {
           .from('candidates')
           .select('*')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
 
         if (fetchError) {
           console.error('Error fetching user:', fetchError);
@@ -51,25 +49,27 @@ const ViewUser = () => {
         }
 
         if (!candidate) {
-          setError("User not found");
-          setLoading(false);
-          return;
+          throw new Error("User not found");
         }
 
         console.log('Fetched candidate data:', candidate);
         const transformedUser = transformUserData(candidate as Tables<'candidates'>);
         console.log('Transformed user data:', transformedUser);
         setUser(transformedUser);
+        setError(null);
       } catch (error: any) {
         console.error('Error in fetchUser:', error);
-        toast.error("Failed to load user data");
+        toast.error(error.message || "Failed to load user data");
         setError(error.message || "Failed to fetch user data");
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUser();
+    if (userId) {
+      fetchUser();
+    }
   }, [userId]);
 
   if (!isAdmin) {
