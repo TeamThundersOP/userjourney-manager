@@ -38,7 +38,8 @@ const ViewUser = () => {
       }
 
       try {
-        console.log('Fetching user data for:', userId);
+        console.log('Attempting to fetch user with ID:', userId);
+        
         const { data: candidate, error: fetchError } = await supabase
           .from('candidates')
           .select('*')
@@ -46,19 +47,23 @@ const ViewUser = () => {
           .maybeSingle();
 
         if (fetchError) {
-          console.error('Error fetching user:', fetchError);
-          throw fetchError;
+          console.error('Database error:', fetchError);
+          throw new Error(`Failed to fetch user: ${fetchError.message}`);
         }
 
         if (!candidate) {
-          throw new Error("User not found");
+          console.log('No candidate found with ID:', userId);
+          setError(`No user found with ID: ${userId}`);
+          setUser(null);
+          return;
         }
 
-        console.log('Fetched candidate data:', candidate);
+        console.log('Successfully fetched candidate:', candidate);
         const transformedUser = transformUserData(candidate as Tables<'candidates'>);
         console.log('Transformed user data:', transformedUser);
         setUser(transformedUser);
         setError(null);
+
       } catch (error: any) {
         console.error('Error in fetchUser:', error);
         toast.error(error.message || "Failed to load user data");
@@ -70,10 +75,10 @@ const ViewUser = () => {
     };
 
     if (userId) {
-      setLoading(true); // Reset loading state before fetching
+      setLoading(true);
       fetchUser();
     } else {
-      setLoading(false); // If no userId, don't show loading state
+      setLoading(false);
     }
   }, [userId]);
 
