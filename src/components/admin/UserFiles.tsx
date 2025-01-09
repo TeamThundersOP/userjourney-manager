@@ -19,7 +19,7 @@ const UserFiles = ({ user }: UserFilesProps) => {
     try {
       const allFiles = JSON.parse(localStorage.getItem('userFiles') || '[]') as UserFile[];
       return allFiles.filter((file) => {
-        const fileUserId = String(file.user_id);
+        const fileUserId = String(file.userId);
         const currentUserId = String(user.id);
         return fileUserId === currentUserId;
       });

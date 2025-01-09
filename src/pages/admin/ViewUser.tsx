@@ -31,77 +31,45 @@ const ViewUser = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (!userId) {
-        setError("User ID is required");
-        setLoading(false);
-        return;
-      }
-
       try {
-        console.log('Starting fetch for user ID:', userId);
-        
-        // First, check if the user exists
-        const { count, error: countError } = await supabase
-          .from('candidates')
-          .select('*', { count: 'exact', head: true })
-          .eq('id', userId);
-          
-        if (countError) {
-          console.error('Error checking user existence:', countError);
-          throw new Error(`Failed to check user existence: ${countError.message}`);
-        }
-        
-        console.log('Count result:', count);
-        
-        if (count === 0) {
-          console.log('No user found with ID:', userId);
-          setError(`No user found with ID: ${userId}`);
-          setUser(null);
+        if (!userId) {
+          setError("No user ID or email provided");
           setLoading(false);
           return;
         }
 
-        // If user exists, fetch their data
+        console.log('Fetching user data for:', userId);
         const { data: candidate, error: fetchError } = await supabase
           .from('candidates')
           .select('*')
-          .eq('id', userId)
-          .maybeSingle();
+          .or(`id.eq.${userId},email.eq.${userId}`)
+          .single();
 
         if (fetchError) {
-          console.error('Database error:', fetchError);
-          throw new Error(`Failed to fetch user: ${fetchError.message}`);
+          console.error('Error fetching user:', fetchError);
+          throw fetchError;
         }
 
         if (!candidate) {
-          console.log('No candidate data returned for ID:', userId);
-          setError(`No user found with ID: ${userId}`);
-          setUser(null);
+          setError("User not found");
+          setLoading(false);
           return;
         }
 
-        console.log('Successfully fetched candidate:', candidate);
+        console.log('Fetched candidate data:', candidate);
         const transformedUser = transformUserData(candidate as Tables<'candidates'>);
         console.log('Transformed user data:', transformedUser);
         setUser(transformedUser);
-        setError(null);
-
       } catch (error: any) {
         console.error('Error in fetchUser:', error);
-        toast.error(error.message || "Failed to load user data");
+        toast.error("Failed to load user data");
         setError(error.message || "Failed to fetch user data");
-        setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
-    if (userId) {
-      setLoading(true);
-      fetchUser();
-    } else {
-      setLoading(false);
-    }
+    fetchUser();
   }, [userId]);
 
   if (!isAdmin) {

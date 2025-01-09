@@ -11,7 +11,7 @@ export const UserFiles = ({ userId }: UserFilesProps) => {
 
   useEffect(() => {
     const storedFiles = JSON.parse(localStorage.getItem('userFiles') || '[]');
-    const userFiles = storedFiles.filter((file: UserFile) => file.user_id === userId);
+    const userFiles = storedFiles.filter((file: UserFile) => file.userId === userId);
     setFiles(userFiles);
   }, [userId]);
 
@@ -40,7 +40,7 @@ export const UserFiles = ({ userId }: UserFilesProps) => {
               <div>
                 <h3 className="font-medium">{file.name}</h3>
                 <p className="text-sm text-gray-500">
-                  {file.category} • {file.size} • Uploaded on {new Date(file.uploaded_at).toLocaleDateString()}
+                  {file.category} • {file.size} • Uploaded on {new Date(file.uploadedAt).toLocaleDateString()}
                 </p>
               </div>
             </div>
