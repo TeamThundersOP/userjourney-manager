@@ -31,11 +31,13 @@ const ViewUser = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        if (!userId) {
-          throw new Error("User ID is required");
-        }
+      if (!userId) {
+        setError("User ID is required");
+        setLoading(false);
+        return;
+      }
 
+      try {
         console.log('Fetching user data for:', userId);
         const { data: candidate, error: fetchError } = await supabase
           .from('candidates')
@@ -68,7 +70,10 @@ const ViewUser = () => {
     };
 
     if (userId) {
+      setLoading(true); // Reset loading state before fetching
       fetchUser();
+    } else {
+      setLoading(false); // If no userId, don't show loading state
     }
   }, [userId]);
 
