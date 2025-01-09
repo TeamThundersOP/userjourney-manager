@@ -38,8 +38,30 @@ const ViewUser = () => {
       }
 
       try {
-        console.log('Attempting to fetch user with ID:', userId);
+        console.log('Starting fetch for user ID:', userId);
         
+        // First, check if the user exists
+        const { count, error: countError } = await supabase
+          .from('candidates')
+          .select('*', { count: 'exact', head: true })
+          .eq('id', userId);
+          
+        if (countError) {
+          console.error('Error checking user existence:', countError);
+          throw new Error(`Failed to check user existence: ${countError.message}`);
+        }
+        
+        console.log('Count result:', count);
+        
+        if (count === 0) {
+          console.log('No user found with ID:', userId);
+          setError(`No user found with ID: ${userId}`);
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
+        // If user exists, fetch their data
         const { data: candidate, error: fetchError } = await supabase
           .from('candidates')
           .select('*')
@@ -52,7 +74,7 @@ const ViewUser = () => {
         }
 
         if (!candidate) {
-          console.log('No candidate found with ID:', userId);
+          console.log('No candidate data returned for ID:', userId);
           setError(`No user found with ID: ${userId}`);
           setUser(null);
           return;
